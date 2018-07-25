@@ -1,3 +1,8 @@
 from django.contrib import admin
 
-# Register your models here.
+from .models import Indicator, Entity, Evidence, Metric
+
+admin.site.register(Indicator)
+admin.site.register(Entity)
+admin.site.register(Evidence)
+admin.site.register(Metric)

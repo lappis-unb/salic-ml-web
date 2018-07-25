@@ -16,6 +16,9 @@ services:
       - "8080:8080"
     depends_on:
       - db
+    environment:
+      - SALIC_DB_USER=
+      - SALIC_DB_PASSWORD=
   salic_db:
     image: edsonma/openconnect-globalprotect
     environment:

@@ -10,4 +10,6 @@ ADD . /salic_ml_web/
 
 WORKDIR /salic_ml_web
 
+RUN apt-get install libmysqlclient-dev
+
 RUN pip install -r requirements.txt
