@@ -1,4 +1,4 @@
-import MySQLdb
+import pyodbc
 import os
 
 SALIC_CREDENTIALS = {
@@ -7,16 +7,12 @@ SALIC_CREDENTIALS = {
     'DATABASE': os.environ.get('SALIC_DB_NAME', ''),
 }
 
+
 def testConnection():
-    db = MySQLdb.connect(
-        host="salic_db",
-        user="minc_lappis_edson",
-        passwd="1qazxsw2",
-        #db="",
-        port=1435
-    )
+    db_parameters = 'DRIVER=FreeTDS;SERVER=salic_db;PORT=1435;DATABASE=;UID={0};PWD={1};TDS_Version=8.0;'.format(SALIC_CREDENTIALS['USER'], SALIC_CREDENTIALS['PASSWORD'])
+    db = pyodbc.connect(db_parameters)
     cursor = db.cursor()
-    cursor.execute("SHOW DATABASES;")
+    cursor.execute("SELECT * FROM BDCORPORATIVO.scSAC.tbItemCusto")
     data = cursor.fetchone()
     db.close()
     return data
