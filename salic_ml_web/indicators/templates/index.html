@@ -1,0 +1,44 @@
+{% extends 'base.html' %} {% block content %}
+<h1 class="ui header" style="margin-bottom: 50px;">Projetos em análise de resultados</h1>
+<table id="example" style="text-align: center" class="ui celled table striped">
+    <thead>
+        <tr>
+            <th>Pronac</th>
+            <th>Complexidade</th>
+            <th>Título</th>
+            <th>Responsável</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for x in a %}
+        <tr>
+            <td>
+                <button class="ui positive button">
+                    1234
+                </button>
+            </td>
+            <td>70%</td>
+            <td>Edinburgh</td>
+            <td>Ferdinando</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+    <tfoot>
+        <tr>
+            <th>Pronac</th>
+            <th>Complexidade</th>
+            <th>Título</th>
+            <th>Responsável</th>
+        </tr>
+    </tfoot>
+</table>
+
+<script>
+    $(document).ready(function () {
+        $('#example').DataTable({
+            columnDefs: [
+                { targets: '_all', visible: true }
+            ]
+        });
+    });
+</script> {% endblock %}
