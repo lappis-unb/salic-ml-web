@@ -3,7 +3,8 @@ from django.http import HttpResponse
 from salic_db.utils import testConnection
 
 def index(request):
-    return HttpResponse("This is index")
+    a = [1,2,3,4]
+    return render(request, 'index.html', {'a': a})
 
 def dbConnectionTest(request):
     connection_result = testConnection()
