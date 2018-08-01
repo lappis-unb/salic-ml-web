@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>ML Salic</title>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.3.1/semantic.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.10.19/css/dataTables.semanticui.min.css">
+    <link rel="stylesheet" href="./static/css/style.css">
+    <link rel="stylesheet" href="./static/css/circle.css">
+    
+    <script src="https://code.jquery.com/jquery-3.3.1.js"></script>
+    <script src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.10.19/js/dataTables.semanticui.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.3.1/semantic.min.js"></script>
+</head>
+
+<body>
+    <div class="container-application">
+        <h1 class="ui header">Projetos em análise de resultados</h1>
+        <table id="example" style="text-align: center" class="ui celled table striped">
+            <thead>
+                <tr>
+                    <th>Pronac</th>
+                    <th>Complexidade</th>
+                    <th>Título</th>
+                    <th>Responsável</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>
+                        <button class="ui positive button">
+                             project.pronac
+                        </button>
+                    </td>
+                    <td> project.complexity </td>
+                    <td> project.title </td>
+                    <td> project.responsible </td>
+                </tr>
+            </tbody>
+            <tfoot>
+                <tr>
+                    <th>Pronac</th>
+                    <th>Complexidade</th>
+                    <th>Título</th>
+                    <th>Responsável</th>
+                </tr>
+            </tfoot>
+        </table>
+
+        <script>
+            $(document).ready(function () {
+                $('#example').DataTable({
+                    "ordering": true,
+                    "searching": true,
+                    "paging": true,
+                    "info": true,
+                    //"dom": '<"top"f>rt<"bottom"><"clear">',
+                });
+            });
+
+        </script>
+    </div>
+</body>
+
+</html>
+<script>
+    $('.ui.accordion')
+        .accordion()
+        ;
+    $('.ui.rating')
+        .rating({
+            initialRating: 3,
+            maxRating: 5
+        })
+        ;
+</script>

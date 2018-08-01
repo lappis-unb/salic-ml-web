@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>ML Salic</title>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.3.1/semantic.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.10.19/css/dataTables.semanticui.min.css">
+    <link rel="stylesheet" href="./static/css/style.css">
+    <link rel="stylesheet" href="./static/css/circle.css">
+
+    <script src="https://code.jquery.com/jquery-3.3.1.js"></script>
+    <script src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.10.19/js/dataTables.semanticui.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.3.1/semantic.min.js"></script>
+</head>
+
+<body>
+    <div class="container-application">
+        <div class="Element-space-between">
+            <h1>1234 - Nome do projeto</h1>
+        </div>
+
+        <div class="ui message Element-space-between">
+            <div class="header Element-space-between">
+                Preencha seus dados para avaliar este projeto:
+            </div>
+            <div>
+                <div class="ui form">
+                    <div class="three fields">
+                        <div class="field">
+                            <label>Nome</label>
+                            <input placeholder="First Name" type="text">
+                        </div>
+                        <div class="field">
+                            <label>Email</label>
+                            <div class="ui right labeled input">
+                                <input type="text" placeholder="Enter weight..">
+                                <div class="ui label">
+                                    @gmail.com
+                                </div>
+                            </div>
+                        </div>
+                        <div class="field">
+                            <div class="ui submit button" style="margin-top: 24px;">Enviar</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="ui divider Element-space-between"></div>
+
+        <div class="ui icon message Element-space-between">
+            <div class="clearfix">
+                <div class="c100 p70 small orange">
+                    <span>70%</span>
+                    <div class="slice">
+                        <div class="bar"></div>
+                        <div class="fill"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="content">
+                <div class="header">
+                    Diagnóstico de complexidade da prestação de contas
+                </div>
+            </div>
+        </div>
+
+        <div class="ui divider Element-space-between"></div>
+        <div class="ui styled fluid accordion">
+            <div class="title active">
+                <i class="dropdown icon"></i>
+                Metrica 1
+                <i class="check icon Metric-green"></i>
+            </div>
+            <div class="content active">
+                <p class="transition visible" style="display: block !important;">
+                    <div class="content">
+                        bla bla bla
+                    </div>
+                    <div class="ui icon message Element-space-between">
+                        <div class="content">
+                            <div class="ui form">
+                                <div class="three fields">
+                                    <div class="field">
+                                        <label>Esta informação foi útil para você?</label>
+                                        <div class="ui massive star rating"></div>
+                                    </div>
+                                    <div class="field">
+                                        <label>Porque? Justifique sua resposta</label>
+                                        <input placeholder="First Name" type="text">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </p>
+
+            </div>
+            <div class="title active">
+                <i class="dropdown icon"></i>
+                Metrica 2
+                <i class="times icon Metric-red"></i>
+            </div>
+            <div class="content active">
+                <div class="content">
+                    bla bla bla
+                </div>
+                <div class="ui icon message Element-space-between">
+                    <div class="content">
+                        <div class="ui form">
+                            <div class="three fields">
+                                <div class="field">
+                                    <label>Esta informação foi útil para você?</label>
+                                    <div class="ui massive star rating"></div>
+                                </div>
+                                <div class="field">
+                                    <label>Porque? Justifique sua resposta</label>
+                                    <input placeholder="First Name" type="text">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="title">
+                <i class="dropdown icon"></i>
+                Metrica 3
+                <i class="check icon Metric-green"></i>
+            </div>
+            <div class="content">
+                <div class="content">
+                    bla bla bla
+                </div>
+                <div class="ui icon message Element-space-between">
+                    <div class="content">
+                        <div class="ui form">
+                            <div class="three fields">
+                                <div class="field">
+                                    <label>Esta informação foi útil para você?</label>
+                                    <div class="ui massive star rating"></div>
+                                </div>
+                                <div class="field">
+                                    <label>Porque? Justifique sua resposta</label>
+                                    <input placeholder="First Name" type="text">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="ui divider Element-space-between"></div>
+
+        <div class="ui message Element-space-between">
+            <div class="header Element-space-between">
+                Na sua opinião, como você avalia este projeto:
+            </div>
+            <div class="ui form">
+                <div class="inline fields">
+                    <div class="field">
+                        <div class="ui radio checkbox">
+                            <input type="radio" name="frequency" checked="checked">
+                            <label>Muito complexo</label>
+                        </div>
+                    </div>
+                    <div class="field">
+                        <div class="ui radio checkbox">
+                            <input type="radio" name="frequency">
+                            <label>Complexo</label>
+                        </div>
+                    </div>
+                    <div class="field">
+                        <div class="ui radio checkbox">
+                            <input type="radio" name="frequency">
+                            <label>Normal</label>
+                        </div>
+                    </div>
+                    <div class="field">
+                        <div class="ui radio checkbox">
+                            <input type="radio" name="frequency">
+                            <label>Simples</label>
+                        </div>
+                    </div>
+                    <div class="field">
+                        <div class="ui radio checkbox">
+                            <input type="radio" name="frequency">
+                            <label>Muito simples</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div style="text-align: center;">
+            <button class="ui primary button">
+                Terminar Diagnóstico
+            </button>
+        </div>
+    </div>
+</body>
+
+</html>
+<script>
+    $('.ui.accordion')
+        .accordion()
+        ;
+    $('.ui.rating')
+        .rating({
+            initialRating: 3,
+            maxRating: 5
+        })
+        ;
+</script>
