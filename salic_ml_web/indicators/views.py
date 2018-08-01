@@ -4,7 +4,17 @@ from django.http import HttpResponse
 from salic_db.utils import test_connection, make_query_from_db
 
 def index(request):
-    return HttpResponse("This is index")
+    projects = [
+        {"pronac": "1234", "complexity": 25, "title": "Show do Tiririca", "responsible": "Florentina"},
+        {"pronac": "4321", "complexity": 75, "title": "Show do ex Calipso", "responsible": "Chimbinha"},
+        {"pronac": "1324", "complexity": 95, "title": "Projeto da Cláudia Leitte", "responsible": "Cláudia Leitte"},
+        {"pronac": "1243", "complexity": 15, "title": "Tourada", "responsible": "Ferdinando"},
+        {"pronac": "2143", "complexity": 5, "title": "Projeto modelo", "responsible": "Modelo"},
+    ]
+    return render(request, 'index.html', {'projects': projects})
+
+def show_metrics(request):
+    return render(request, 'show_metrics.html', {})
 
 def db_connection_test(request):
     connection_result = test_connection()

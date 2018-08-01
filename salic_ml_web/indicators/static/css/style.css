@@ -1,0 +1,12 @@
+.Elements-space-between{
+    margin-bottom: 25px;
+}
+.Metric-green, .Metric-red{
+    float: right;
+}
+.Metric-green {
+    color: green;
+}
+.Metric-red {
+    color: red;
+}
