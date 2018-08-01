@@ -1,4 +1,4 @@
-.Elements-space-between{
+.Element-space-between{
     margin-bottom: 25px;
 }
 .Metric-green, .Metric-red{
@@ -9,4 +9,10 @@
 }
 .Metric-red {
     color: red;
+}
+.container-application{
+    padding: 25px 50px;
+}
+.Complexity-text{
+    margin-left: 15px;
 }
