@@ -1,5 +1,5 @@
 {% extends 'base.html' %} {% block content %}
-<h1 class="ui header" style="margin-bottom: 50px;">Projetos em análise de resultados</h1>
+<h1 class="ui header">Projetos em análise de resultados</h1>
 <table id="example" style="text-align: center" class="ui celled table striped">
     <thead>
         <tr>
@@ -10,16 +10,16 @@
         </tr>
     </thead>
     <tbody>
-        {% for x in a %}
+        {% for project in projects %}
         <tr>
             <td>
                 <button class="ui positive button">
-                    1234
+                    {{ project.pronac }}
                 </button>
             </td>
-            <td>70%</td>
-            <td>Edinburgh</td>
-            <td>Ferdinando</td>
+            <td>{{ project.complexity }}</td>
+            <td>{{ project.title }}</td>
+            <td>{{ project.responsible }}</td>
         </tr>
         {% endfor %}
     </tbody>
@@ -36,9 +36,12 @@
 <script>
     $(document).ready(function () {
         $('#example').DataTable({
-            columnDefs: [
-                { targets: '_all', visible: true }
-            ]
+            "ordering": true,
+            "searching": true,
+            "paging": true,
+            "info": true,
+            //"dom": '<"top"f>rt<"bottom"><"clear">',
         });
     });
+    
 </script> {% endblock %}
