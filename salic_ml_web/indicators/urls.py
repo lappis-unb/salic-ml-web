@@ -3,5 +3,6 @@ from . import views
 
 urlpatterns = [
     path('', views.index, name='index'),
-    path('db_test', views.dbConnectionTest, name='db_test')
+    path('db_test', views.db_connection_test, name='db_test'),
+    path('db_query', views.projects_to_analyse, name='make_query')
 ]
