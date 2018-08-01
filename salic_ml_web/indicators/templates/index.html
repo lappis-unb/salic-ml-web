@@ -1,4 +1,6 @@
-{% extends 'base.html' %} {% block content %}
+{% extends 'base.html' %}
+
+{% block content %}
 <h1 class="ui header">Projetos em análise de resultados</h1>
 <table id="example" style="text-align: center" class="ui celled table striped">
     <thead>
@@ -18,8 +20,8 @@
                 </button>
             </td>
             <td>{{ project.complexity }}</td>
-            <td>{{ project.title }}</td>
-            <td>{{ project.responsible }}</td>
+            <td>{{ project.project_name }}</td>
+            <td>{{ project.analist }}</td>
         </tr>
         {% endfor %}
     </tbody>
@@ -43,5 +45,5 @@
             //"dom": '<"top"f>rt<"bottom"><"clear">',
         });
     });
-    
-</script> {% endblock %}
+</script>
+{% endblock %}

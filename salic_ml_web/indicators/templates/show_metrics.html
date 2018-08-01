@@ -1,4 +1,6 @@
-{% extends 'base.html' %} {% block content %}
+{% extends 'base.html' %}
+
+{% block content %}
 <div class="Element-space-between">
     <h1>1234 - Nome do projeto</h1>
 </div>
@@ -35,19 +37,9 @@
 
 <div class="ui icon message Element-space-between">
     <div class="clearfix">
-        <div class="c100 p70 small orange">
-            <span>70%</span>
-            <div class="slice">
-                <div class="bar"></div>
-                <div class="fill"></div>
-            </div>
-        </div>
+        <div id="indicatorContainer"></div>
     </div>
-    <div class="content">
-        <div class="header">
-            Diagnóstico de complexidade da prestação de contas
-        </div>
-    </div>
+    <h3 class="Complexity-text">Diagnóstico de complexidade da prestação de contas</h3>
 </div>
 
 <div class="ui divider Element-space-between"></div>
@@ -184,4 +176,5 @@
 </div>
 {% endblock %}
 <script>
+    
 </script>
