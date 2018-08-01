@@ -4,7 +4,7 @@ from salic_db.utils import testConnection
 
 def index(request):
     a = [1,2,3,4]
-    return render(request, 'index.html', {'a': a})
+    return render(request, 'show_metrics.html', {'a': a})
 
 def dbConnectionTest(request):
     connection_result = testConnection()
