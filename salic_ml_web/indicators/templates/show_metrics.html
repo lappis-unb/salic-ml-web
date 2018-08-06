@@ -1,42 +1,44 @@
-{% extends 'base.html' %}
-
-{% block content %}
+{% extends 'base.html' %} {% block content %}
 <div class="Element-space-between">
     <h1>{{project.pronac}} - {{project.name}}</h1>
 </div>
 
 <div class="ui message Element-space-between">
+    {% if user %}
+    <div class="header Element-space-between">
+        Bem vindo(a) {{user.name}}!
+    </div>
+    {% else %}
     <div class="header Element-space-between">
         Preencha seus dados para avaliar este projeto:
     </div>
     <form action="/user_info" method="post">
         {% csrf_token %}
-        <label for="team_name">Enter name: </label>
-        <input id="team_name" type="text" name="name_field" value="Default name for team.">
-        <input type="submit" value="OK">
-    </form>
-    <div>
-        <div class="ui form">
-            <div class="three fields">
-                <div class="field">
-                    <label>Nome</label>
-                    <input placeholder="First Name" type="text">
-                </div>
-                <div class="field">
-                    <label>Email</label>
-                    <div class="ui right labeled input">
-                        <input type="text" placeholder="Enter weight..">
-                        <div class="ui label">
-                            @gmail.com
+        <div>
+            <div class="ui form">
+                <div class="three fields">
+                    <div class="field">
+                        <label>Nome</label>
+                        <input required placeholder="First Name" type="text" name="user_first_name">
+                    </div>
+                    <div class="field">
+                        <label>Email</label>
+                        <div class="ui right labeled input">
+                            <input required placeholder="Enter weight.." type="text" name="user_email">
+                            <div class="ui label">
+                                @gmail.com
+                            </div>
                         </div>
                     </div>
-                </div>
-                <div class="field">
-                    <div class="ui submit button" style="margin-top: 24px;">Enviar</div>
+                    <input type="hidden" name="project_pronac" value="{{ project.pronac }}">
+                    <div class="field">
+                        <input class="ui submit button" style="margin-top: 24px;" type="submit" value="Enviar">
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
+    </form>
+    {% endif %}
 </div>
 
 <div class="ui divider Element-space-between"></div>
@@ -182,5 +184,5 @@
 </div>
 {% endblock %}
 <script>
-    
+
 </script>
