@@ -1,9 +1,10 @@
 # Remove this import when has a valid complexity value
 import random
 from django.shortcuts import render, get_object_or_404
-from .models import Entity, User
 from django.http import HttpResponse
+from .models import Entity, User, ProjectFeedback, MetricFeedback, Metric
 from salic_db.utils import test_connection, make_query_from_db
+
 
 def index(request):
     # projects = [
@@ -25,11 +26,8 @@ def index(request):
 
 def show_metrics(request, pronac):
     project = get_object_or_404(Entity, pronac=int(pronac))
-
     current_user = None
-
     metrics = []
-
     return render(request, 'show_metrics.html', {'project': project, 'user': current_user, 'metrics': metrics})
 
 
@@ -68,13 +66,13 @@ def projects_to_analyse(request):
 
     return filtered_data_dict
 
+
 def fetch_user_data(request):
-    
     try:
         user = User.objects.get(email=request.POST['user_email'])
     except:
         user_name = request.POST['user_first_name']
-        
+
         user_email = request.POST['user_email'] + "@gmail.com"
 
         user = User.objects.create(email=user_email, name=user_name)
@@ -82,6 +80,51 @@ def fetch_user_data(request):
     pronac = request.POST['project_pronac']
     project = get_object_or_404(Entity, pronac=int(pronac))
 
-    metrics = []
+    project_indicators = [
+        {
+            'name': 'complexidade da prestação de contas',
+            'value': '50',
+            'metrics': [
+                {
+                    'name': 'Metrica 01',
+                    'value': '12',
+                    'reason': 'any reason',
+                    'outlier_check': True
+                },
+                {
+                    'name': 'Metrica 02',
+                    'value': '13',
+                    'reason': 'any reason',
+                    'outlier_check': True
+                },
+                {
+                    'name': 'Metrica 03',
+                    'value': '60',
+                    'reason': 'any reason',
+                    'outlier_check': False
+                },
+                {
+                    'name': 'Metrica 04',
+                    'value': '70',
+                    'reason': 'any reason',
+                    'outlier_check': False
+                },
+            ]
+        },
+    ]
+    project_feedback_list = ['Muito simples', 'Simples', 'Normal', 'Complexo', 'Muito complexo']
+    
+    return render(request, 'show_metrics.html', {'project': project, 'user': user, 'project_indicators': project_indicators, 'project_feedback_list': project_feedback_list})
 
-    return render(request, 'show_metrics.html', {'project': project, 'user': user, 'metrics': metrics})
+def post_metrics_feedback(request):
+    entity = Entity.objects.get(pronac=request.POST['project_pronac'])
+    user = User.objects.get(email=request.POST['user_email'])
+
+    project_feedback_grade = request.POST['project_feedback_grade']
+    #ProjectFeedback.objects.create(user=user, entity=entity, grade=project_feedback_grade)
+
+    print('8'*100)
+    print(project_feedback_grade)
+    print('8'*100)
+    return HttpResponse(project_feedback_grade)
+

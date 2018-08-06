@@ -43,24 +43,31 @@
 
 <div class="ui divider Element-space-between"></div>
 
+{% for indicator in project_indicators %}
+
 <div class="ui icon message Element-space-between">
     <div class="clearfix">
         <div id="indicatorContainer"></div>
     </div>
-    <h3 class="Complexity-text">Diagnóstico de complexidade da prestação de contas</h3>
+    <h3 class="Complexity-text">Diagnóstico de {{indicator.name}}</h3>
 </div>
 
 <div class="ui divider Element-space-between"></div>
+
 <div class="ui styled fluid accordion">
+    {% for metric in indicator.metrics %}
     <div class="title active">
         <i class="dropdown icon"></i>
-        Metrica 1
+        {{metric.name}} {% if metric.outlier_check %}
         <i class="check icon Metric-green"></i>
+        {% else %}
+        <i class="times icon Metric-green"></i>
+        {% endif %}
     </div>
     <div class="content active">
         <p class="transition visible" style="display: block !important;">
             <div class="content">
-                bla bla bla
+                {{metric.reason}}
             </div>
             <div class="ui icon message Element-space-between">
                 <div class="content">
@@ -68,121 +75,80 @@
                         <div class="three fields">
                             <div class="field">
                                 <label>Esta informação foi útil para você?</label>
-                                <div class="ui massive star rating"></div>
+                                <div class="ui massive star rating" onclick="getRating()"></div>
                             </div>
                             <div class="field">
                                 <label>Porque? Justifique sua resposta</label>
-                                <input placeholder="First Name" type="text">
+                                <input placeholder="First Name" name="" type="text">
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
         </p>
-
     </div>
-    <div class="title active">
-        <i class="dropdown icon"></i>
-        Metrica 2
-        <i class="times icon Metric-red"></i>
-    </div>
-    <div class="content active">
-        <div class="content">
-            bla bla bla
-        </div>
-        <div class="ui icon message Element-space-between">
-            <div class="content">
-                <div class="ui form">
-                    <div class="three fields">
-                        <div class="field">
-                            <label>Esta informação foi útil para você?</label>
-                            <div class="ui massive star rating"></div>
-                        </div>
-                        <div class="field">
-                            <label>Porque? Justifique sua resposta</label>
-                            <input placeholder="First Name" type="text">
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="title">
-        <i class="dropdown icon"></i>
-        Metrica 3
-        <i class="check icon Metric-green"></i>
-    </div>
-    <div class="content">
-        <div class="content">
-            bla bla bla
-        </div>
-        <div class="ui icon message Element-space-between">
-            <div class="content">
-                <div class="ui form">
-                    <div class="three fields">
-                        <div class="field">
-                            <label>Esta informação foi útil para você?</label>
-                            <div class="ui massive star rating"></div>
-                        </div>
-                        <div class="field">
-                            <label>Porque? Justifique sua resposta</label>
-                            <input placeholder="First Name" type="text">
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
+    {% endfor %}
 </div>
+{% endfor %}
 
 <div class="ui divider Element-space-between"></div>
 
-<div class="ui message Element-space-between">
-    <div class="header Element-space-between">
-        Na sua opinião, como você avalia este projeto:
-    </div>
-    <div class="ui form">
-        <div class="inline fields">
-            <div class="field">
-                <div class="ui radio checkbox">
-                    <input type="radio" name="frequency" checked="checked">
-                    <label>Muito complexo</label>
+<form action="/metrics_feedback" method="post">
+    {% csrf_token %}
+    <input type="hidden" name="project_pronac" value="{{ project.pronac }}">
+    <input type="hidden" name="user_email" value="{{ user.email }}">
+    <div class="ui message Element-space-between">
+        <div class="header Element-space-between" style="margin-bottom: 20px;">
+            Na sua opinião, como você avalia este projeto:
+        </div>
+        <div class="ui form">
+            <div class="inline fields">
+                {% for grade in project_feedback_list %}
+                <div class="field">
+                    <div class="ui radio checkbox">
+                        <input type="radio" name="project_feedback_grade" value={{forloop.counter}}>
+                        <label>{{ grade }}</label>
+                    </div>
                 </div>
-            </div>
-            <div class="field">
-                <div class="ui radio checkbox">
-                    <input type="radio" name="frequency">
-                    <label>Complexo</label>
-                </div>
-            </div>
-            <div class="field">
-                <div class="ui radio checkbox">
-                    <input type="radio" name="frequency">
-                    <label>Normal</label>
-                </div>
-            </div>
-            <div class="field">
-                <div class="ui radio checkbox">
-                    <input type="radio" name="frequency">
-                    <label>Simples</label>
-                </div>
-            </div>
-            <div class="field">
-                <div class="ui radio checkbox">
-                    <input type="radio" name="frequency">
-                    <label>Muito simples</label>
-                </div>
+                {% endfor %}
             </div>
         </div>
     </div>
-</div>
-<div style="text-align: center;">
-    <button class="ui primary button">
-        Terminar Diagnóstico
-    </button>
-</div>
-{% endblock %}
-<script>
 
-</script>
+    <div style="text-align: center;">
+        <button class="ui primary button">
+            Terminar Diagnóstico
+        </button>
+    </div>
+</form>
+<script>
+    // Make method to change complexity color
+
+    var radialObj = $('#indicatorContainer').radialIndicator({
+        barColor: '#87CEEB',
+        barWidth: 10,
+        initValue: 0,
+        roundCorner: true,
+        percentage: true
+    }).data('radialIndicator');
+
+    $('.ui.rating').rating({
+        initialRating: 0,
+        maxRating: 5
+    })
+
+    function getRating() {
+        var value = $('.ui.rating').rating('get rating')
+        console.log(value);
+    }
+
+    // function getRadio() {
+    //     var v = $('.ui.checkbox').checkbox("is checked");
+    //     console.log(JSON.stringify(v))
+    //     return v;
+    // }
+
+    $('.ui.accordion').accordion({ exclusive: false });
+
+    radialObj.value("{{project_indicators.0.value}}")
+</script> {% endblock %}
