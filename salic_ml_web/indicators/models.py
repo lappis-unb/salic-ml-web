@@ -76,6 +76,10 @@ class MetricFeedback(models.Model):
     grade = models.IntegerField(default=1)
     reason = models.TextField(max_length=500)
 
+    def __str__(self):
+        string = "{0} - {1}" %(self.metric.name, self.user.name)
+        return string
+
 class ProjectFeedback(models.Model):
     user = models.ForeignKey(
         User,
@@ -88,3 +92,7 @@ class ProjectFeedback(models.Model):
         related_name='entity_feedbacks'
     )
     grade = models.IntegerField(default=1)
+
+    def __str__(self):
+        string = "{0} - {1}" %(self.entity.name, self.user.name)
+        return string

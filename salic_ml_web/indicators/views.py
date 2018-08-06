@@ -6,27 +6,31 @@ from django.http import HttpResponse
 from salic_db.utils import test_connection, make_query_from_db
 
 def index(request):
-    projects = [
-        {"pronac": "1234", "complexity": 25,
-            "project_name": "Show do Tiririca", "analist": "Florentina"},
-        {"pronac": "4321", "complexity": 75,
-            "project_name": "Show do ex Calipso", "analist": "Chimbinha"},
-        {"pronac": "1324", "complexity": 95,
-            "project_name": "Projeto da Cláudia Leitte", "analist": "Cláudia Leitte"},
-        {"pronac": "1243", "complexity": 15,
-            "project_name": "Tourada", "analist": "Ferdinando"},
-        {"pronac": "2143", "complexity": 5,
-            "project_name": "Projeto modelo", "analist": "Modelo"},
-    ]
+    # projects = [
+    #     {"pronac": "1234", "complexity": 25,
+    #         "project_name": "Show do Tiririca", "analist": "Florentina"},
+    #     {"pronac": "4321", "complexity": 75,
+    #         "project_name": "Show do ex Calipso", "analist": "Chimbinha"},
+    #     {"pronac": "1324", "complexity": 95,
+    #         "project_name": "Projeto da Cláudia Leitte", "analist": "Cláudia Leitte"},
+    #     {"pronac": "1243", "complexity": 15,
+    #         "project_name": "Tourada", "analist": "Ferdinando"},
+    #     {"pronac": "2143", "complexity": 5,
+    #         "project_name": "Projeto modelo", "analist": "Modelo"},
+    # ]
     projects = projects_to_analyse(request)
 
     return render(request, 'index.html', {'projects': projects})
-    # return HttpResponse(type(projects))
 
 
 def show_metrics(request, pronac):
     project = get_object_or_404(Entity, pronac=int(pronac))
-    return render(request, 'show_metrics.html', {'project': project})
+
+    current_user = None
+
+    metrics = []
+
+    return render(request, 'show_metrics.html', {'project': project, 'user': current_user, 'metrics': metrics})
 
 
 def db_connection_test(request):
@@ -65,8 +69,19 @@ def projects_to_analyse(request):
     return filtered_data_dict
 
 def fetch_user_data(request):
-    print("8"*800)
-    print(request.POST)
-    print("8"*800)
-    # user = User.objects.create(email = email, name=name)
-    return HttpResponse(request.POST['name_field'])
+    
+    try:
+        user = User.objects.get(email=request.POST['user_email'])
+    except:
+        user_name = request.POST['user_first_name']
+        
+        user_email = request.POST['user_email'] + "@gmail.com"
+
+        user = User.objects.create(email=user_email, name=user_name)
+
+    pronac = request.POST['project_pronac']
+    project = get_object_or_404(Entity, pronac=int(pronac))
+
+    metrics = []
+
+    return render(request, 'show_metrics.html', {'project': project, 'user': user, 'metrics': metrics})
