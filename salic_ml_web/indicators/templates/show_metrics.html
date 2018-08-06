@@ -2,13 +2,19 @@
 
 {% block content %}
 <div class="Element-space-between">
-    <h1>1234 - Nome do projeto</h1>
+    <h1>{{project.pronac}} - {{project.name}}</h1>
 </div>
 
 <div class="ui message Element-space-between">
     <div class="header Element-space-between">
         Preencha seus dados para avaliar este projeto:
     </div>
+    <form action="/user_info" method="post">
+        {% csrf_token %}
+        <label for="team_name">Enter name: </label>
+        <input id="team_name" type="text" name="name_field" value="Default name for team.">
+        <input type="submit" value="OK">
+    </form>
     <div>
         <div class="ui form">
             <div class="three fields">

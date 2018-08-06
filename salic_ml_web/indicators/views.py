@@ -1,6 +1,7 @@
 # Remove this import when has a valid complexity value
 import random
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
+from .models import Entity, User
 from django.http import HttpResponse
 from salic_db.utils import test_connection, make_query_from_db
 
@@ -23,8 +24,9 @@ def index(request):
     # return HttpResponse(type(projects))
 
 
-def show_metrics(request):
-    return render(request, 'show_metrics.html', {})
+def show_metrics(request, pronac):
+    project = get_object_or_404(Entity, pronac=int(pronac))
+    return render(request, 'show_metrics.html', {'project': project})
 
 
 def db_connection_test(request):
@@ -61,3 +63,10 @@ def projects_to_analyse(request):
         )
 
     return filtered_data_dict
+
+def fetch_user_data(request):
+    print("8"*800)
+    print(request.POST)
+    print("8"*800)
+    # user = User.objects.create(email = email, name=name)
+    return HttpResponse(request.POST['name_field'])
