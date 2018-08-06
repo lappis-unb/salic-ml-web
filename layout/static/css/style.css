@@ -1,15 +1,137 @@
-.Elements-space-between{
-    margin-bottom: 25px;
+HTML{
+	font-size: 16px;
 }
-.Metric-green, .Metric-red{
-    float: right;
-}
-.Metric-green {
-    color: green;
-}
-.Metric-red {
-    color: red;
-}
+
 .container-application{
-    padding: 25px 50px;
+	margin: auto;
+	max-width: 1200px;
+	padding: 100px 50px 25px !important;
+}
+
+.ui.fixed.inverted.menu{
+	align-items: center;
+	background-color: #1B5E20;
+	color:#FFF;
+	padding: 1em 0;
+  	justify-content: center;
+}
+
+.ui.fixed.inverted.menu .ui.inverted.button{
+	font-size: 1.2em;
+	left: 1em;
+	box-shadow: none !important;
+	position: absolute;
+}
+
+.ui.fixed.inverted.menu .ui.statistic{
+	margin: 0 2em;
+}
+
+.ui.fixed.inverted.menu H1{
+	height: auto;
+	margin: auto 0;
+}
+
+
+
+.ui.styled.accordion > .title{
+	font-size: 2em;
+}
+
+.ui.styled.accordion > .title .dropdown.icon {
+	color: #000;
+	float: right;
+	margin-right: 0px;
+}
+
+.ui.styled.accordion .content{
+	padding: 0 1em 3em 7em;
+}
+
+.ui.styled.accordion .accordion{
+	box-shadow: none !important;
+	margin-top: -1em;
+}
+
+.ui.styled.accordion .accordion .title{
+	border: none !important;
+	color: #000;
+	padding-left: 0;
+	padding-bottom: 0;
+}
+
+.ui.styled.accordion .accordion .content{
+	padding-left: 1.6em;
+}
+
+
+
+.ui.ribbon.label {
+	left: calc(-2rem - 1.2em);
+	color: #FFF;
+	margin-left: 0;
+	padding: 1em 0 1em 2em;
+}
+
+.ui.ribbon.label .icon{
+	font-size: 3em;
+	padding-left: 0.2em;
+}
+
+
+.Metric-bad .ui.ribbon.label{
+	background-color: #db2828;
+	border-color: #b21e1e;
+}
+
+.Metric-bad .icon:before{
+	content: "\f2c7"; /* Thermometer full */
+}
+
+.Metric-average .ui.ribbon.label{
+	background-color: #f2b01c;
+	border-color: #cf910c;
+}
+
+.Metric-average .icon:before{
+	content: "\f2c9"; /* Thermometer half full */
+}
+
+.Metric-good .ui.ribbon.label{
+	color: #666;
+}
+
+.Metric-good .icon:before{
+	content: "\f2cb"; /* Thermometer empty */
+}
+
+
+
+.Metric-good {
+	color: #666 !important;
+}
+.Metric-average {
+	color: #f2b01c !important;
+}
+.Metric-bad {
+	color: #db2828 !important;
+}
+
+.list.header{
+	font-weight: bold;
+}
+
+
+#FinalForm{
+	text-align: center;
+}
+
+#FinalForm .header{
+	font-size: 1.2em;
+	font-weight: bold;
+	margin-bottom: 1em;
+}
+
+#FinalForm .button{
+	margin: 2em;
 }
