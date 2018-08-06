@@ -28,8 +28,27 @@ HTML{
 }
 
 .ui.fixed.inverted.menu H1{
+	font-size: 1.2em;
 	height: auto;
 	margin: auto 0;
+}
+
+#Summary{
+	margin: 6em -40px 2em;
+	display: table;
+}
+
+#Summary .c100{
+	margin: 0 0.2em 0 0;
+}
+
+#Summary .ui.header{
+	display: table-cell;
+	font-size: 4em;
+	font-style: italic;
+	margin: 0;
+/*	padding: 0 0.5em;*/
+	vertical-align: middle;
 }
 
 
