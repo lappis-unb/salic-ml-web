@@ -31,27 +31,29 @@
 				<h1>{NOME_DO_PROJETO}</h1>
 		</div>
 
-		<div class="ui raised segment" id="LoginArea">
-			<div class="header">
-				Preencha seus dados para avaliar este projeto (ou para continuar uma avaliação interrompida):
-			</div>
-			<div class="ui form">
-				<div class="three fields">
-					<div class="field">
-						<!--                        <label>Nome</label>-->
-						<input placeholder="Nome completo" type="text">
-					</div>
-					<div class="field">
-						<!--                        <label>Email</label>-->
-						<div class="ui right labeled input">
-							<input type="text" placeholder="E-mail">
-							<div class="ui label">
-								@cultura.gov.br
+		<div class="ui ten column centered grid">
+			<div class="ui raised segment" id="LoginArea">
+				<div class="ui form">
+				<div class="header">
+					Preencha seus dados para avaliar este projeto (ou para continuar uma avaliação interrompida):
+				</div>
+					<div class="three fields">
+						<div class="six wide field">
+							<!--                        <label>Nome</label>-->
+							<input placeholder="Nome completo" type="text">
+						</div>
+						<div class="seven wide field">
+							<!--                        <label>Email</label>-->
+							<div class="ui right labeled input">
+								<input type="text" placeholder="E-mail">
+								<div class="ui label">
+									@cultura.gov.br
+								</div>
 							</div>
 						</div>
-					</div>
-					<div class="field">
-						<div class="ui primary submit button">Enviar</div>
+						<div class="two wide field">
+							<div class="ui primary submit button">Enviar</div>
+						</div>
 					</div>
 				</div>
 			</div>
@@ -86,21 +88,17 @@
 				<div class="content active">
 					<h3>(Barra de distribuição de itens nesse projeto em relação à média do segmento)</h3>                  
 					<div class="ui divider"></div>
-					<div class="ui container">
-						<div class="ui form">
-							<div class="field">
-								<label>Quanto essa informação é útil para você?</label>
-								<div class="two fields">
-									<div class="field three wide">
-										<div class="ui huge star rating"></div>
-									</div>
-									<div class="field">
-										<input placeholder="Por quê?" type="text" size="50">
-									</div>
+						<div class="ui fedback form">
+							<div class="header">Quanto essa informação é útil para você?</div>
+							<div class="fields">
+								<div class="four wide field">
+									<div class="ui massive star rating"></div>
+								</div>
+								<div class="inline field">
+									<input placeholder="Por quê?" type="text" size="50">
 								</div>
 							</div>
 						</div>
-					</div>
 				</div>
 
 
@@ -276,10 +274,10 @@
 			</div>
 
 			<div class="ui basic segment" id="FinalForm">
+				<div class="ui equal width form">
 				<div class="header">
 					Na sua opinião, como você avalia <em>&ldquo;{NOME_DO_PROJETO}&rdquo;</em>:
 				</div>
-				<div class="ui equal width form">
 					<div class="inline fields">
 						<div class="field">
 							<div class="ui radio checkbox">
@@ -320,9 +318,11 @@
 			</div>
 
 		</div>
-		</body>
-
-	</html>
+		
+	</div>
+		
+</body>
+	
 <script>
 	$('#DiagnosticMetrics')
 		.accordion({
@@ -336,3 +336,5 @@
 	})
 	;
 </script>
+
+</html>

@@ -8,6 +8,16 @@ HTML{
 	padding: 100px 50px 25px !important;
 }
 
+.header{
+	font-weight: bold;
+}
+
+
+
+/*************************** 
+ ******* Sticky Menu *******
+ ***************************/
+
 .ui.fixed.inverted.menu{
 	align-items: center;
 	background-color: #1B5E20;
@@ -33,6 +43,12 @@ HTML{
 	margin: auto 0;
 }
 
+
+
+/*************************** 
+ ********* Summary *********
+ ***************************/
+
 #Summary{
 	margin: 6em -40px 2em;
 	display: table;
@@ -47,11 +63,14 @@ HTML{
 	font-size: 4em;
 	font-style: italic;
 	margin: 0;
-/*	padding: 0 0.5em;*/
 	vertical-align: middle;
 }
 
 
+
+/*************************** 
+ ** Diagnostic Accordion ***
+ ***************************/
 
 .ui.styled.accordion > .title{
 	font-size: 2em;
@@ -66,6 +85,8 @@ HTML{
 .ui.styled.accordion .content{
 	padding: 0 1em 3em 7em;
 }
+
+/*** Nested accordion ***/
 
 .ui.styled.accordion .accordion{
 	box-shadow: none !important;
@@ -84,6 +105,9 @@ HTML{
 }
 
 
+/*************************** 
+ ****** Metric Status ******
+ ***************************/
 
 .ui.ribbon.label {
 	left: calc(-2rem - 1.2em);
@@ -98,57 +122,61 @@ HTML{
 }
 
 
+.Metric-bad {
+	color: #db2828 !important;
+}
 .Metric-bad .ui.ribbon.label{
 	background-color: #db2828;
 	border-color: #b21e1e;
 }
-
 .Metric-bad .icon:before{
 	content: "\f2c7"; /* Thermometer full */
 }
 
+.Metric-average {
+	color: #f2b01c !important;
+}
 .Metric-average .ui.ribbon.label{
 	background-color: #f2b01c;
 	border-color: #cf910c;
 }
-
 .Metric-average .icon:before{
 	content: "\f2c9"; /* Thermometer half full */
 }
 
+.Metric-good {
+	color: #666 !important;
+}
 .Metric-good .ui.ribbon.label{
 	color: #666;
 }
-
 .Metric-good .icon:before{
 	content: "\f2cb"; /* Thermometer empty */
 }
 
 
+/*************************** 
+ ********** Forms **********
+ ***************************/
 
-.Metric-good {
-	color: #666 !important;
-}
-.Metric-average {
-	color: #f2b01c !important;
-}
-.Metric-bad {
-	color: #db2828 !important;
+.ui.form .header{
+	display: block;
+	margin-bottom: 1em;
 }
 
-.list.header{
-	font-weight: bold;
-}
 
+.star.rating{
+	padding-top: 6px;
+	width: 100%;
+}
 
 #FinalForm{
+	margin: 3em;
 	text-align: center;
 }
 
 #FinalForm .header{
 	font-size: 1.2em;
-	font-weight: bold;
-	margin-bottom: 1em;
 }
 
 #FinalForm .button{
