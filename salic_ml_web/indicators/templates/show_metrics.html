@@ -1,129 +1,427 @@
 {% extends 'base.html' %} {% block content %}
-<div class="Element-space-between">
-    <h1>{{project.pronac}} - {{project.name}}</h1>
-</div>
 
-<div class="ui message Element-space-between">
+<div class="ui fixed inverted menu" id="ProjectID">
+    <button class="ui icon inverted button" id="btBack">
+        <i class="left arrow icon"></i>
+    </button>
+    <div class="ui tiny inverted statistic">
+        <div class="label">PRONAC</div>
+        <div class="value">{{project.pronac}}</div>
+    </div>
+    <h1>{{project.name}}</h1>
     {% if user %}
     <div class="header Element-space-between">
-        Bem vindo(a) {{user.name}}!
+        - Bem vindo(a) {{user.name}}!
     </div>
-    {% else %}
-    <div class="header Element-space-between">
-        Preencha seus dados para avaliar este projeto:
-    </div>
-    <form action="/user_info" method="post">
-        {% csrf_token %}
-        <div>
-            <div class="ui form">
+    {% endif %}
+</div>
+
+{% if not user %}
+<div class="ui ten column centered grid">
+    <div class="ui raised segment" id="LoginArea">
+        <div class="ui form">
+            <div class="header">
+                Preencha seus dados para avaliar este projeto (ou para continuar uma avaliação interrompida):
+            </div>
+            <form action="/user_info" method="post">
+                {% csrf_token %}
                 <div class="three fields">
-                    <div class="field">
-                        <label>Nome</label>
-                        <input required placeholder="First Name" type="text" name="user_first_name">
+                    <div class="six wide field">
+                        <input required placeholder="Nome Completo" type="text" name="user_first_name">
                     </div>
-                    <div class="field">
-                        <label>Email</label>
+                    <div class="seven wide field">
                         <div class="ui right labeled input">
-                            <input required placeholder="Enter weight.." type="text" name="user_email">
+                            <input required placeholder="Email" type="text" name="user_email">
                             <div class="ui label">
-                                @gmail.com
+                                @cultura.gov.br
                             </div>
                         </div>
                     </div>
                     <input type="hidden" name="project_pronac" value="{{ project.pronac }}">
-                    <div class="field">
-                        <input class="ui submit button" style="margin-top: 24px;" type="submit" value="Enviar">
+                    <div class="two wide field">
+                        <input class="ui submit button primary" type="submit" value="Enviar">
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endif %} {% for indicator in project_indicators %}
+
+<!-- Este aqui de baixo é para ser o original -->
+<!-- <div class="ui icon message Element-space-between">
+    <div class="clearfix">
+        <div id="indicatorContainer"></div>
+    </div> onclick="getRating()"
+    <h3 class="Complexity-text">Diagnóstico de </h3>
+</div> -->
+<div class="ui clearing basic segment" id="Summary">
+    <div class="c100 p70 big orange">
+        <span>70%</span>
+        <div class="slice">
+            <div class="bar"></div>
+            <div class="fill"></div>
+        </div>
+    </div>
+    <h1 class="ui header">
+        Diagnóstico de {{indicator.name}}
+    </h1>
+</div>
+
+<form action="/metrics_feedback" method="post">
+    {% csrf_token %}
+
+
+    <div class="ui basic segment" id="DiagnosticArea">
+
+        <div class="ui styled fluid accordion" id="DiagnosticMetrics">
+
+            <!-- METRIC -->
+            <!-- Total do número de itens -->
+            <div class="title active Metric-bad">
+                <div class="ui ribbon label">
+                    <i class="icon"></i>
+                </div>
+                Itens orçamentários: 378
+                <i class="dropdown icon"></i>
+                <div class="helper">
+                    <i class="question circle outline icon"></i>
+                    <div class="ui floating message">
+                        <p>Compara a quantidade de itens deste projeto com a
+                            <strong>quantidade mais comum</strong> de itens em projetos do mesmo segmento</p>
                     </div>
                 </div>
             </div>
-        </div>
-    </form>
-    {% endif %}
-</div>
 
-<div class="ui divider Element-space-between"></div>
+            <div class="content active Metric-bad">
+                <!-- Barra de distribuição de itens nesse projeto em relação à média do segmento -->
+                <div class="ui pointing below label">
+                    Este projeto
+                </div>
+                <div class="ui progress" data-percent="12" data-total="1000" id="MedianDisplay-TotalItems">
+                    <div class="bar">
+                        <div class="progress">50 - 170</div>
+                    </div>
+                    <div class="label">Média de itens orçamentários para Jogos Eletrônicos</div>
+                </div>
 
-{% for indicator in project_indicators %}
-
-<div class="ui icon message Element-space-between">
-    <div class="clearfix">
-        <div id="indicatorContainer"></div>
-    </div>
-    <h3 class="Complexity-text">Diagnóstico de {{indicator.name}}</h3>
-</div>
-
-<div class="ui divider Element-space-between"></div>
-
-<div class="ui styled fluid accordion">
-    {% for metric in indicator.metrics %}
-    <div class="title active">
-        <i class="dropdown icon"></i>
-        {{metric.name}} {% if metric.outlier_check %}
-        <i class="check icon Metric-green"></i>
-        {% else %}
-        <i class="times icon Metric-green"></i>
-        {% endif %}
-    </div>
-    <div class="content active">
-        <p class="transition visible" style="display: block !important;">
-            <div class="content">
-                {{metric.reason}}
+                <div class="ui fedback form">
+                    <div class="ui divider"></div>
+                    <div class="header">Quanto essa informação é útil para você?</div>
+                    <div class="fields">
+                        <div class="four wide field">
+                            <div class="ui massive star rating"></div>
+                        </div>
+                        <div class="inline field">
+                            <input placeholder="Por quê?" type="text" size="50">
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="ui icon message Element-space-between">
-                <div class="content">
-                    <div class="ui form">
-                        <div class="three fields">
-                            <div class="field">
-                                <label>Esta informação foi útil para você?</label>
-                                <div class="ui massive star rating" onclick="getRating()"></div>
+
+            <!-- METRIC -->
+            <!-- 1 Porcentagem de itens do projeto em relação a distribuição dos itens mais comuns para aquele segmento ou area -->
+            <div class="title active Metric-average">
+                <div class="ui ribbon label">
+                    <i class="icon"></i>
+                </div>
+                Itens orçamentários fora do comum: 30%
+                <i class="dropdown icon"></i>
+                <div class="helper">
+                    <i class="question circle outline icon"></i>
+                    <div class="ui floating message">
+                        <p>Indica os itens orçamentários deste projeto que
+                            <strong>não estão entre os mais comuns</strong> do segmento.</p>
+                        <p>Também lista os itens que aparecem frequentemente em projetos do segmento, mas que
+                            <strong>não aparecem neste projeto</strong>.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="content active">
+                <div class="ui grid">
+                    <div class="eight wide column">
+                        <div class="list header">Itens inesperados</div>
+                        <div class="ui bulleted list">
+                            <div class="item">
+                                <a href="#">Nome do Item 1</a>
                             </div>
-                            <div class="field">
-                                <label>Porque? Justifique sua resposta</label>
-                                <input placeholder="Escreva aqui..." name="feedback_justify" type="text">
+                            <div class="item">
+                                <a href="#">Nome do Item 2</a>
+                            </div>
+                            <div class="item">
+                                <a href="#">Nome do Item 3</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="eight wide column">
+                        <div class="list header">Itens ausentes</div>
+                        <div class="ui bulleted list">
+                            <div class="item">
+                                <a href="#">Nome do Item 1</a>
+                            </div>
+                            <div class="item">
+                                <a href="#">Nome do Item 2</a>
+                            </div>
+                            <div class="item">
+                                <a href="#">Nome do Item 3</a>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </p>
-    </div>
-    {% endfor %}
-</div>
-{% endfor %}
 
-<div class="ui divider Element-space-between"></div>
 
-<form action="/metrics_feedback" method="post">
-    {% csrf_token %}
-    <input type="hidden" name="project_pronac" value="{{ project.pronac }}">
-    <input type="hidden" name="user_email" value="{{ user.email }}">
-    <div class="ui message Element-space-between">
-        <div class="header Element-space-between" style="margin-bottom: 20px;">
-            Na sua opinião, como você avalia este projeto:
-        </div>
-        <div class="ui form">
-            <div class="inline fields">
-                {% for grade in project_feedback_list %}
-                <div class="field">
-                    <div class="ui radio checkbox">
-                        <input type="radio" name="project_feedback_grade" value={{forloop.counter}}>
-                        <label>{{ grade }}</label>
+            <!-- METRIC -->
+            <!-- Número de comprovantes do projeto-->
+            <div class="title active Metric-good">
+                <div class="ui ribbon label">
+                    <i class="icon"></i>
+                </div>
+                Comprovantes de pagamento: 500
+                <i class="dropdown icon"></i>
+                <div class="helper">
+                    <i class="question circle outline icon"></i>
+                    <div class="ui floating message">
+                        <p>Compara a quantidade de comprovantes deste projeto com a
+                            <strong>quantidade mais comum</strong> de comprovantes em projetos do mesmo segmento</p>
                     </div>
                 </div>
-                {% endfor %}
             </div>
-        </div>
-    </div>
+            <div class="content active">
+                <h3>(Barra de distribuição de da quant de comprovantes nesse projeto em relação à média do segmento)</h3>
+            </div>
 
-    <div style="text-align: center;">
-        <button class="ui primary button">
-            Terminar Diagnóstico
-        </button>
-    </div>
+
+            <!-- METRIC -->
+            <!-- 5 Porcentagem de itens acima da mediana histórica, média do desvio da mediana, ou o próprio vetor de diferença em relação a mediana -->
+            <div class="title active Metric-bad">
+                <div class="ui ribbon label">
+                    <i class="icon"></i>
+                </div>
+                Preços acima da média: 40%
+                <i class="dropdown icon"></i>
+                <div class="helper">
+                    <i class="question circle outline icon"></i>
+                    <div class="ui floating message">
+                        <p>Verifica a porcentagem de itens com valor acima da mediana histórica neste projeto e compara com
+                            a
+                            <strong>porcentagem mais frequente</strong> de itens acima da mediana em projetos do mesmo segmento</p>
+                    </div>
+                </div>
+            </div>
+            <div class="content active">
+                <h3>(Barra de distribuição em relação à média)</h3>
+            </div>
+
+
+            <!-- METRIC -->
+            <!-- Total do valor comprovado do projeto -->
+            <div class="title active Metric-bad">
+                <div class="ui ribbon label">
+                    <i class="icon"></i>
+                </div>
+                Valor comprovado: R$ 320.000,00
+                <i class="dropdown icon"></i>
+                <div class="helper">
+                    <i class="question circle outline icon"></i>
+                    <div class="ui floating message">
+                        <p>Compara o valor comprovado neste projeto com o
+                            <strong>valor mais frequentemente</strong> comprovado em projetos do mesmo segmento</p>
+                    </div>
+                </div>
+            </div>
+            <div class="content active">
+                <h3>(Barra de distribuição do valor do projeto em relação à média do segmento)</h3>
+            </div>
+
+
+            <!-- METRIC -->
+            <!-- Total do valor captado do projeto-->
+            <div class="title active Metric-average">
+                <div class="ui ribbon label">
+                    <i class="icon"></i>
+                </div>
+                Valor captado: R$ 300.000,00
+                <i class="dropdown icon"></i>
+                <div class="helper">
+                    <i class="question circle outline icon"></i>
+                    <div class="ui floating message">
+                        <p>Compara o valor captado neste projeto com o
+                            <strong>valor mais frequentemente</strong> captado em projetos do mesmo segmento</p>
+                    </div>
+                </div>
+            </div>
+            <div class="content active">
+                <h3>(Barra de distribuição do valor do projeto em relação à média do segmento)</h3>
+            </div>
+
+
+            <!-- METRIC -->
+            <!-- 3 Como a planilha, incluindo itens e preços, mudam ao longo do tempo em termos de rubrica ou outra categoria -->
+            <div class="title active Metric-good">
+                <div class="ui ribbon label">
+                    <i class="icon"></i>
+                </div>
+                Mudanças na planilha orçamentária: 41
+                <i class="dropdown icon"></i>
+                <div class="helper">
+                    <i class="question circle outline icon"></i>
+                    <div class="ui floating message">
+                        <p>Compara o quantidade de mudanças de valor em itens orçamentários neste projeto com a
+                            <strong>quantidade de mudanças mais frequente</strong> em projetos do mesmo segmento.</p>
+                        <p>Também indica quantas versões de planilha orçamentária foram geradas até a prestação de contas.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="content active">
+                <h3>(Barra de distribuição de quant. de mudanças nesse proj em relação à média do segmento)</h3>
+                <h3>Versões de planilha orçamentária: 7</h3>
+            </div>
+
+
+            <!-- METRIC -->
+            <!-- 2 Número de projetos já enviados por aquele proponente ou outros "escritores" da proposta -->
+            <div class="title active Metric-good">
+                <div class="ui ribbon label">
+                    <i class="icon"></i>
+                </div>
+                Projetos do mesmo proponente: 3
+                <i class="dropdown icon"></i>
+                <div class="helper">
+                    <i class="question circle outline icon"></i>
+                    <div class="ui floating message">
+                        <p>Indica os projetos que o proponente já executou no passado.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="content active">
+                <div class="ui bulleted list">
+                    <div class="item">
+                        <a href="#">Nome do projeto 1</a>
+                    </div>
+                    <div class="item">
+                        <a href="#">Nome do projeto 2</a>
+                    </div>
+                    <div class="item">
+                        <a href="#">Nome do projeto 3</a>
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- METRIC -->
+            <!-- 4 Porcentagem ou distribuição dos fornecedores do projeto em relação a fornecedores já conhecidos -->
+            <div class="title active Metric-good">
+                <div class="ui ribbon label">
+                    <i class="icon"></i>
+                </div>
+                Novos fornecedores: 7%
+                <i class="dropdown icon"></i>
+                <div class="helper">
+                    <i class="question circle outline icon"></i>
+                    <div class="ui floating message">
+                        <p>Indica a proporção de fornecedores que
+                            <strong>nunca participaram de projetos</strong> de incentivo antes em relação ao total de fornecedores
+                            envolvidos com o projeto.</p>
+                        <p>Também lista os itens orçamentários dos novos fornecedores.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="content active">
+                <div class="accordion">
+                    <div class="title">
+                        <i class="dropdown icon"></i>
+                        Novo Fornecedor A
+                    </div>
+                    <div class="content">
+                        <div class="ui bulleted list">
+                            <div class="item">
+                                <a href="#">Nome do item 1</a>
+                            </div>
+                            <div class="item">
+                                <a href="#">Nome do item 2</a>
+                            </div>
+                            <div class="item">
+                                <a href="#">Nome do item 3</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="title">
+                        <i class="dropdown icon"></i>
+                        Novo Fornecedor B
+                    </div>
+                    <div class="content">
+                        <div class="ui bulleted list">
+                            <div class="item">
+                                <a href="#">Nome do item 1</a>
+                            </div>
+                            <div class="item">
+                                <a href="#">Nome do item 2</a>
+                            </div>
+                            <div class="item">
+                                <a href="#">Nome do item 3</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- METRIC -->
+            <!-- Total do valor aprovado do projeto -->
+            <div class="title active Metric-good">
+                <div class="ui ribbon label">
+                    <i class="icon"></i>
+                </div>
+                Valor aprovado: R$ 420.000,00
+                <i class="dropdown icon"></i>
+                <div class="helper">
+                    <i class="question circle outline icon"></i>
+                    <div class="ui floating message">
+                        <p>Compara o valor aprovado para este projeto com o
+                            <strong>valor mais frequentemente</strong> aprovado em projetos do mesmo segmento</p>
+                    </div>
+                </div>
+            </div>
+            <div class="content active">
+                <h3>(Barra de distribuição em relação à média)</h3>
+            </div>
+
+        </div>
+
+
+
+
+
+        <input type="hidden" name="project_pronac" value="{{ project.pronac }}">
+        <input type="hidden" name="user_email" value="{{ user.email }}">
+        <div class="ui basic segment" id="FinalForm">
+            <div class="ui equal width form">
+                <div class="header">
+                    Na sua opinião, como você avalia
+                    <em>&ldquo;{{ project.name }}&rdquo;</em>:
+                </div>
+                <div class="inline fields">
+                    {% for grade in project_feedback_list %}
+                    <div class="field">
+                        <div class="ui radio checkbox">
+                            <input type="radio" required name="project_feedback_grade" value={{forloop.counter}}>
+                            <label>{{ grade }}</label>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            <button class="ui huge primary button">
+                Terminar Diagnóstico
+            </button>
+        </div>
+        {% endfor %}
 </form>
+
+
 <script>
     // Make method to change complexity color
-
     var radialObj = $('#indicatorContainer').radialIndicator({
         barColor: '#87CEEB',
         barWidth: 10,
