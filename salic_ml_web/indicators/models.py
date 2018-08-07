@@ -56,8 +56,8 @@ class Evidence(models.Model):
 
 
 class User(models.Model):
-    name = models.CharField(max_length=200)
-    email = models.EmailField(max_length=254)
+    name = models.CharField(max_length=200, blank=True)
+    email = models.EmailField(max_length=254, blank=True, null=True, unique=True)
 
     def __str__(self):
         return self.name
@@ -77,8 +77,7 @@ class MetricFeedback(models.Model):
     reason = models.TextField(max_length=500)
 
     def __str__(self):
-        string = "{0} - {1}" %(self.metric.name, self.user.name)
-        return string
+        return "{0} - {1}".format(self.metric.name, self.user.name)
 
 class ProjectFeedback(models.Model):
     user = models.ForeignKey(
@@ -94,5 +93,4 @@ class ProjectFeedback(models.Model):
     grade = models.IntegerField(default=1)
 
     def __str__(self):
-        string = "{0} - {1}" %(self.entity.name, self.user.name)
-        return string
+        return "{0} - {1}".format(self.entity.name, self.user.name)
