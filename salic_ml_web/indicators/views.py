@@ -152,6 +152,7 @@ def fetch_user_data(request):
     return render(request, 'show_metrics.html', {'project': project, 'user': user, 'project_indicators': project_indicators, 'project_feedback_list': project_feedback_list})
 
 def post_metrics_feedback(request):
+
     entity = Entity.objects.get(pronac=request.POST['project_pronac'])
     user = User.objects.get(email=request.POST['user_email'])
     indicators = Indicator.objects.filter(entity=entity)
@@ -166,14 +167,16 @@ def post_metrics_feedback(request):
 
     saved_data['metrics_feedback'] = []
 
+    ratings = list(request.POST['all_ratings'])
+    ratings.reverse()
+
     # Creates metric feedback objects
     for indicator in indicators:
         for metric in indicator.metrics.all():
-            
-            metric_feedback_rating_tag = metric.name + '_rating'
+
             metric_feedback_text_tag = metric.name + '_text'
 
-            metric_feedback_rating = request.POST[metric_feedback_rating_tag]
+            metric_feedback_rating = ratings.pop()
             metric_feedback_text = request.POST[metric_feedback_text_tag]
 
             saved_metric_feedback = MetricFeedback.objects.create(user=user, metric=metric, grade=int(metric_feedback_rating), reason=metric_feedback_text)
@@ -185,4 +188,3 @@ def post_metrics_feedback(request):
             })
 
     return HttpResponse(str(saved_data))
-

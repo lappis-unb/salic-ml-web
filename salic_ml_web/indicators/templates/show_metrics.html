@@ -70,8 +70,6 @@
 
 <form action="/metrics_feedback" method="post">
     {% csrf_token %}
-
-
     <div class="ui basic segment" id="DiagnosticArea">
 
         <div class="ui styled fluid accordion" id="DiagnosticMetrics">
@@ -496,7 +494,7 @@
             </div>
         </div>
 
-
+        <input type="hidden" name="all_ratings" value="" id="all_ratings">
         <input type="hidden" name="project_pronac" value="{{ project.pronac }}">
         <input type="hidden" name="user_email" value="{{ user.email }}">
         <div class="ui basic segment" id="FinalForm">
@@ -516,7 +514,7 @@
                     {% endfor %}
                 </div>
             </div>
-            <button class="ui huge primary button">
+            <button class="ui huge primary button" onclick="getRating()">
                 Terminar Diagnóstico
             </button>
         </div>
@@ -541,8 +539,11 @@
 
     function getRating() {
         var value = $('.ui.rating').rating('get rating')
+        var hidden_ratings = document.getElementById("all_ratings")
+        hidden_ratings.value = value.join("")
         console.log(value);
     }
+    
 
     // function getRadio() {
     //     var v = $('.ui.checkbox').checkbox("is checked");
