@@ -2,7 +2,7 @@
 import random
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse
-from .models import Entity, User, ProjectFeedback, MetricFeedback, Metric
+from .models import Entity, User, ProjectFeedback, MetricFeedback, Metric, Indicator
 from salic_db.utils import test_connection, make_query_from_db
 
 
@@ -81,33 +81,69 @@ def fetch_user_data(request):
 
     project_indicators = [
         {
-            'name': 'complexidade da prestação de contas',
+            'name': 'complexidade_financeira',
             'value': '50',
             'metrics': [
                 {
-                    'name': 'Metrica 01',
+                    'name': 'itens_orcamentarios',
                     'value': '12',
                     'reason': 'any reason',
                     'outlier_check': True
                 },
                 {
-                    'name': 'Metrica 02',
+                    'name': 'itens_orcamentarios_fora_do_comum',
                     'value': '13',
                     'reason': 'any reason',
                     'outlier_check': True
                 },
                 {
-                    'name': 'Metrica 03',
+                    'name': 'comprovantes_pagamento',
                     'value': '60',
                     'reason': 'any reason',
                     'outlier_check': False
                 },
                 {
-                    'name': 'Metrica 04',
+                    'name': 'precos_acima_media',
                     'value': '70',
                     'reason': 'any reason',
                     'outlier_check': False
                 },
+                {
+                    'name': 'valor_comprovado',
+                    'value': '70',
+                    'reason': 'any reason',
+                    'outlier_check': ''
+                },
+                {
+                    'name': 'valor_captado',
+                    'value': '70',
+                    'reason': 'any reason',
+                    'outlier_check': ''
+                },
+                {
+                    'name': 'mudancas_planilha_orcamentaria',
+                    'value': '70',
+                    'reason': 'any reason',
+                    'outlier_check': ''
+                },
+                {
+                    'name': 'projetos_mesmo_proponente',
+                    'value': '70',
+                    'reason': 'any reason',
+                    'outlier_check': ''
+                },
+                {
+                    'name': 'novos_fornecedores',
+                    'value': '70',
+                    'reason': 'any reason',
+                    'outlier_check': ''
+                },
+                {
+                    'name': 'valor_aprovado',
+                    'value': '70',
+                    'reason': 'any reason',
+                    'outlier_check': ''
+                }
             ]
         },
     ]
@@ -118,9 +154,35 @@ def fetch_user_data(request):
 def post_metrics_feedback(request):
     entity = Entity.objects.get(pronac=request.POST['project_pronac'])
     user = User.objects.get(email=request.POST['user_email'])
+    indicators = Indicator.objects.filter(entity=entity)
 
+    saved_data = {}
+
+    # Creates project feedback object
     project_feedback_grade = request.POST['project_feedback_grade']
-    #ProjectFeedback.objects.create(user=user, entity=entity, grade=project_feedback_grade)
+    saved_project_feedback = ProjectFeedback.objects.create(user=user, entity=entity, grade=project_feedback_grade)
 
-    return HttpResponse(project_feedback_grade)
+    saved_data['project_feedback'] = saved_project_feedback.grade
+
+    saved_data['metrics_feedback'] = []
+
+    # Creates metric feedback objects
+    for indicator in indicators:
+        for metric in indicator.metrics.all():
+            
+            metric_feedback_rating_tag = metric.name + '_rating'
+            metric_feedback_text_tag = metric.name + '_text'
+
+            metric_feedback_rating = request.POST[metric_feedback_rating_tag]
+            metric_feedback_text = request.POST[metric_feedback_text_tag]
+
+            saved_metric_feedback = MetricFeedback.objects.create(user=user, metric=metric, grade=int(metric_feedback_rating), reason=metric_feedback_text)
+
+            saved_data['metrics_feedback'].append({
+                'metric_name': saved_metric_feedback.metric.name,
+                'grade': saved_metric_feedback.grade,
+                'reason': saved_metric_feedback.reason
+            })
+
+    return HttpResponse(str(saved_data))
 
