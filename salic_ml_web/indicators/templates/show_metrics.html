@@ -17,7 +17,7 @@
 </div>
 
 {% if not user %}
-<div class="ui ten column centered grid">
+<div class="ui ten column centered grid" style="margin-top:50px;">
     <div class="ui raised segment" id="LoginArea">
         <div class="ui form">
             <div class="header">
@@ -78,11 +78,11 @@
 
             <!-- METRIC -->
             <!-- Total do número de itens -->
-            <div class="title active Metric-bad">
+            <div class="title active {{indicator.metrics.0.outlier_check}}">
                 <div class="ui ribbon label">
                     <i class="icon"></i>
                 </div>
-                Itens orçamentários: 378
+                Itens orçamentários: {{indicator.metrics.0.value}}
                 <i class="dropdown icon"></i>
                 <div class="helper">
                     <i class="question circle outline icon"></i>
@@ -125,7 +125,7 @@
                 <div class="ui ribbon label">
                     <i class="icon"></i>
                 </div>
-                Itens orçamentários fora do comum: 30%
+                Itens orçamentários fora do comum: {{indicator.metrics.1.value}}
                 <i class="dropdown icon"></i>
                 <div class="helper">
                     <i class="question circle outline icon"></i>
@@ -177,7 +177,7 @@
                 <div class="ui ribbon label">
                     <i class="icon"></i>
                 </div>
-                Comprovantes de pagamento: 500
+                Comprovantes de pagamento:  {{indicator.metrics.3.value}}
                 <i class="dropdown icon"></i>
                 <div class="helper">
                     <i class="question circle outline icon"></i>
@@ -198,7 +198,7 @@
                 <div class="ui ribbon label">
                     <i class="icon"></i>
                 </div>
-                Preços acima da média: 40%
+                Preços acima da média:  {{indicator.metrics.4.value}}
                 <i class="dropdown icon"></i>
                 <div class="helper">
                     <i class="question circle outline icon"></i>
@@ -220,7 +220,7 @@
                 <div class="ui ribbon label">
                     <i class="icon"></i>
                 </div>
-                Valor comprovado: R$ 320.000,00
+                Valor comprovado:  {{indicator.metrics.5.value}}
                 <i class="dropdown icon"></i>
                 <div class="helper">
                     <i class="question circle outline icon"></i>
@@ -241,7 +241,7 @@
                 <div class="ui ribbon label">
                     <i class="icon"></i>
                 </div>
-                Valor captado: R$ 300.000,00
+                Valor captado:  {{indicator.metrics.6.value}}
                 <i class="dropdown icon"></i>
                 <div class="helper">
                     <i class="question circle outline icon"></i>
@@ -262,7 +262,7 @@
                 <div class="ui ribbon label">
                     <i class="icon"></i>
                 </div>
-                Mudanças na planilha orçamentária: 41
+                Mudanças na planilha orçamentária: {{indicator.metrics.7.value}}
                 <i class="dropdown icon"></i>
                 <div class="helper">
                     <i class="question circle outline icon"></i>
@@ -285,7 +285,7 @@
                 <div class="ui ribbon label">
                     <i class="icon"></i>
                 </div>
-                Projetos do mesmo proponente: 3
+                Projetos do mesmo proponente: {{indicator.metrics.7.value}}
                 <i class="dropdown icon"></i>
                 <div class="helper">
                     <i class="question circle outline icon"></i>
@@ -315,7 +315,7 @@
                 <div class="ui ribbon label">
                     <i class="icon"></i>
                 </div>
-                Novos fornecedores: 7%
+                Novos fornecedores: {{indicator.metrics.8.value}}
                 <i class="dropdown icon"></i>
                 <div class="helper">
                     <i class="question circle outline icon"></i>
@@ -373,7 +373,7 @@
                 <div class="ui ribbon label">
                     <i class="icon"></i>
                 </div>
-                Valor aprovado: R$ 420.000,00
+                Valor aprovado: {{indicator.metrics.9.value}}
                 <i class="dropdown icon"></i>
                 <div class="helper">
                     <i class="question circle outline icon"></i>
