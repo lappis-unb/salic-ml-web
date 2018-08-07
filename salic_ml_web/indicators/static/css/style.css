@@ -1,18 +1,261 @@
-.Element-space-between{
-    margin-bottom: 25px;
+HTML{
+	font-size: 16px;
 }
-.Metric-green, .Metric-red{
-    float: right;
-}
-.Metric-green {
-    color: green;
-}
-.Metric-red {
-    color: red;
-}
+
 .container-application{
-    padding: 25px 50px;
+	margin: auto;
+	max-width: 1200px;
+	padding: 20px 50px 25px !important;
 }
-.Complexity-text{
-    margin-left: 15px;
+
+.header{
+	font-weight: bold;
+}
+
+
+
+/*************************** 
+ ******* Sticky Menu *******
+ ***************************/
+
+.ui.fixed.inverted.menu{
+	align-items: center;
+	background-color: #1B5E20;
+	color:#FFF;
+	padding: 1em 0;
+  	justify-content: center;
+}
+
+.ui.fixed.inverted.menu .ui.inverted.button{
+	font-size: 1.2em;
+	left: 1em;
+	box-shadow: none !important;
+	position: absolute;
+}
+
+.ui.fixed.inverted.menu .ui.statistic{
+	margin: 0 2em;
+}
+
+.ui.fixed.inverted.menu H1{
+	font-size: 1.2em;
+	height: auto;
+	margin: auto 0;
+}
+
+
+
+/*************************** 
+ ********* Summary *********
+ ***************************/
+
+#Summary{
+	margin: 6em -40px 2em;
+	display: table;
+}
+
+#Summary .c100{
+	margin: 0 0.2em 0 0;
+}
+
+#Summary .ui.header{
+	display: table-cell;
+	font-size: 4em;
+	font-style: italic;
+	margin: 0;
+	vertical-align: middle;
+}
+
+
+
+/*************************** 
+ ** Diagnostic Accordion ***
+ ***************************/
+
+.ui.styled.accordion > .title{
+	font-size: 2em;
+}
+
+.ui.styled.accordion > .title .dropdown.icon {
+	color: #000;
+	float: right;
+	margin-right: 0px;
+}
+
+.ui.styled.accordion .content{
+	padding: 0 1em 3em 7em;
+}
+
+/*** Nested accordion ***/
+
+.ui.styled.accordion .accordion{
+	box-shadow: none !important;
+	margin-top: -1em;
+}
+
+.ui.styled.accordion .accordion .title{
+	border: none !important;
+	color: #000;
+	padding-left: 0;
+	padding-bottom: 0;
+}
+
+.ui.styled.accordion .accordion .content{
+	padding-left: 1.6em;
+}
+
+
+/*************************** 
+ ****** Metric Status ******
+ ***************************/
+
+.ui.ribbon.label {
+	left: calc(-2rem - 1.2em);
+	color: #FFF;
+	margin-left: 0;
+	padding: 1em 0 1em 2em;
+}
+
+
+.ui.ribbon.label .icon{
+	font-size: 3em;
+	padding-left: 0.2em;
+}
+
+
+.title.Metric-bad {
+	color: #db2828 !important;
+}
+.Metric-bad .ui.ribbon.label{
+	background-color: #db2828;
+	border-color: #b21e1e;
+}
+.Metric-bad .icon:before{
+	content: "\f2c7"; /* Thermometer full */
+}
+
+.Metric-average {
+	color: #f2b01c !important;
+}
+.Metric-average .ui.ribbon.label{
+	background-color: #f2b01c;
+	border-color: #cf910c;
+}
+.Metric-average .icon:before{
+	content: "\f2c9"; /* Thermometer half full */
+}
+
+.Metric-good {
+	color: #666 !important;
+}
+.Metric-good .ui.ribbon.label{
+	color: #666;
+}
+.Metric-good .icon:before{
+	content: "\f2cb"; /* Thermometer empty */
+}
+
+
+/*************************** 
+ ****** Help Message *******
+ ***************************/
+
+.helper{
+	display: inline;
+}
+
+
+
+.helper .question.icon{
+	color: #999;
+	font-size: 0.8em;
+	margin-left: 0.5em;
+}
+.helper:hover .question.icon{
+	color: #2185d0;
+}
+
+.helper .ui.message{
+	background-color: #dff0ff;
+	border-color: #2185d0;
+	color: #2185d0;
+	font-size: 0.6em;
+	font-weight: normal;
+	left: 25%;
+	margin: 0;
+	opacity: 0;
+	position: absolute;
+	right: 0;
+	transition: opacity 1s;
+	visibility: hidden;
+	width: 50%;
+	z-index: 999;
+}
+
+.helper:hover .ui.message{
+	opacity: 1;
+	visibility: visible;
+}
+
+
+/*************************** 
+ ****** Progress Bar *******
+ ***************************/
+.ui.pointing.below.label{
+	color: #FFF;
+	font-weight: normal;
+	max-width: 5em;
+	text-align: center;
+}
+
+.Metric-bad .ui.pointing.below.label{
+	background-color: #db2828;
+	left: 38%;
+}
+
+.ui.progress{
+	margin: 0 auto;
+} 
+
+.ui.progress .bar{
+	left: 5%;
+	width: 50%;
+}
+
+.ui.progress .bar > .progress{
+	color: #FFF;
+	left: 0;
+	right: 0;
+	text-align: center;
+}
+
+/*************************** 
+ ********** Forms **********
+ ***************************/
+
+.form .divider{
+	margin-top: 5em;
+}
+
+.ui.form .header{
+	display: block;
+	margin-bottom: 1em;
+}
+
+.star.rating{
+	padding-top: 6px;
+	width: 100%;
+}
+
+#FinalForm{
+	margin: 3em;
+	text-align: center;
+}
+
+#FinalForm .header{
+	font-size: 1.2em;
+}
+
+#FinalForm .button{
+	margin: 2em;
 }
