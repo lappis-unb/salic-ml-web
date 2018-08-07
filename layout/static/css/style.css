@@ -116,13 +116,14 @@ HTML{
 	padding: 1em 0 1em 2em;
 }
 
+
 .ui.ribbon.label .icon{
 	font-size: 3em;
 	padding-left: 0.2em;
 }
 
 
-.Metric-bad {
+.title.Metric-bad {
 	color: #db2828 !important;
 }
 .Metric-bad .ui.ribbon.label{
@@ -156,14 +157,90 @@ HTML{
 
 
 /*************************** 
+ ****** Help Message *******
+ ***************************/
+
+.helper{
+	display: inline;
+}
+
+
+
+.helper .question.icon{
+	color: #999;
+	font-size: 0.8em;
+	margin-left: 0.5em;
+}
+.helper:hover .question.icon{
+	color: #2185d0;
+}
+
+.helper .ui.message{
+	background-color: #dff0ff;
+	border-color: #2185d0;
+	color: #2185d0;
+	font-size: 0.6em;
+	font-weight: normal;
+	left: 25%;
+	margin: 0;
+	opacity: 0;
+	position: absolute;
+	right: 0;
+	transition: opacity 1s;
+	visibility: hidden;
+	width: 50%;
+	z-index: 999;
+}
+
+.helper:hover .ui.message{
+	opacity: 1;
+	visibility: visible;
+}
+
+
+/*************************** 
+ ****** Progress Bar *******
+ ***************************/
+.ui.pointing.below.label{
+	color: #FFF;
+	font-weight: normal;
+	max-width: 5em;
+	text-align: center;
+}
+
+.Metric-bad .ui.pointing.below.label{
+	background-color: #db2828;
+	left: 38%;
+}
+
+.ui.progress{
+	margin: 0 auto;
+} 
+
+.ui.progress .bar{
+	left: 5%;
+	width: 50%;
+}
+
+.ui.progress .bar > .progress{
+	color: #FFF;
+	left: 0;
+	right: 0;
+	text-align: center;
+}
+
+/*************************** 
  ********** Forms **********
  ***************************/
+
+.form .divider{
+	margin-top: 5em;
+}
 
 .ui.form .header{
 	display: block;
 	margin-bottom: 1em;
 }
-
 
 .star.rating{
 	padding-top: 6px;

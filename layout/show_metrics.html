@@ -84,23 +84,40 @@
 					</div>
 					Itens orçamentários: 378
 					<i class="dropdown icon"></i>
+					<div class="helper">
+						<i class="question circle outline icon"></i>
+						<div class="ui floating message">
+							<p>Compara a quantidade de itens deste projeto 
+							com a <strong>quantidade mais comum</strong> de itens em projetos do mesmo segmento</p>	
+						</div>
+					</div>
 				</div>
-				<div class="content active">
-					<h3>(Barra de distribuição de itens nesse projeto em relação à média do segmento)</h3>                  
-					<div class="ui divider"></div>
-						<div class="ui fedback form">
-							<div class="header">Quanto essa informação é útil para você?</div>
-							<div class="fields">
-								<div class="four wide field">
-									<div class="ui massive star rating"></div>
-								</div>
-								<div class="inline field">
-									<input placeholder="Por quê?" type="text" size="50">
-								</div>
+				
+				<div class="content active Metric-bad">
+					<!-- Barra de distribuição de itens nesse projeto em relação à média do segmento -->
+					<div class="ui pointing below label">
+						Este projeto
+					</div>
+					<div class="ui progress" data-percent="12"  data-total="1000" id="MedianDisplay-TotalItems" >
+						<div class="bar">
+							<div class="progress">50 - 170</div>
+						</div>
+						<div class="label">Média de itens orçamentários para Jogos Eletrônicos</div>
+					</div>
+					
+					<div class="ui fedback form">
+						<div class="ui divider"></div>
+						<div class="header">Quanto essa informação é útil para você?</div>
+						<div class="fields">
+							<div class="four wide field">
+								<div class="ui massive star rating"></div>
+							</div>
+							<div class="inline field">
+								<input placeholder="Por quê?" type="text" size="50">
 							</div>
 						</div>
+						</div>
 				</div>
-
 
 				<!-- METRIC -->
 				<!-- 1 Porcentagem de itens do projeto em relação a distribuição dos itens mais comuns para aquele segmento ou area -->
@@ -110,6 +127,13 @@
 					</div>
 					Itens orçamentários fora do comum: 30%
 					<i class="dropdown icon"></i>
+					<div class="helper">
+						<i class="question circle outline icon"></i>
+						<div class="ui floating message">
+							<p>Indica os itens orçamentários deste projeto que <strong>não estão entre os mais comuns</strong> do segmento.</p>	
+							<p>Também lista os itens que aparecem frequentemente em projetos do segmento, mas que <strong>não aparecem neste projeto</strong>.</p>	
+						</div>
+					</div>
 				</div>
 				<div class="content active">
 					<div class="ui grid">
@@ -141,11 +165,18 @@
 					</div>
 					Comprovantes de pagamento: 500
 					<i class="dropdown icon"></i>
-				
+					<div class="helper">
+						<i class="question circle outline icon"></i>
+						<div class="ui floating message">
+							<p>Compara a quantidade de comprovantes deste projeto 
+							com a <strong>quantidade mais comum</strong> de comprovantes em projetos do mesmo segmento</p>	
+						</div>
+					</div>
 				</div>        
 				<div class="content active">
 					<h3>(Barra de distribuição de da quant de comprovantes nesse projeto em relação à média do segmento)</h3>
 				</div>
+
 
 				<!-- METRIC -->
 				<!-- 5 Porcentagem de itens acima da mediana histórica, média do desvio da mediana, ou o próprio vetor de diferença em relação a mediana -->
@@ -155,10 +186,18 @@
 					</div>
 					Preços acima da média: 40%
 					<i class="dropdown icon"></i>
+					<div class="helper">
+						<i class="question circle outline icon"></i>
+						<div class="ui floating message">
+							<p>Verifica a porcentagem de itens com valor acima da mediana histórica neste projeto e
+							compara com a <strong>porcentagem mais frequente</strong> de itens acima da mediana em projetos do mesmo segmento</p>	
+						</div>
+					</div>
 				</div>        
 				<div class="content active">
 					<h3>(Barra de distribuição em relação à média)</h3>                  
 				</div>      
+
 
 				<!-- METRIC -->
 				<!-- Total do valor comprovado do projeto -->
@@ -168,6 +207,13 @@
 					</div>
 					Valor comprovado: R$ 320.000,00
 					<i class="dropdown icon"></i>
+					<div class="helper">
+						<i class="question circle outline icon"></i>
+						<div class="ui floating message">
+							<p>Compara o valor comprovado neste projeto 
+							com o <strong>valor mais frequentemente</strong> comprovado em projetos do mesmo segmento</p>	
+						</div>
+					</div>
 				</div>
 				<div class="content active">
 					<h3>(Barra de distribuição do valor do projeto em relação à média do segmento)</h3>                  
@@ -182,24 +228,40 @@
 					</div>
 					Valor captado: R$ 300.000,00
 					<i class="dropdown icon"></i>
+					<div class="helper">
+						<i class="question circle outline icon"></i>
+						<div class="ui floating message">
+							<p>Compara o valor captado neste projeto 
+							com o <strong>valor mais frequentemente</strong> captado em projetos do mesmo segmento</p>	
+						</div>
+					</div>
 				</div>
 				<div class="content active">
 					<h3>(Barra de distribuição do valor do projeto em relação à média do segmento)</h3>                  
 				</div>
+
 
 				<!-- METRIC -->
 				<!-- 3 Como a planilha, incluindo itens e preços, mudam ao longo do tempo em termos de rubrica ou outra categoria -->
 				<div class="title active Metric-good">
 					<div class="ui ribbon label">
 						<i class="icon"></i>
-					</div>					Mudanças na planilha orçamentária: 41
+					</div>
+					Mudanças na planilha orçamentária: 41
 					<i class="dropdown icon"></i>
+					<div class="helper">
+						<i class="question circle outline icon"></i>
+						<div class="ui floating message">
+							<p>Compara o quantidade de mudanças de valor em itens orçamentários neste projeto 
+							com a <strong>quantidade de mudanças mais frequente</strong> em projetos do mesmo segmento.</p>
+							<p>Também indica quantas versões de planilha orçamentária foram geradas até a prestação de contas.</p>
+						</div>
+					</div>
 				</div>        
 				<div class="content active">
 					<h3>(Barra de distribuição de quant. de mudanças nesse proj em relação à média do segmento)</h3>                  
 					<h3>Versões de planilha orçamentária: 7</h3>                  
 				</div>                       
-
 
 
 				<!-- METRIC -->
@@ -210,6 +272,12 @@
 					</div>
 					Projetos do mesmo proponente: 3
 					<i class="dropdown icon"></i>
+					<div class="helper">
+						<i class="question circle outline icon"></i>
+						<div class="ui floating message">
+							<p>Indica os projetos que o proponente já executou no passado.</p>
+						</div>
+					</div>
 				</div>        
 				<div class="content active">
 					<div class="ui bulleted list">                          
@@ -219,6 +287,7 @@
 					</div>                    
 				</div>         
 
+
 				<!-- METRIC -->
 				<!-- 4 Porcentagem ou distribuição dos fornecedores do projeto em relação a fornecedores já conhecidos -->
 				<div class="title active Metric-good">
@@ -227,6 +296,14 @@
 					</div>
 					Novos fornecedores: 7%
 					<i class="dropdown icon"></i>
+					<div class="helper">
+						<i class="question circle outline icon"></i>
+						<div class="ui floating message">
+							<p>Indica a proporção de fornecedores que <strong>nunca participaram de projetos</strong> de incentivo antes 
+								em relação ao total de fornecedores envolvidos com o projeto.</p>
+							<p>Também lista os itens orçamentários dos novos fornecedores.</p>
+						</div>
+					</div>
 				</div>        
 				<div class="content active">
 					<div class="accordion">
@@ -256,8 +333,6 @@
 				</div>            
 
 
-
-
 				<!-- METRIC -->
 				<!-- Total do valor aprovado do projeto -->
 				<div class="title active Metric-good">
@@ -266,6 +341,13 @@
 					</div>
 					Valor aprovado: R$ 420.000,00
 					<i class="dropdown icon"></i>
+					<div class="helper">
+						<i class="question circle outline icon"></i>
+						<div class="ui floating message">
+							<p>Compara o valor aprovado para este projeto 
+							com o <strong>valor mais frequentemente</strong> aprovado em projetos do mesmo segmento</p>	
+						</div>
+					</div>
 				</div>
 				<div class="content active">
 					<h3>(Barra de distribuição em relação à média)</h3>                     
@@ -326,13 +408,19 @@
 <script>
 	$('#DiagnosticMetrics')
 		.accordion({
-		exclusive: false
+			exclusive: false
+	})
+	;
+	$('#MedianDisplay-TotalItems')
+		.progress({
+			showActivity: false,
+			label: ''
 	})
 	;
 	$('.ui.rating')
 		.rating({
-		initialRating: 3,
-		maxRating: 5
+			initialRating: 3,
+			maxRating: 5
 	})
 	;
 </script>
