@@ -110,10 +110,10 @@
                     <div class="header">Quanto essa informação é útil para você?</div>
                     <div class="fields">
                         <div class="four wide field">
-                            <div class="ui massive star rating"></div>
+                            <div class="ui massive star rating" name="itens_orcamentarios_rating"></div>
                         </div>
                         <div class="inline field">
-                            <input placeholder="Por quê?" type="text" size="50">
+                            <input placeholder="Por quê?" type="text" size="50" name="itens_orcamentarios_text">
                         </div>
                     </div>
                 </div>
@@ -167,6 +167,18 @@
                             </div>
                         </div>
                     </div>
+                    <div class="ui fedback form">
+                        <div class="ui divider"></div>
+                        <div class="header">Quanto essa informação é útil para você?</div>
+                        <div class="fields">
+                            <div class="four wide field">
+                                <div class="ui massive star rating" name="itens_orcamentarios_fora_do_comum_rating"></div>
+                            </div>
+                            <div class="inline field">
+                                <input placeholder="Por quê?" type="text" size="50" name="itens_orcamentarios_fora_do_comum_text">
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -177,7 +189,7 @@
                 <div class="ui ribbon label">
                     <i class="icon"></i>
                 </div>
-                Comprovantes de pagamento:  {{indicator.metrics.3.value}}
+                Comprovantes de pagamento: {{indicator.metrics.3.value}}
                 <i class="dropdown icon"></i>
                 <div class="helper">
                     <i class="question circle outline icon"></i>
@@ -189,6 +201,18 @@
             </div>
             <div class="content active">
                 <h3>(Barra de distribuição de da quant de comprovantes nesse projeto em relação à média do segmento)</h3>
+                <div class="ui fedback form">
+                    <div class="ui divider"></div>
+                    <div class="header">Quanto essa informação é útil para você?</div>
+                    <div class="fields">
+                        <div class="four wide field">
+                            <div class="ui massive star rating" name="comprovantes_pagamento_rating"></div>
+                        </div>
+                        <div class="inline field">
+                            <input placeholder="Por quê?" type="text" size="50" name="comprovantes_pagamento_text">
+                        </div>
+                    </div>
+                </div>
             </div>
 
 
@@ -198,7 +222,7 @@
                 <div class="ui ribbon label">
                     <i class="icon"></i>
                 </div>
-                Preços acima da média:  {{indicator.metrics.4.value}}
+                Preços acima da média: {{indicator.metrics.4.value}}
                 <i class="dropdown icon"></i>
                 <div class="helper">
                     <i class="question circle outline icon"></i>
@@ -211,6 +235,18 @@
             </div>
             <div class="content active">
                 <h3>(Barra de distribuição em relação à média)</h3>
+                <div class="ui fedback form">
+                    <div class="ui divider"></div>
+                    <div class="header">Quanto essa informação é útil para você?</div>
+                    <div class="fields">
+                        <div class="four wide field">
+                            <div class="ui massive star rating" name="precos_acima_media_rating"></div>
+                        </div>
+                        <div class="inline field">
+                            <input placeholder="Por quê?" type="text" size="50" name="precos_acima_media_text">
+                        </div>
+                    </div>
+                </div>
             </div>
 
 
@@ -220,7 +256,7 @@
                 <div class="ui ribbon label">
                     <i class="icon"></i>
                 </div>
-                Valor comprovado:  {{indicator.metrics.5.value}}
+                Valor comprovado: {{indicator.metrics.5.value}}
                 <i class="dropdown icon"></i>
                 <div class="helper">
                     <i class="question circle outline icon"></i>
@@ -232,6 +268,18 @@
             </div>
             <div class="content active">
                 <h3>(Barra de distribuição do valor do projeto em relação à média do segmento)</h3>
+                <div class="ui fedback form">
+                    <div class="ui divider"></div>
+                    <div class="header">Quanto essa informação é útil para você?</div>
+                    <div class="fields">
+                        <div class="four wide field">
+                            <div class="ui massive star rating" name="valor_comprovado_rating"></div>
+                        </div>
+                        <div class="inline field">
+                            <input placeholder="Por quê?" type="text" size="50" name="valor_comprovado_text">
+                        </div>
+                    </div>
+                </div>
             </div>
 
 
@@ -241,7 +289,7 @@
                 <div class="ui ribbon label">
                     <i class="icon"></i>
                 </div>
-                Valor captado:  {{indicator.metrics.6.value}}
+                Valor captado: {{indicator.metrics.6.value}}
                 <i class="dropdown icon"></i>
                 <div class="helper">
                     <i class="question circle outline icon"></i>
@@ -253,6 +301,18 @@
             </div>
             <div class="content active">
                 <h3>(Barra de distribuição do valor do projeto em relação à média do segmento)</h3>
+                <div class="ui fedback form">
+                    <div class="ui divider"></div>
+                    <div class="header">Quanto essa informação é útil para você?</div>
+                    <div class="fields">
+                        <div class="four wide field">
+                            <div class="ui massive star rating" name="valor_captado_rating"></div>
+                        </div>
+                        <div class="inline field">
+                            <input placeholder="Por quê?" type="text" size="50" name="valor_captado_text">
+                        </div>
+                    </div>
+                </div>
             </div>
 
 
@@ -276,6 +336,18 @@
             <div class="content active">
                 <h3>(Barra de distribuição de quant. de mudanças nesse proj em relação à média do segmento)</h3>
                 <h3>Versões de planilha orçamentária: 7</h3>
+                <div class="ui fedback form">
+                    <div class="ui divider"></div>
+                    <div class="header">Quanto essa informação é útil para você?</div>
+                    <div class="fields">
+                        <div class="four wide field">
+                            <div class="ui massive star rating" name="mudancas_planilha_orcamentaria_rating"></div>
+                        </div>
+                        <div class="inline field">
+                            <input placeholder="Por quê?" type="text" size="50" name="mudancas_planilha_orcamentaria_text">
+                        </div>
+                    </div>
+                </div>
             </div>
 
 
@@ -304,6 +376,18 @@
                     </div>
                     <div class="item">
                         <a href="#">Nome do projeto 3</a>
+                    </div>
+                </div>
+                <div class="ui fedback form">
+                    <div class="ui divider"></div>
+                    <div class="header">Quanto essa informação é útil para você?</div>
+                    <div class="fields">
+                        <div class="four wide field">
+                            <div class="ui massive star rating" name="projetos_mesmo_proponente_rating"></div>
+                        </div>
+                        <div class="inline field">
+                            <input placeholder="Por quê?" type="text" size="50" name="projetos_mesmo_proponente_text">
+                        </div>
                     </div>
                 </div>
             </div>
@@ -363,6 +447,18 @@
                             </div>
                         </div>
                     </div>
+                    <div class="ui fedback form">
+                        <div class="ui divider"></div>
+                        <div class="header">Quanto essa informação é útil para você?</div>
+                        <div class="fields">
+                            <div class="four wide field">
+                                <div class="ui massive star rating" name="novos_fornecedores_rating"></div>
+                            </div>
+                            <div class="inline field">
+                                <input placeholder="Por quê?" type="text" size="50" name="novos_fornecedores_text">
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -385,12 +481,20 @@
             </div>
             <div class="content active">
                 <h3>(Barra de distribuição em relação à média)</h3>
+                <div class="ui fedback form">
+                    <div class="ui divider"></div>
+                    <div class="header">Quanto essa informação é útil para você?</div>
+                    <div class="fields">
+                        <div class="four wide field">
+                            <div class="ui massive star rating" name="valor_aprovado_rating"></div>
+                        </div>
+                        <div class="inline field">
+                            <input placeholder="Por quê?" type="text" size="50" name="valor_aprovado_text">
+                        </div>
+                    </div>
+                </div>
             </div>
-
         </div>
-
-
-
 
 
         <input type="hidden" name="project_pronac" value="{{ project.pronac }}">
