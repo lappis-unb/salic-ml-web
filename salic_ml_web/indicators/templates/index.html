@@ -1,6 +1,4 @@
-{% extends 'base.html' %}
-
-{% block content %}
+{% extends 'base.html' %} {% block content %}
 <h1 class="ui header">Projetos em análise de resultados</h1>
 <table id="example" style="text-align: center" class="ui celled table striped">
     <thead>
@@ -15,9 +13,9 @@
         {% for project in projects %}
         <tr>
             <td>
-                <button class="ui positive button">
+                <a class="ui positive button" href="{% url 'show_metrics' project.pronac %}">
                     {{ project.pronac }}
-                </button>
+                </a>
             </td>
             <td>{{ project.complexity }}</td>
             <td>{{ project.project_name }}</td>
@@ -45,5 +43,4 @@
             //"dom": '<"top"f>rt<"bottom"><"clear">',
         });
     });
-</script>
-{% endblock %}
+</script> {% endblock %}

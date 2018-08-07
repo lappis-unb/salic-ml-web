@@ -7,19 +7,19 @@ from salic_db.utils import test_connection, make_query_from_db
 
 
 def index(request):
-    # projects = [
-    #     {"pronac": "1234", "complexity": 25,
-    #         "project_name": "Show do Tiririca", "analist": "Florentina"},
-    #     {"pronac": "4321", "complexity": 75,
-    #         "project_name": "Show do ex Calipso", "analist": "Chimbinha"},
-    #     {"pronac": "1324", "complexity": 95,
-    #         "project_name": "Projeto da Cláudia Leitte", "analist": "Cláudia Leitte"},
-    #     {"pronac": "1243", "complexity": 15,
-    #         "project_name": "Tourada", "analist": "Ferdinando"},
-    #     {"pronac": "2143", "complexity": 5,
-    #         "project_name": "Projeto modelo", "analist": "Modelo"},
-    # ]
-    projects = projects_to_analyse(request)
+    projects = [
+        {"pronac": "1234", "complexity": 25,
+            "project_name": "Show do Tiririca", "analist": "Florentina"},
+        {"pronac": "4321", "complexity": 75,
+            "project_name": "Show do ex Calipso", "analist": "Chimbinha"},
+        {"pronac": "1324", "complexity": 95,
+            "project_name": "Projeto da Cláudia Leitte", "analist": "Cláudia Leitte"},
+        {"pronac": "1243", "complexity": 15,
+            "project_name": "Tourada", "analist": "Ferdinando"},
+        {"pronac": "2143", "complexity": 5,
+            "project_name": "Projeto modelo", "analist": "Modelo"},
+    ]
+    # projects = projects_to_analyse(request)
 
     return render(request, 'index.html', {'projects': projects})
 
@@ -71,9 +71,9 @@ def fetch_user_data(request):
     try:
         user = User.objects.get(email=request.POST['user_email'])
     except:
-        user_name = request.POST['user_first_name']
+        user_name = str(request.POST['user_first_name'])
 
-        user_email = request.POST['user_email'] + "@gmail.com"
+        user_email = str(request.POST['user_email'] + "@gmail.com")
 
         user = User.objects.create(email=user_email, name=user_name)
 
@@ -123,8 +123,5 @@ def post_metrics_feedback(request):
     project_feedback_grade = request.POST['project_feedback_grade']
     #ProjectFeedback.objects.create(user=user, entity=entity, grade=project_feedback_grade)
 
-    print('8'*100)
-    print(project_feedback_grade)
-    print('8'*100)
     return HttpResponse(project_feedback_grade)
 
