@@ -56,8 +56,8 @@ class Evidence(models.Model):
 
 
 class User(models.Model):
-    name = models.CharField(max_length=200, blank=True)
-    email = models.EmailField(max_length=254, blank=True, null=True, unique=True)
+    name = models.CharField(max_length=200, blank=False)
+    email = models.EmailField(max_length=254, blank=False, null=False, unique=True)
 
     def __str__(self):
         return self.name

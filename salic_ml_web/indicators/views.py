@@ -68,12 +68,11 @@ def projects_to_analyse(request):
 
 
 def fetch_user_data(request):
+    user_email = request.POST['user_email'] + '@gmail.com'
     try:
-        user = User.objects.get(email=request.POST['user_email'])
+        user = User.objects.get(email=user_email)
     except:
         user_name = str(request.POST['user_first_name'])
-
-        user_email = str(request.POST['user_email'] + "@gmail.com")
 
         user = User.objects.create(email=user_email, name=user_name)
 
