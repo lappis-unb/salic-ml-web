@@ -80,7 +80,7 @@
                 <div class="ui ribbon label">
                     <i class="icon"></i>
                 </div>
-                Itens orçamentários: {{indicator.metrics.0.value}}
+                <span>Itens orçamentários: {{indicator.metrics.0.value}}</span>
                 <i class="dropdown icon"></i>
                 <div class="helper">
                     <i class="question circle outline icon"></i>
@@ -123,7 +123,7 @@
                 <div class="ui ribbon label">
                     <i class="icon"></i>
                 </div>
-                Itens orçamentários fora do comum: {{indicator.metrics.1.value}}
+                <span>Itens orçamentários fora do comum: {{indicator.metrics.1.value}}%</span>
                 <i class="dropdown icon"></i>
                 <div class="helper">
                     <i class="question circle outline icon"></i>
@@ -140,36 +140,28 @@
                     <div class="eight wide column">
                         <div class="list header">Itens inesperados</div>
                         <div class="ui bulleted list">
+                            {% for itens in indicator.metrics.1.expected_itens %}
                             <div class="item">
-                                <a href="#">Nome do Item 1</a>
+                                <a href="{{itens.link}}">{{itens.name}}</a>
                             </div>
-                            <div class="item">
-                                <a href="#">Nome do Item 2</a>
-                            </div>
-                            <div class="item">
-                                <a href="#">Nome do Item 3</a>
-                            </div>
+                            {% endfor %}
                         </div>
                     </div>
                     <div class="eight wide column">
                         <div class="list header">Itens ausentes</div>
                         <div class="ui bulleted list">
+                            {% for itens in indicator.metrics.1.missing_itens %}
                             <div class="item">
-                                <a href="#">Nome do Item 1</a>
+                                <a href="{{itens.link}}">{{itens.name}}</a>
                             </div>
-                            <div class="item">
-                                <a href="#">Nome do Item 2</a>
-                            </div>
-                            <div class="item">
-                                <a href="#">Nome do Item 3</a>
-                            </div>
+                            {% endfor %}
                         </div>
                     </div>
                     <div class="ui fedback form">
                         <div class="ui divider"></div>
                         <div class="header">Quanto essa informação é útil para você?</div>
                         <div class="fields">
-                            <div class="four wide field">
+                            <div class="five wide field">
                                 <div class="ui massive star rating" name="itens_orcamentarios_fora_do_comum_rating"></div>
                             </div>
                             <div class="inline field">
@@ -187,7 +179,7 @@
                 <div class="ui ribbon label">
                     <i class="icon"></i>
                 </div>
-                Comprovantes de pagamento: {{indicator.metrics.3.value}}
+                Comprovantes de pagamento: {{indicator.metrics.2.value}}
                 <i class="dropdown icon"></i>
                 <div class="helper">
                     <i class="question circle outline icon"></i>
@@ -220,7 +212,7 @@
                 <div class="ui ribbon label">
                     <i class="icon"></i>
                 </div>
-                Preços acima da média: {{indicator.metrics.4.value}}
+                <span>Preços acima da média: {{indicator.metrics.3.value}}%</span>
                 <i class="dropdown icon"></i>
                 <div class="helper">
                     <i class="question circle outline icon"></i>
@@ -254,7 +246,7 @@
                 <div class="ui ribbon label">
                     <i class="icon"></i>
                 </div>
-                Valor comprovado: {{indicator.metrics.5.value}}
+                <span>Valor comprovado: R${{indicator.metrics.4.value}}</span>
                 <i class="dropdown icon"></i>
                 <div class="helper">
                     <i class="question circle outline icon"></i>
@@ -287,7 +279,7 @@
                 <div class="ui ribbon label">
                     <i class="icon"></i>
                 </div>
-                Valor captado: {{indicator.metrics.6.value}}
+                <span>Valor captado: R${{indicator.metrics.5.value}}</span>
                 <i class="dropdown icon"></i>
                 <div class="helper">
                     <i class="question circle outline icon"></i>
@@ -320,7 +312,7 @@
                 <div class="ui ribbon label">
                     <i class="icon"></i>
                 </div>
-                Mudanças na planilha orçamentária: {{indicator.metrics.7.value}}
+                <span>Mudanças na planilha orçamentária: R${{indicator.metrics.6.value}}</span>
                 <i class="dropdown icon"></i>
                 <div class="helper">
                     <i class="question circle outline icon"></i>
@@ -333,7 +325,7 @@
             </div>
             <div class="content active">
                 <h3>(Barra de distribuição de quant. de mudanças nesse proj em relação à média do segmento)</h3>
-                <h3>Versões de planilha orçamentária: 7</h3>
+                <h3>Versões de planilha orçamentária: {{indicator.metrics.6.document_version}}</h3>
                 <div class="ui fedback form">
                     <div class="ui divider"></div>
                     <div class="header">Quanto essa informação é útil para você?</div>
@@ -355,7 +347,7 @@
                 <div class="ui ribbon label">
                     <i class="icon"></i>
                 </div>
-                Projetos do mesmo proponente: {{indicator.metrics.7.value}}
+                <span>Projetos do mesmo proponente: {{indicator.metrics.7.value}}</span>
                 <i class="dropdown icon"></i>
                 <div class="helper">
                     <i class="question circle outline icon"></i>
@@ -366,15 +358,11 @@
             </div>
             <div class="content active">
                 <div class="ui bulleted list">
+                    {% for project in indicator.metrics.7.proponent_projects %}
                     <div class="item">
-                        <a href="#">Nome do projeto 1</a>
+                        <a href="{{project.link}}">{{project.name}}</a>
                     </div>
-                    <div class="item">
-                        <a href="#">Nome do projeto 2</a>
-                    </div>
-                    <div class="item">
-                        <a href="#">Nome do projeto 3</a>
-                    </div>
+                    {% endfor %}
                 </div>
                 <div class="ui fedback form">
                     <div class="ui divider"></div>
@@ -397,7 +385,7 @@
                 <div class="ui ribbon label">
                     <i class="icon"></i>
                 </div>
-                Novos fornecedores: {{indicator.metrics.8.value}}
+                <span>Novos fornecedores: {{indicator.metrics.8.value}}%</span>
                 <i class="dropdown icon"></i>
                 <div class="helper">
                     <i class="question circle outline icon"></i>
@@ -411,40 +399,21 @@
             </div>
             <div class="content active">
                 <div class="accordion">
+                    {% for provider in indicator.metrics.8.providers %}
                     <div class="title">
                         <i class="dropdown icon"></i>
-                        Novo Fornecedor A
+                        {{provider.name}}
                     </div>
                     <div class="content">
                         <div class="ui bulleted list">
+                            {% for itens in provider.itens_list %}
                             <div class="item">
-                                <a href="#">Nome do item 1</a>
+                                <a href="{{itens.link}}">{{itens.name}}</a>
                             </div>
-                            <div class="item">
-                                <a href="#">Nome do item 2</a>
-                            </div>
-                            <div class="item">
-                                <a href="#">Nome do item 3</a>
-                            </div>
+                            {% endfor %}
                         </div>
                     </div>
-                    <div class="title">
-                        <i class="dropdown icon"></i>
-                        Novo Fornecedor B
-                    </div>
-                    <div class="content">
-                        <div class="ui bulleted list">
-                            <div class="item">
-                                <a href="#">Nome do item 1</a>
-                            </div>
-                            <div class="item">
-                                <a href="#">Nome do item 2</a>
-                            </div>
-                            <div class="item">
-                                <a href="#">Nome do item 3</a>
-                            </div>
-                        </div>
-                    </div>
+                    {% endfor %}
                     <div class="ui fedback form">
                         <div class="ui divider"></div>
                         <div class="header">Quanto essa informação é útil para você?</div>
@@ -467,7 +436,7 @@
                 <div class="ui ribbon label">
                     <i class="icon"></i>
                 </div>
-                Valor aprovado: {{indicator.metrics.9.value}}
+                <span>Valor aprovado: R${{indicator.metrics.9.value}}</span>
                 <i class="dropdown icon"></i>
                 <div class="helper">
                     <i class="question circle outline icon"></i>
@@ -514,7 +483,7 @@
                     {% endfor %}
                 </div>
             </div>
-            <button class="ui huge primary button" onclick="getRating()">
+            <button class="ui huge primary button" onmouseover="getRating()">
                 Terminar Diagnóstico
             </button>
         </div>
@@ -540,10 +509,18 @@
     function getRating() {
         var value = $('.ui.rating').rating('get rating')
         var hidden_ratings = document.getElementById("all_ratings")
+        for (var i = 0, size = value.length; i < size; ++i) {
+            console.log(value[i]);
+            if (!value[i]) {
+                alert('Por favor, deixe sua avaliação em todas as estrelas')
+                break;
+            }
+        }
+
         hidden_ratings.value = value.join("")
         console.log(value);
     }
-    
+
 
     // function getRadio() {
     //     var v = $('.ui.checkbox').checkbox("is checked");
@@ -553,5 +530,5 @@
 
     $('.ui.accordion').accordion({ exclusive: false });
 
-    radialObj.value("{{project_indicators.0.value}}")
+    // radialObj.value("{{project_indicators.0.value}}")
 </script> {% endblock %}
