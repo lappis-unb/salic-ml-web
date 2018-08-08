@@ -83,7 +83,7 @@ def fetch_user_data(request):
     project_indicators = [
         {
             'name': 'complexidade_financeira',
-            'value': '50',
+            'value': '80',
             'metrics': [
                 {
                     'name': 'itens_orcamentarios',

@@ -1,9 +1,9 @@
 {% extends 'base.html' %} {% block content %}
 
 <div class="ui fixed inverted menu" id="ProjectID">
-    <button class="ui icon inverted button" id="btBack">
+    <a class="ui icon inverted button" id="btBack" href="{% url 'index' %}">
         <i class="left arrow icon"></i>
-    </button>
+    </a>
     <div class="ui tiny inverted statistic">
         <div class="label">PRONAC</div>
         <div class="value">{{project.pronac}}</div>
@@ -52,10 +52,18 @@
 <!-- <div class="ui icon message Element-space-between">
     <div class="clearfix">
         <div id="indicatorContainer"></div>
-    </div> onclick="getRating()"
+    </div>
     <h3 class="Complexity-text">Diagnóstico de </h3>
 </div> -->
 <div class="ui clearing basic segment" id="Summary">
+    <div class="clearfix" style="margin-right: 30px;">
+        <div id="indicatorContainer"></div>
+    </div>
+    <h1 class="ui header">
+        Diagnóstico de complexidade da prestação de contas
+    </h1>
+</div>
+<!-- <div class="ui clearing basic segment" id="Summary">
     <div class="c100 p70 big orange">
         <span>70%</span>
         <div class="slice">
@@ -66,7 +74,7 @@
     <h1 class="ui header">
         Diagnóstico de complexidade da prestação de contas
     </h1>
-</div>
+</div> -->
 
 <form action="/metrics_feedback" method="post">
     {% csrf_token %}
@@ -462,6 +470,20 @@
                 </div>
             </div>
         </div>
+        <div class="ui modal">
+            <div class="header">Sucesso ao enviar o feedback</div>
+            <div class="content">
+                <p>BADJSKALDJJJKQO</p>
+            </div>
+            <div class="actions">
+                <div class="ui cancel button">Permanecer na página atual</div>
+                <a class="ui primary button" href="{% url 'index' %}">
+                    Ir para a lista dos projetos
+                </a>
+            </div>
+        </div>
+
+        <button onclick="showModal()">Mostra</button>
 
         <input type="hidden" name="all_ratings" value="" id="all_ratings">
         <input type="hidden" name="project_pronac" value="{{ project.pronac }}">
@@ -494,33 +516,31 @@
 <script>
     // Make method to change complexity color
     var radialObj = $('#indicatorContainer').radialIndicator({
-        barColor: '#87CEEB',
+        radius: 70,
+        barColor: {
+            0: '#1B5E20',
+            30: '#F2B01C',
+            80: '#DB2828',
+            100: '#DB2828'
+        },
         barWidth: 10,
         initValue: 0,
         roundCorner: true,
         percentage: true
     }).data('radialIndicator');
 
-    $('.ui.rating').rating({
-        initialRating: 0,
-        maxRating: 5
-    })
-
     function getRating() {
         var value = $('.ui.rating').rating('get rating')
         var hidden_ratings = document.getElementById("all_ratings")
         for (var i = 0, size = value.length; i < size; ++i) {
-            console.log(value[i]);
             if (!value[i]) {
                 alert('Por favor, deixe sua avaliação em todas as estrelas')
                 break;
             }
         }
-
         hidden_ratings.value = value.join("")
-        console.log(value);
+        // console.log(value);
     }
-
 
     // function getRadio() {
     //     var v = $('.ui.checkbox').checkbox("is checked");
@@ -528,7 +548,14 @@
     //     return v;
     // }
 
+    $('.ui.rating').rating({
+        initialRating: 0,
+        maxRating: 5
+    })
+    function showModal() {
+        $('.ui.modal').modal('show')
+    }
     $('.ui.accordion').accordion({ exclusive: false });
 
-    // radialObj.value("{{project_indicators.0.value}}")
+    radialObj.value("{{project_indicators.0.value}}")
 </script> {% endblock %}
