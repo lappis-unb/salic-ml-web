@@ -6,7 +6,11 @@ from .models import Entity, User, ProjectFeedback, MetricFeedback, Metric, Indic
 from salic_db.utils import test_connection, make_query_from_db
 from core.finance.financial_metrics import FinancialMetrics
 
+# Instanciating FinancialMetrics global module
 financial_metrics = FinancialMetrics()
+
+# Uncomment line below when deploying
+# financial_metrics.save()
 
 def index(request):
     # projects = [
@@ -29,17 +33,21 @@ def index(request):
 def show_metrics(request, pronac):
     pronac = int(pronac)
     try:
-        # user = User.objects.get(email=user_email)
         project = Entity.objects.get(pronac=pronac)
     except:
-        string_pronac = "{:06}".format(pronac)
-        project_query = "SELECT CONCAT(AnoProjeto, Sequencial), NomeProjeto \
-        FROM SAC.dbo.Projetos WHERE CONCAT(AnoProjeto, Sequencial) = '{0}'".format(string_pronac)
-        project_raw_data = make_query_from_db(project_query)
+        # string_pronac = "{:06}".format(pronac)
+        # project_query = "SELECT CONCAT(AnoProjeto, Sequencial), NomeProjeto \
+        # FROM SAC.dbo.Projetos WHERE CONCAT(AnoProjeto, Sequencial) = '{0}'".format(string_pronac)
+        # project_raw_data = make_query_from_db(project_query)
+        # project_data = {
+        #         'pronac': project_raw_data[0][0],
+        #         'project_name': project_raw_data[0][1]
+        # }
+
         project_data = {
-                'pronac': project_raw_data[0][0],
-                'project_name': project_raw_data[0][1]
-            }
+            'pronac': pronac,
+            'project_name': 'Mock'
+        }
         project = Entity.objects.create(pronac=int(project_data['pronac']), name=project_data['project_name'])
 
     current_user = None
@@ -90,17 +98,23 @@ def get_items_interval(mean, std):
     end = mean + (1.5 * std)
 
     result = {
-        'start': start,
-        'end': end
+        'start': int(start),
+        'end': int(end)
     }
 
     return result
 
-def get_items_outlier_color(is_outlier):
+def get_outlier_color(is_outlier):
     if is_outlier:
         return 'Metric-bad'
     else:
-        return ''
+        return 'Metric-good'
+
+def float_to_money(value):
+    us_value = '{:,.2f}'.format(value)
+    v_value = us_value.replace(',','v')
+    c_value = v_value.replace('.',',')
+    return 'R$' + c_value.replace('v','.')
     
 def fetch_user_data(request):
     user_email = request.POST['user_email'] + '@cultura.gov.br'
@@ -114,239 +128,289 @@ def fetch_user_data(request):
     pronac = request.POST['project_pronac']
     project = get_object_or_404(Entity, pronac=int(pronac))
 
-    metrics = financial_metrics.get_metrics(int(pronac), ['items'])
+    metrics_list = ['items', 'raised_funds', 'verified_funds']
+
+    metrics = {}
+
+    for metric_name in metrics_list:
+        try:
+            metrics[metric_name] = financial_metrics.get_metrics(int(pronac), [metric_name])[metric_name]
+        except:
+            metrics[metric_name] = None
 
     result = {
         'pronac': pronac,
-        'metrics': metrics
+        'received_metrics': metrics
     }
 
     # itens_orcamentarios
-    items_interval = get_items_interval(metrics['items']['mean'], metrics['items']['std'])
     items = {
-        'total_items': metrics['items']['value'],
-        'interval_start': items_interval['start'],
-        'interval_end': items_interval['end'],
-        'outlier_color': get_items_outlier_color(metrics['items']['is_outlier'])
+            'total_items': 0,
+            'interval_start': 0,
+            'interval_end': 0,
+            'outlier_check': get_outlier_color(False)
     }
 
-    result['items'] = items
+    if metrics['items']:
+        items_interval = get_items_interval(metrics['items']['mean'], metrics['items']['std'])
+        items = {
+            'total_items': metrics['items']['value'],
+            'interval_start': items_interval['start'],
+            'interval_end': items_interval['end'],
+            'outlier_check': get_outlier_color(metrics['items']['is_outlier'])
+        }
 
-    # project_indicators = [
-    #     {
-    #         'name': 'complexidade_financeira',
-    #         'value': '80',
-    #         'metrics': [
-    #             {
-    #                 'name': 'itens_orcamentarios',
-    #                 'value': '10',  # e porcentagem? Valor em reais ?...
-    #                 'reason': 'any reason',
-    #                 'outlier_check': 'Metric-bad'  # E outlier?
-    #             },
-    #             {
-    #                 'name': 'itens_orcamentarios_fora_do_comum',
-    #                 'value': '20',
-    #                 'reason': 'any reason',
-    #                 'outlier_check': 'Metric-average',
-    #                 'expected_itens': [
-    #                     {
-    #                         'name': 'Nome do Item 1',
-    #                         'link': '#',
-    #                     },
-    #                     {
-    #                         'name': 'Nome do Item 2',
-    #                         'link': '#',
-    #                     },
-    #                     {
-    #                         'name': 'Nome do Item 3',
-    #                         'link': '#',
-    #                     },
-    #                     {
-    #                         'name': 'Nome do Item 4',
-    #                         'link': '#',
-    #                     },
-    #                     {
-    #                         'name': 'Nome do Item 5',
-    #                         'link': '#',
-    #                     },
-    #                 ],
-    #                 'missing_itens': [
-    #                     {
-    #                         'name': 'Nome do Item 1',
-    #                         'link': '#',
-    #                     },
-    #                     {
-    #                         'name': 'Nome do Item 2',
-    #                         'link': '#',
-    #                     },
-    #                     {
-    #                         'name': 'Nome do Item 3',
-    #                         'link': '#',
-    #                     },
-    #                     {
-    #                         'name': 'Nome do Item 4',
-    #                         'link': '#',
-    #                     },
-    #                     {
-    #                         'name': 'Nome do Item 5',
-    #                         'link': '#',
-    #                     },
-    #                 ]
-    #             },
-    #             {
-    #                 'name': 'comprovantes_pagamento',
-    #                 'value': '30',
-    #                 'reason': 'any reason',
-    #                 'outlier_check': 'Metric-bad',
-    #             },
-    #             {
-    #                 'name': 'precos_acima_media',
-    #                 'value': '40',
-    #                 'reason': 'any reason',
-    #                 'outlier_check': ''
-    #             },
-    #             {
-    #                 'name': 'valor_comprovado',
-    #                 'value': '50',
-    #                 'reason': 'any reason',
-    #                 'outlier_check': ''
-    #             },
-    #             {
-    #                 'name': 'valor_captado',
-    #                 'value': '60',
-    #                 'reason': 'any reason',
-    #                 'outlier_check': ''
-    #             },
-    #             {
-    #                 'name': 'mudancas_planilha_orcamentaria',
-    #                 'value': '70',
-    #                 'reason': 'any reason',
-    #                 'outlier_check': '',
-    #                 'document_version': 14,
-    #             },
-    #             {
-    #                 'name': 'projetos_mesmo_proponente',
-    #                 'value': '80',
-    #                 'reason': 'any reason',
-    #                 'outlier_check': '',
-    #                 'proponent_projects': [
-    #                     {
-    #                         'name': 'Projeto 1',
-    #                         'link': '#',
-    #                     },
-    #                     {
-    #                         'name': 'Projeto 2',
-    #                         'link': '#',
-    #                     },
-    #                     {
-    #                         'name': 'Projeto 3',
-    #                         'link': '#',
-    #                     },
-    #                 ],
-    #             },
-    #             {
-    #                 'name': 'novos_fornecedores',
-    #                 'value': '90',
-    #                 'reason': 'any reason',
-    #                 'outlier_check': '',
-    #                 'providers': [
-    #                     {
-    #                         'name': 'Ferdinando',
-    #                         'itens_list': [
-    #                             {
-    #                                 'name': 'Nome do Item 1',
-    #                                 'link': '#',
-    #                             },
-    #                             {
-    #                                 'name': 'Nome do Item 2',
-    #                                 'link': '#',
-    #                             },
-    #                             {
-    #                                 'name': 'Nome do Item 3',
-    #                                 'link': '#',
-    #                             },
-    #                             {
-    #                                 'name': 'Nome do Item 4',
-    #                                 'link': '#',
-    #                             },
-    #                             {
-    #                                 'name': 'Nome do Item 5',
-    #                                 'link': '#',
-    #                             },
-    #                         ]
-    #                     },
-    #                     {
-    #                         'name': 'Bruce Wayne',
-    #                         'itens_list': [
-    #                             {
-    #                                 'name': 'Nome do Item 1',
-    #                                 'link': '#',
-    #                             },
-    #                             {
-    #                                 'name': 'Nome do Item 2',
-    #                                 'link': '#',
-    #                             },
-    #                             {
-    #                                 'name': 'Nome do Item 3',
-    #                                 'link': '#',
-    #                             },
-    #                             {
-    #                                 'name': 'Nome do Item 4',
-    #                                 'link': '#',
-    #                             },
-    #                             {
-    #                                 'name': 'Nome do Item 5',
-    #                                 'link': '#',
-    #                             },
-    #                         ]
-    #                     },
-    #                     {
-    #                         'name': 'Frank Castle',
-    #                         'itens_list': [
-    #                             {
-    #                                 'name': 'Nome do Item 1',
-    #                                 'link': '#',
-    #                             },
-    #                             {
-    #                                 'name': 'Nome do Item 2',
-    #                                 'link': '#',
-    #                             },
-    #                             {
-    #                                 'name': 'Nome do Item 3',
-    #                                 'link': '#',
-    #                             },
-    #                             {
-    #                                 'name': 'Nome do Item 4',
-    #                                 'link': '#',
-    #                             },
-    #                             {
-    #                                 'name': 'Nome do Item 5',
-    #                                 'link': '#',
-    #                             },
-    #                         ]
-    #                     },
-    #                 ]
-    #             },
-    #             {
-    #                 'name': 'valor_aprovado',
-    #                 'value': '100',
-    #                 'reason': 'any reason',
-    #                 'outlier_check': ''
-    #             },
-    #             {
-    #                 'name': 'nome_da_métrica',
-    #                 'value': '12',  # É porcentagem? Dinheiro? Confirmar informações
-    #                 'reason': 'any reason',  # Texto se necessário
-    #                 'outlier_check': 'Metric-bad'  # E outlier?
-    #             },
-    #         ]
-    #     },
-    # ]
-    # project_feedback_list = ['Muito simples',
-    #                          'Simples', 'Normal', 'Complexo', 'Muito complexo']
+    result['itens_orcamentarios'] = items
 
-    # return render(request, 'show_metrics.html', {'project': project, 'user': user, 'project_indicators': project_indicators, 'project_feedback_list': project_feedback_list})
-    return HttpResponse(str(result))
+    # valor_captado
+    raised_funds = {
+        'value': float_to_money(0.0),
+        'maximum_expected_value': float_to_money(0.0),
+        'outlier_check': get_outlier_color(False)
+    }
+
+    if metrics['raised_funds']:
+        raised_funds = {
+            'value': float_to_money(metrics['raised_funds']['total_verified_funds']),
+            'maximum_expected_value': float_to_money(metrics['raised_funds']['maximum_expected_funds']),
+            'outlier_check': get_outlier_color(metrics['raised_funds']['is_outlier'])
+        }
+
+    result['valor_captado'] = raised_funds
+
+    # valor_comprovado
+    verified_funds = {
+        'value': float_to_money(0.0),
+        'maximum_expected_value': float_to_money(0.0),
+        'outlier_check': get_outlier_color(False)
+    }
+
+    if metrics['verified_funds']:
+        verified_funds = {
+            'value': float_to_money(metrics['verified_funds']['total_verified_funds']),
+            'maximum_expected_value': float_to_money(metrics['verified_funds']['maximum_expected_funds']),
+            'outlier_check': get_outlier_color(metrics['verified_funds']['is_outlier'])
+        }
+
+    result['valor_comprovado'] = verified_funds
+
+    project_indicators = [
+        {
+            'name': 'complexidade_financeira',
+            'value': '80',
+            'metrics': [
+                {
+                    'name': 'itens_orcamentarios',
+                    'value': result['itens_orcamentarios']['total_items'],  # e porcentagem? Valor em reais ?...
+                    'reason': 'any reason',
+                    'outlier_check': result['itens_orcamentarios']['outlier_check'],  # E outlier?,
+                    'interval_start': result['itens_orcamentarios']['interval_start'],
+                    'interval_end': result['itens_orcamentarios']['interval_end']
+                },
+                {
+                    'name': 'itens_orcamentarios_fora_do_comum',
+                    'value': '20',
+                    'reason': 'any reason',
+                    'outlier_check': 'Metric-average',
+                    'expected_itens': [
+                        {
+                            'name': 'Nome do Item 1',
+                            'link': '#',
+                        },
+                        {
+                            'name': 'Nome do Item 2',
+                            'link': '#',
+                        },
+                        {
+                            'name': 'Nome do Item 3',
+                            'link': '#',
+                        },
+                        {
+                            'name': 'Nome do Item 4',
+                            'link': '#',
+                        },
+                        {
+                            'name': 'Nome do Item 5',
+                            'link': '#',
+                        },
+                    ],
+                    'missing_itens': [
+                        {
+                            'name': 'Nome do Item 1',
+                            'link': '#',
+                        },
+                        {
+                            'name': 'Nome do Item 2',
+                            'link': '#',
+                        },
+                        {
+                            'name': 'Nome do Item 3',
+                            'link': '#',
+                        },
+                        {
+                            'name': 'Nome do Item 4',
+                            'link': '#',
+                        },
+                        {
+                            'name': 'Nome do Item 5',
+                            'link': '#',
+                        },
+                    ]
+                },
+                {
+                    'name': 'comprovantes_pagamento',
+                    'value': '30',
+                    'reason': 'any reason',
+                    'outlier_check': 'Metric-bad',
+                },
+                {
+                    'name': 'precos_acima_media',
+                    'value': '40',
+                    'reason': 'any reason',
+                    'outlier_check': ''
+                },
+                {
+                    'name': 'valor_comprovado',
+                    'value': result['valor_comprovado']['value'],
+                    'reason': result['valor_comprovado']['maximum_expected_value'],
+                    'outlier_check': result['valor_comprovado']['outlier_check']
+                },
+                {
+                    'name': 'valor_captado',
+                    'value': result['valor_captado']['value'],
+                    'reason': result['valor_captado']['maximum_expected_value'],
+                    'outlier_check': result['valor_captado']['outlier_check']
+                },
+                {
+                    'name': 'mudancas_planilha_orcamentaria',
+                    'value': '70',
+                    'reason': 'any reason',
+                    'outlier_check': '',
+                    'document_version': 14,
+                },
+                {
+                    'name': 'projetos_mesmo_proponente',
+                    'value': '80',
+                    'reason': 'any reason',
+                    'outlier_check': '',
+                    'proponent_projects': [
+                        {
+                            'name': 'Projeto 1',
+                            'link': '#',
+                        },
+                        {
+                            'name': 'Projeto 2',
+                            'link': '#',
+                        },
+                        {
+                            'name': 'Projeto 3',
+                            'link': '#',
+                        },
+                    ],
+                },
+                {
+                    'name': 'novos_fornecedores',
+                    'value': '90',
+                    'reason': 'any reason',
+                    'outlier_check': '',
+                    'providers': [
+                        {
+                            'name': 'Ferdinando',
+                            'itens_list': [
+                                {
+                                    'name': 'Nome do Item 1',
+                                    'link': '#',
+                                },
+                                {
+                                    'name': 'Nome do Item 2',
+                                    'link': '#',
+                                },
+                                {
+                                    'name': 'Nome do Item 3',
+                                    'link': '#',
+                                },
+                                {
+                                    'name': 'Nome do Item 4',
+                                    'link': '#',
+                                },
+                                {
+                                    'name': 'Nome do Item 5',
+                                    'link': '#',
+                                },
+                            ]
+                        },
+                        {
+                            'name': 'Bruce Wayne',
+                            'itens_list': [
+                                {
+                                    'name': 'Nome do Item 1',
+                                    'link': '#',
+                                },
+                                {
+                                    'name': 'Nome do Item 2',
+                                    'link': '#',
+                                },
+                                {
+                                    'name': 'Nome do Item 3',
+                                    'link': '#',
+                                },
+                                {
+                                    'name': 'Nome do Item 4',
+                                    'link': '#',
+                                },
+                                {
+                                    'name': 'Nome do Item 5',
+                                    'link': '#',
+                                },
+                            ]
+                        },
+                        {
+                            'name': 'Frank Castle',
+                            'itens_list': [
+                                {
+                                    'name': 'Nome do Item 1',
+                                    'link': '#',
+                                },
+                                {
+                                    'name': 'Nome do Item 2',
+                                    'link': '#',
+                                },
+                                {
+                                    'name': 'Nome do Item 3',
+                                    'link': '#',
+                                },
+                                {
+                                    'name': 'Nome do Item 4',
+                                    'link': '#',
+                                },
+                                {
+                                    'name': 'Nome do Item 5',
+                                    'link': '#',
+                                },
+                            ]
+                        },
+                    ]
+                },
+                {
+                    'name': 'valor_aprovado',
+                    'value': '100',
+                    'reason': 'any reason',
+                    'outlier_check': ''
+                },
+                {
+                    'name': 'nome_da_métrica',
+                    'value': '12',  # É porcentagem? Dinheiro? Confirmar informações
+                    'reason': 'any reason',  # Texto se necessário
+                    'outlier_check': 'Metric-bad'  # E outlier?
+                },
+            ]
+        },
+    ]
+    project_feedback_list = ['Muito simples',
+                             'Simples', 'Normal', 'Complexo', 'Muito complexo']
+
+    return render(request, 'show_metrics.html', {'project': project, 'user': user, 'project_indicators': project_indicators, 'project_feedback_list': project_feedback_list})
+    # return HttpResponse(str(result))
 
 def post_metrics_feedback(request):
 
