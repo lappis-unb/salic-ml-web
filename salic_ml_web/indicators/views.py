@@ -86,37 +86,81 @@ def fetch_user_data(request):
             'metrics': [
                 {
                     'name': 'itens_orcamentarios',
-                    'value': '12',
+                    'value': '10',  # e porcentagem? Valor em reais ?...
                     'reason': 'any reason',
-                    'outlier_check': 'Metric-bad'
+                    'outlier_check': 'Metric-bad'  # E outlier?
                 },
                 {
                     'name': 'itens_orcamentarios_fora_do_comum',
-                    'value': '13',
+                    'value': '20',
                     'reason': 'any reason',
-                    'outlier_check': 'Metric-average'
+                    'outlier_check': 'Metric-average',
+                    'expected_itens': [
+                        {
+                            'name': 'Nome do Item 1',
+                            'link': '#',
+                        },
+                        {
+                            'name': 'Nome do Item 2',
+                            'link': '#',
+                        },
+                        {
+                            'name': 'Nome do Item 3',
+                            'link': '#',
+                        },
+                        {
+                            'name': 'Nome do Item 4',
+                            'link': '#',
+                        },
+                        {
+                            'name': 'Nome do Item 5',
+                            'link': '#',
+                        },
+                    ],
+                    'missing_itens': [
+                        {
+                            'name': 'Nome do Item 1',
+                            'link': '#',
+                        },
+                        {
+                            'name': 'Nome do Item 2',
+                            'link': '#',
+                        },
+                        {
+                            'name': 'Nome do Item 3',
+                            'link': '#',
+                        },
+                        {
+                            'name': 'Nome do Item 4',
+                            'link': '#',
+                        },
+                        {
+                            'name': 'Nome do Item 5',
+                            'link': '#',
+                        },
+                    ]
                 },
                 {
                     'name': 'comprovantes_pagamento',
-                    'value': '60',
+                    'value': '30',
                     'reason': 'any reason',
                     'outlier_check': 'Metric-bad',
                 },
                 {
                     'name': 'precos_acima_media',
-                    'value': '70',
+                    'value': '40',
                     'reason': 'any reason',
                     'outlier_check': ''
                 },
                 {
                     'name': 'valor_comprovado',
-                    'value': '70',
+                    'value': '50',
                     'reason': 'any reason',
                     'outlier_check': ''
                 },
                 {
                     'name': 'valor_captado',
-                    'value': '70',
+                    'value': '60',
                     'reason': 'any reason',
                     'outlier_check': ''
                 },
@@ -124,32 +168,132 @@ def fetch_user_data(request):
                     'name': 'mudancas_planilha_orcamentaria',
                     'value': '70',
                     'reason': 'any reason',
-                    'outlier_check': ''
+                    'outlier_check': '',
+                    'document_version': 14,
                 },
                 {
                     'name': 'projetos_mesmo_proponente',
-                    'value': '70',
+                    'value': '80',
                     'reason': 'any reason',
-                    'outlier_check': ''
+                    'outlier_check': '',
+                    'proponent_projects': [
+                        {
+                            'name': 'Projeto 1',
+                            'link': '#',
+                        },
+                        {
+                            'name': 'Projeto 2',
+                            'link': '#',
+                        },
+                        {
+                            'name': 'Projeto 3',
+                            'link': '#',
+                        },
+                    ],
                 },
                 {
                     'name': 'novos_fornecedores',
-                    'value': '70',
+                    'value': '90',
+                    'reason': 'any reason',
+                    'outlier_check': '',
+                    'providers': [
+                        {
+                            'name': 'Ferdinando',
+                            'itens_list': [
+                                {
+                                    'name': 'Nome do Item 1',
+                                    'link': '#',
+                                },
+                                {
+                                    'name': 'Nome do Item 2',
+                                    'link': '#',
+                                },
+                                {
+                                    'name': 'Nome do Item 3',
+                                    'link': '#',
+                                },
+                                {
+                                    'name': 'Nome do Item 4',
+                                    'link': '#',
+                                },
+                                {
+                                    'name': 'Nome do Item 5',
+                                    'link': '#',
+                                },
+                            ]
+                        },
+                        {
+                            'name': 'Bruce Wayne',
+                            'itens_list': [
+                                {
+                                    'name': 'Nome do Item 1',
+                                    'link': '#',
+                                },
+                                {
+                                    'name': 'Nome do Item 2',
+                                    'link': '#',
+                                },
+                                {
+                                    'name': 'Nome do Item 3',
+                                    'link': '#',
+                                },
+                                {
+                                    'name': 'Nome do Item 4',
+                                    'link': '#',
+                                },
+                                {
+                                    'name': 'Nome do Item 5',
+                                    'link': '#',
+                                },
+                            ]
+                        },
+                        {
+                            'name': 'Frank Castle',
+                            'itens_list': [
+                                {
+                                    'name': 'Nome do Item 1',
+                                    'link': '#',
+                                },
+                                {
+                                    'name': 'Nome do Item 2',
+                                    'link': '#',
+                                },
+                                {
+                                    'name': 'Nome do Item 3',
+                                    'link': '#',
+                                },
+                                {
+                                    'name': 'Nome do Item 4',
+                                    'link': '#',
+                                },
+                                {
+                                    'name': 'Nome do Item 5',
+                                    'link': '#',
+                                },
+                            ]
+                        },
+                    ]
+                },
+                {
+                    'name': 'valor_aprovado',
+                    'value': '100',
                     'reason': 'any reason',
                     'outlier_check': ''
                 },
                 {
-                    'name': 'valor_aprovado',
-                    'value': '70',
-                    'reason': 'any reason',
-                    'outlier_check': ''
-                }
+                    'name': 'nome_da_métrica',
+                    'value': '12',  # É porcentagem? Dinheiro? Confirmar informações
+                    'reason': 'any reason',  # Texto se necessário
+                    'outlier_check': 'Metric-bad'  # E outlier?
+                },
             ]
         },
     ]
-    project_feedback_list = ['Muito simples', 'Simples', 'Normal', 'Complexo', 'Muito complexo']
-    
+    project_feedback_list = ['Muito simples',
+                             'Simples', 'Normal', 'Complexo', 'Muito complexo']
+
     return render(request, 'show_metrics.html', {'project': project, 'user': user, 'project_indicators': project_indicators, 'project_feedback_list': project_feedback_list})
+
 
 def post_metrics_feedback(request):
 
@@ -161,7 +305,8 @@ def post_metrics_feedback(request):
 
     # Creates project feedback object
     project_feedback_grade = request.POST['project_feedback_grade']
-    saved_project_feedback = ProjectFeedback.objects.create(user=user, entity=entity, grade=project_feedback_grade)
+    saved_project_feedback = ProjectFeedback.objects.create(
+        user=user, entity=entity, grade=project_feedback_grade)
 
     saved_data['project_feedback'] = saved_project_feedback.grade
 
@@ -179,7 +324,8 @@ def post_metrics_feedback(request):
             metric_feedback_rating = ratings.pop()
             metric_feedback_text = request.POST[metric_feedback_text_tag]
 
-            saved_metric_feedback = MetricFeedback.objects.create(user=user, metric=metric, grade=int(metric_feedback_rating), reason=metric_feedback_text)
+            saved_metric_feedback = MetricFeedback.objects.create(
+                user=user, metric=metric, grade=int(metric_feedback_rating), reason=metric_feedback_text)
 
             saved_data['metrics_feedback'].append({
                 'metric_name': saved_metric_feedback.metric.name,
