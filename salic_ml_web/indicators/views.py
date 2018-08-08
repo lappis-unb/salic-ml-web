@@ -38,7 +38,8 @@ def db_connection_test(request):
 
 def projects_to_analyse(request):
     query = "SELECT CONCAT(AnoProjeto, Sequencial), NomeProjeto, Analista, \
-             Situacao FROM SAC.dbo.Projetos WHERE DtFimExecucao < GETDATE()"
+             Situacao FROM SAC.dbo.Projetos WHERE DtFimExecucao < GETDATE() \
+             AND DtProtocolo >= '2009-01-01'"
     query_result = make_query_from_db(query)
 
     end_situations = [
@@ -318,7 +319,6 @@ def post_metrics_feedback(request):
     # Creates metric feedback objects
     for indicator in indicators:
         for metric in indicator.metrics.all():
-
             metric_feedback_text_tag = metric.name + '_text'
 
             metric_feedback_rating = ratings.pop()
