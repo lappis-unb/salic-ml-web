@@ -122,3 +122,8 @@ tags
 # Persistent undo
 [._]*.un~
 
+# Data files
+data/
+
+### VisualStudioCode ###
+.vscode/*
