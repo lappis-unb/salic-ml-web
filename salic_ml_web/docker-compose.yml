@@ -12,6 +12,7 @@ services:
     command: ["./init_dev.sh"]
     volumes:
       - .:/salic_ml_web
+      - ./../data:/usr/local/lib/python3.6/dist-packages/data
     ports:
       - "8080:8080"
     depends_on:
