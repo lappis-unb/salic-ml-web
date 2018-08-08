@@ -10,8 +10,8 @@
     </div>
     <h1>{{project.name}}</h1>
     {% if user %}
-    <div class="header Element-space-between">
-        - Bem vindo(a) {{user.name}}!
+    <div class="ui basic segment" id="LoggedUser">
+        Avaliando como:<br />{{user.name}}
     </div>
     {% endif %}
 </div>
@@ -506,7 +506,7 @@
         <input type="hidden" name="project_pronac" value="{{ project.pronac }}">
         <input type="hidden" name="user_email" value="{{ user.email }}">
         <div class="ui basic segment" id="FinalForm">
-            <div class="ui equal width form">
+            <div class="ui equal width form project-feedback-container">
                 <div class="header">
                     Na sua opinião, como você avalia
                     <em>&ldquo;{{ project.name }}&rdquo;</em>:
