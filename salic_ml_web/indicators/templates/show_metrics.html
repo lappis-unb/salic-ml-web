@@ -110,6 +110,14 @@
                     </div>
                     <div class="label">Média de itens orçamentários para Jogos Eletrônicos</div>
                 </div>
+                
+                <div>
+                    {{indicator.metrics.0.value}}
+                    {{indicator.metrics.0.reason}}
+                    {{indicator.metrics.0.outlier_check}}
+                    {{indicator.metrics.0.interval_start}}
+                    {{indicator.metrics.0.interval_end}}
+                </div>
 
                 <div class="ui fedback form">
                     <div class="ui divider"></div>
@@ -254,7 +262,7 @@
                 <div class="ui ribbon label">
                     <i class="icon"></i>
                 </div>
-                <span>Valor comprovado: R${{indicator.metrics.4.value}}</span>
+                <span>Valor comprovado: {{indicator.metrics.4.value}}</span>
                 <i class="dropdown icon"></i>
                 <div class="helper">
                     <i class="question circle outline icon"></i>
@@ -287,7 +295,7 @@
                 <div class="ui ribbon label">
                     <i class="icon"></i>
                 </div>
-                <span>Valor captado: R${{indicator.metrics.5.value}}</span>
+                <span>Valor captado: {{indicator.metrics.5.value}}</span>
                 <i class="dropdown icon"></i>
                 <div class="helper">
                     <i class="question circle outline icon"></i>
@@ -320,7 +328,7 @@
                 <div class="ui ribbon label">
                     <i class="icon"></i>
                 </div>
-                <span>Mudanças na planilha orçamentária: R${{indicator.metrics.6.value}}</span>
+                <span>Mudanças na planilha orçamentária: {{indicator.metrics.6.value}}</span>
                 <i class="dropdown icon"></i>
                 <div class="helper">
                     <i class="question circle outline icon"></i>
@@ -444,7 +452,7 @@
                 <div class="ui ribbon label">
                     <i class="icon"></i>
                 </div>
-                <span>Valor aprovado: R${{indicator.metrics.9.value}}</span>
+                <span>Valor aprovado: {{indicator.metrics.9.value}}</span>
                 <i class="dropdown icon"></i>
                 <div class="helper">
                     <i class="question circle outline icon"></i>
@@ -574,6 +582,9 @@
                 if (arr.indexOf(classNameAdd) == -1) {
                     element[i].style = "border: solid 2px red";
                 }
+            }
+            else {
+                    element[i].style = "border: none";
             }
             if(entrou) $('#erro-star').modal('show')              
         }
