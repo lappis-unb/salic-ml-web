@@ -5,12 +5,14 @@ HTML{
 .container-application{
 	margin: auto;
 	max-width: 1200px;
-	padding: 20px 50px 25px !important;
+	padding: 100px 50px 25px !important;
 }
 
 .header{
 	font-weight: bold;
 }
+
+
 
 /*************************** 
  ******* Sticky Menu *******
@@ -20,7 +22,7 @@ HTML{
 	align-items: center;
 	background-color: #1B5E20;
 	color:#FFF;
-	padding: 1em 0;
+	padding: 15px 0;
   	justify-content: center;
 }
 
@@ -39,8 +41,18 @@ HTML{
 	font-size: 1.2em;
 	height: auto;
 	margin: auto 0;
+	width: auto;
+	max-width: 40%;
 }
 
+.ui.fixed.inverted.menu #LoggedUser{
+	bottom: 0;
+	font-size: 0.8em;
+	width: 15%;
+	position: absolute;
+	right: 0;
+	text-align: right !important;
+}
 
 
 /*************************** 
@@ -256,4 +268,8 @@ HTML{
 
 #FinalForm .button{
 	margin: 2em;
+}
+
+.borda-vermela{
+	border: solid 2px red !important;
 }
