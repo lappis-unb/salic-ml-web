@@ -60,35 +60,27 @@ def db_connection_test(request):
 
 
 def projects_to_analyse(request):
-    query = "SELECT CONCAT(AnoProjeto, Sequencial), NomeProjeto, Analista, \
-             Situacao FROM SAC.dbo.Projetos WHERE DtFimExecucao < GETDATE() \
-             AND DtProtocolo >= '2009-01-01'"
+    end_situations = " \
+        'A09', 'A13', 'A14', 'A16', 'A17', 'A18', 'A20', 'A23', 'A24', 'A26', \
+        'A40', 'A41', 'A42', 'C09', 'D18', 'E04', 'E09', 'E36', 'E47', 'E49', \
+        'E63', 'E64', 'E65', 'G16', 'G25', 'G26', 'G29', 'G30', 'G56', 'K00', \
+        'K01', 'K02', 'L01', 'L02', 'L03', 'L04', 'L05', 'L06', 'L08', 'L09', \
+        'L10', 'L11' \
+    "
+
+    query = "SELECT CONCAT(AnoProjeto, Sequencial), NomeProjeto, Analista \
+             FROM SAC.dbo.Projetos WHERE DtFimExecucao < GETDATE() \
+             AND Situacao NOT IN ({})".format(end_situations)
+
     query_result = make_query_from_db(query)
 
-    end_situations = [
-        'A09', 'A13', 'A14', 'A16', 'A17', 'A18', 'A20', 'A23', 'A24', 'A26',
-        'A40', 'A41', 'A42', 'C09', 'D18', 'E04', 'E09', 'E36', 'E47', 'E49',
-        'E63', 'E64', 'E65', 'G16', 'G25', 'G26', 'G29', 'G30', 'G56', 'K00',
-        'K01', 'K02', 'L01', 'L02', 'L03', 'L04', 'L05', 'L06', 'L08', 'L09',
-        'L10', 'L11'
-    ]
+    filtered_data = [{'pronac': each[0],
+                      'complexity': random.randint(0, 100),
+                      'project_name': each[1],
+                      'analist': each[2]}
+                      for each in query_result]
 
-    filtered_data = [
-        each for each in query_result if each[3] not in end_situations]
-
-    filtered_data_dict = []
-
-    for each in filtered_data:
-        filtered_data_dict.append(
-            {
-                'pronac': each[0],
-                'complexity': random.randint(0, 100),
-                'project_name': each[1],
-                'analist': each[2]
-            }
-        )
-
-    return filtered_data_dict
+    return filtered_data
 
 def get_items_interval(mean, std):
     start = 0
@@ -115,7 +107,7 @@ def float_to_money(value):
     v_value = us_value.replace(',','v')
     c_value = v_value.replace('.',',')
     return 'R$' + c_value.replace('v','.')
-    
+
 def fetch_user_data(request):
     user_email = request.POST['user_email'] + '@cultura.gov.br'
     try:
