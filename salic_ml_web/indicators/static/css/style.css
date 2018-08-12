@@ -270,6 +270,7 @@ HTML{
 .project-feedback-container{
 	margin-bottom: 2em;
 }
-.borda-vermela{
+.borda-vermelha {
 	border: solid 2px red !important;
+	border-radius: 5px;
 }
