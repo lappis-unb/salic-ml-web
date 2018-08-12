@@ -11,7 +11,8 @@
     <h1>{{project.name}}</h1>
     {% if user %}
     <div class="ui basic segment" id="LoggedUser">
-        Avaliando como:<br />{{user.name}}
+        Avaliando como:
+        <br />{{user.name}}
     </div>
     {% endif %}
 </div>
@@ -110,12 +111,9 @@
                     </div>
                     <div class="label">Média de itens orçamentários para Jogos Eletrônicos</div>
                 </div>
-                
+
                 <div>
-                    {{indicator.metrics.0.value}}
-                    {{indicator.metrics.0.reason}}
-                    {{indicator.metrics.0.outlier_check}}
-                    {{indicator.metrics.0.interval_start}}
+                    {{indicator.metrics.0.value}} {{indicator.metrics.0.reason}} {{indicator.metrics.0.outlier_check}} {{indicator.metrics.0.interval_start}}
                     {{indicator.metrics.0.interval_end}}
                 </div>
 
@@ -123,7 +121,7 @@
                     <div class="ui divider"></div>
                     <div class="header">Quanto essa informação é útil para você?</div>
                     <div class="fields">
-                        <div class="four wide field rating-star">
+                        <div class="four wide field rating-star" onclick="rmRedBorder(this)">
                             <div class="ui massive star rating" name="itens_orcamentarios_rating"></div>
                         </div>
                         <div class="inline field">
@@ -177,7 +175,7 @@
                         <div class="ui divider"></div>
                         <div class="header">Quanto essa informação é útil para você?</div>
                         <div class="fields">
-                            <div class="five wide field rating-star">
+                            <div class="five wide field rating-star" onclick="rmRedBorder(this)">
                                 <div class="ui massive star rating" name="itens_orcamentarios_fora_do_comum_rating"></div>
                             </div>
                             <div class="inline field">
@@ -211,7 +209,7 @@
                     <div class="ui divider"></div>
                     <div class="header">Quanto essa informação é útil para você?</div>
                     <div class="fields">
-                        <div class="four wide field rating-star">
+                        <div class="four wide field rating-star" onclick="rmRedBorder(this)">
                             <div class="ui massive star rating" name="comprovantes_pagamento_rating"></div>
                         </div>
                         <div class="inline field">
@@ -245,7 +243,7 @@
                     <div class="ui divider"></div>
                     <div class="header">Quanto essa informação é útil para você?</div>
                     <div class="fields">
-                        <div class="four wide field rating-star">
+                        <div class="four wide field rating-star" onclick="rmRedBorder(this)">
                             <div class="ui massive star rating" name="precos_acima_media_rating"></div>
                         </div>
                         <div class="inline field">
@@ -278,7 +276,7 @@
                     <div class="ui divider"></div>
                     <div class="header">Quanto essa informação é útil para você?</div>
                     <div class="fields">
-                        <div class="four wide field rating-star">
+                        <div class="four wide field rating-star" onclick="rmRedBorder(this)">
                             <div class="ui massive star rating" name="valor_comprovado_rating"></div>
                         </div>
                         <div class="inline field">
@@ -311,7 +309,7 @@
                     <div class="ui divider"></div>
                     <div class="header">Quanto essa informação é útil para você?</div>
                     <div class="fields">
-                        <div class="four wide field rating-star">
+                        <div class="four wide field rating-star" onclick="rmRedBorder(this)">
                             <div class="ui massive star rating" name="valor_captado_rating"></div>
                         </div>
                         <div class="inline field">
@@ -346,7 +344,7 @@
                     <div class="ui divider"></div>
                     <div class="header">Quanto essa informação é útil para você?</div>
                     <div class="fields">
-                        <div class="four wide field rating-star">
+                        <div class="four wide field rating-star" onclick="rmRedBorder(this)">
                             <div class="ui massive star rating" name="mudancas_planilha_orcamentaria_rating"></div>
                         </div>
                         <div class="inline field">
@@ -384,7 +382,7 @@
                     <div class="ui divider"></div>
                     <div class="header">Quanto essa informação é útil para você?</div>
                     <div class="fields">
-                        <div class="four wide field rating-star">
+                        <div class="four wide field rating-star" onclick="rmRedBorder(this)">
                             <div class="ui massive star rating" name="projetos_mesmo_proponente_rating"></div>
                         </div>
                         <div class="inline field">
@@ -434,7 +432,7 @@
                         <div class="ui divider"></div>
                         <div class="header">Quanto essa informação é útil para você?</div>
                         <div class="fields">
-                            <div class="four wide field rating-star">
+                            <div class="four wide field rating-star" onclick="rmRedBorder(this)">
                                 <div class="ui massive star rating" name="novos_fornecedores_rating"></div>
                             </div>
                             <div class="inline field">
@@ -468,7 +466,7 @@
                     <div class="ui divider"></div>
                     <div class="header">Quanto essa informação é útil para você?</div>
                     <div class="fields">
-                        <div class="four wide field rating-star">
+                        <div class="four wide field rating-star" onclick="rmRedBorder(this)">
                             <div class="ui massive star rating" name="valor_aprovado_rating"></div>
                         </div>
                         <div class="inline field">
@@ -485,7 +483,7 @@
                 <p>Por favor, avalie todas as métricas através das estrelinhas.</p>
             </div>
             <div class="actions">
-                <div class="ui primary cancel button">Ok, avaliarei!</div>
+                <button class="ui primary cancel button" id="confirmation-rating">Ok, avaliarei!</button>
             </div>
         </div>
 
@@ -531,27 +529,6 @@
 
 
 <script>
-    function rmRedBorder() {
-        var element = document.getElementsByClassName("rating-star");
-        var classNameAdd = "borda-vermelha";
-        for(var i = 0, size = element.length; i < size; ++i){
-            var arr = element[i].className.split(" ");
-            if (arr.indexOf(classNameAdd) == -1) {
-                element[i].style = "border: none";
-            }
-        }
-    }
-    function addRedBorder() {
-        var element = document.getElementsByClassName("rating-star");
-        var classNameAdd = "borda-vermelha";
-        for(var i = 0, size = element.length; i < size; ++i){
-            var arr = element[i].className.split(" ");
-            if (arr.indexOf(classNameAdd) == -1) {
-                element[i].style = "border: solid 2px red";
-            }
-        }
-    }
-
     // Make method to change complexity color
     var radialObj = $('#indicatorContainer').radialIndicator({
         radius: 70,
@@ -567,26 +544,24 @@
         percentage: true
     }).data('radialIndicator');
 
+    function rmRedBorder(element) {
+        element.classList.remove("borda-vermelha");
+    }
+
     function getRating() {
         var value = $('.ui.rating').rating('get rating')
         var hidden_ratings = document.getElementById("all_ratings")
-        
+
         var element = document.getElementsByClassName("rating-star");
         var classNameAdd = "borda-vermelha";
-        
+
         var entrou = false;
-        for(var i = 0, size = value.length; i < size; ++i){
-            if(!value[i]){
+        for (var i = 0, size = value.length; i < size; ++i) {
+            if (!value[i]) {
                 entrou = true;
-                var arr = element[i].className.split(" ");
-                if (arr.indexOf(classNameAdd) == -1) {
-                    element[i].style = "border: solid 2px red";
-                }
+                element[i].classList.add(classNameAdd);
             }
-            else {
-                    element[i].style = "border: none";
-            }
-            if(entrou) $('#erro-star').modal('show')              
+            if (entrou) $('#erro-star').modal('show')
         }
         hidden_ratings.value = value.join("")
     }
@@ -595,11 +570,27 @@
         initialRating: 0,
         maxRating: 5
     })
+
     function showModal() {
-        rmRedBorder()
         $('#modal-sucess').modal('show')
     }
-    $('.ui.accordion').accordion({ exclusive: false });
 
+    var toTop = document.getElementById("confirmation-rating");
+    toTop.addEventListener("click", function () {
+        scrollToTop(2000);
+    });
+
+    function scrollToTop(scrollDuration) {
+        var scrollStep = -window.scrollY / (scrollDuration / 15),
+            scrollInterval = setInterval(function () {
+                if (window.scrollY != 0) {
+                    window.scrollBy(0, scrollStep);
+                }
+                else clearInterval(scrollInterval);
+            }, 15);
+    }
+
+    $('.ui.accordion').accordion({ exclusive: false });
     radialObj.value("{{project_indicators.0.value}}")
+
 </script> {% endblock %}
