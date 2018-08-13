@@ -49,13 +49,6 @@
 </div>
 {% endif %} {% for indicator in project_indicators %}
 
-<!-- Este aqui de baixo é para ser o original -->
-<!-- <div class="ui icon message Element-space-between">
-    <div class="clearfix">
-        <div id="indicatorContainer"></div>
-    </div>
-    <h3 class="Complexity-text">Diagnóstico de </h3>
-</div> -->
 <div class="ui clearing basic segment" id="Summary">
     <div class="clearfix" style="margin-right: 30px;">
         <div id="indicatorContainer"></div>
@@ -64,23 +57,10 @@
         Diagnóstico de complexidade da prestação de contas
     </h1>
 </div>
-<!-- <div class="ui clearing basic segment" id="Summary">
-    <div class="c100 p70 big orange">
-        <span>70%</span>
-        <div class="slice">
-            <div class="bar"></div>
-            <div class="fill"></div>
-        </div>
-    </div>
-    <h1 class="ui header">
-        Diagnóstico de complexidade da prestação de contas
-    </h1>
-</div> -->
 
 <form action="/metrics_feedback" method="post">
     {% csrf_token %}
     <div class="ui basic segment" id="DiagnosticArea">
-
         <div class="ui styled fluid accordion" id="DiagnosticMetrics">
 
             <!-- METRIC -->
@@ -94,8 +74,10 @@
                 <div class="helper">
                     <i class="question circle outline icon"></i>
                     <div class="ui floating message">
-                        <p>Compara a quantidade de itens deste projeto com a
-                            <strong>quantidade mais comum</strong> de itens em projetos do mesmo segmento</p>
+                        <p>
+                            Compara a quantidade de itens deste projeto com a
+                            <strong>quantidade mais comum</strong> de itens em projetos do mesmo segmento
+                        </p>
                     </div>
                 </div>
             </div>
@@ -113,8 +95,11 @@
                 </div>
 
                 <div>
-                    {{indicator.metrics.0.value}} {{indicator.metrics.0.reason}} {{indicator.metrics.0.outlier_check}} {{indicator.metrics.0.interval_start}}
-                    {{indicator.metrics.0.interval_end}}
+                    <p>Valor da métrica: {{indicator.metrics.0.value}}</p>
+                    <p>Explicação do resultado da métrica: {{indicator.metrics.0.reason}}</p>
+                    <p>É um outlier: {{indicator.metrics.0.outlier_check}}</p>
+                    <p>Valor inicial do intervalo: {{indicator.metrics.0.interval_start}}</p>
+                    <p>Valor final do intervalo: {{indicator.metrics.0.interval_end}}</p>
                 </div>
 
                 <div class="ui fedback form">
@@ -527,9 +512,7 @@
         {% endfor %}
 </form>
 
-
 <script>
-    // Make method to change complexity color
     var radialObj = $('#indicatorContainer').radialIndicator({
         radius: 70,
         barColor: {

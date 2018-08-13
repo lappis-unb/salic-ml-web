@@ -193,9 +193,9 @@ def fetch_user_data(request):
             'metrics': [
                 {
                     'name': 'itens_orcamentarios',
-                    'value': result['itens_orcamentarios']['total_items'],  # e porcentagem? Valor em reais ?...
+                    'value': result['itens_orcamentarios']['total_items'],
                     'reason': 'any reason',
-                    'outlier_check': result['itens_orcamentarios']['outlier_check'],  # E outlier?,
+                    'outlier_check': result['itens_orcamentarios']['outlier_check'],
                     'interval_start': result['itens_orcamentarios']['interval_start'],
                     'interval_end': result['itens_orcamentarios']['interval_end']
                 },
