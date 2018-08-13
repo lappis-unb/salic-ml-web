@@ -1,0 +1,22 @@
+stages:
+    - build
+
+
+variables:
+    WEB_IMAGE: $CI_REGISTRY_IMAGE/web:$CI_COMMIT_REF_NAME
+
+build:
+    image: docker:latest
+    stage: build
+    services:
+        - docker:dind
+    script:
+        - docker login -u "gitlab-ci-token" -p "$CI_JOB_TOKEN" $CI_REGISTRY
+        - docker build -f salic-ml-web/salic_ml_web/Dockerfile -t $WEB_IMAGE .
+        - docker tag $WEB_IMAGE $CI_REGISTRY_IMAGE/web:latest
+        - docker push $WEB_IMAGE
+        - docker push $CI_REGISTRY_IMAGE/nginx-api:latest
+    only:
+        - /master|homolog_minc|gitlab-ci/
+    tags:
+        - docker
