@@ -1,5 +1,6 @@
 stages:
     - build
+    - deploy_homolog
 
 
 variables:
@@ -11,12 +12,28 @@ build:
     services:
         - docker:dind
     script:
+        - cd salic_ml_web/
         - docker login -u "gitlab-ci-token" -p "$CI_JOB_TOKEN" $CI_REGISTRY
-        - docker build -f salic-ml-web/salic_ml_web/Dockerfile -t $WEB_IMAGE .
+        - docker build -f ./Dockerfile -t $WEB_IMAGE .
         - docker tag $WEB_IMAGE $CI_REGISTRY_IMAGE/web:latest
         - docker push $WEB_IMAGE
-        - docker push $CI_REGISTRY_IMAGE/nginx-api:latest
+        - docker push $CI_REGISTRY_IMAGE/web:latest
     only:
         - /master|homolog_minc|gitlab-ci/
     tags:
         - docker
+
+deploy_homolog_minc:
+    image: debian:buster-slim
+    stage: deploy_homolog
+    services:
+        - docker:dind
+    script:
+        - apt update
+        - apt install sshpass openssh-client -y
+        - mkdir ~/.ssh
+        - touch ~/.ssh/known_hosts
+        - ssh-keyscan -H $SSH_IP >> ~/.ssh/known_hosts
+        - sshpass -p $SSH_PASSWORD ssh $SSH_USER@$SSH_IP "sshpass -p $SSH_VPN_PASSWORD ssh $SSH_VPN_USER@$SSH_VPN_IP 'cd salic-ml-web/; echo $SSH_VPN_PASSWORD | sudo -S docker-compose pull; echo $SSH_VPN_PASSWORD | sudo -S docker-compose up -d'"
+    only:
+        - /homolog_minc|gitlab-ci/
