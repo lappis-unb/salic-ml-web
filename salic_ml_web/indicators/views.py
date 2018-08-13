@@ -108,6 +108,31 @@ def float_to_money(value):
     c_value = v_value.replace('.',',')
     return 'R$' + c_value.replace('v','.')
 
+def register_project_indicator(pronac, name, value):
+    entity = Entity.objects.get(pronac=pronac)
+    
+    if Indicator.objects.filter(entity=entity, name=name).count() is not 0:
+        indicator = Indicator.objects.get(entity=entity, name=name)
+        indicator.value = value
+        indicator.save()
+    else:
+        indicator = Indicator.objects.create(entity=entity, name=name, value=value)
+
+    return indicator
+
+def register_project_metric(name, value, reason, indicator_name, pronac):
+    entity = Entity.objects.get(pronac=pronac)
+    indicator = Indicator.objects.get(name=indicator_name, entity=entity)
+    if Metric.objects.filter(name=name, indicator=indicator) is not 0:
+        metric = Metric.objects.get(name=name, indicator=indicator)
+        metric.value = value
+        metric.reason = reason
+        metric.save()
+    else:
+        metric = Metric.objects.create(name=name, value=value, reason=reason, indicator=indicator)
+
+    return metric
+
 def fetch_user_data(request):
     user_email = request.POST['user_email'] + '@cultura.gov.br'
     try:
@@ -135,6 +160,9 @@ def fetch_user_data(request):
         'received_metrics': metrics
     }
 
+    #complexidade_financeira
+    financial_complexity_indicator = register_project_indicator(int(pronac), 'complexidade_financeira', 0)
+
     # itens_orcamentarios
     items = {
             'total_items': 0,
@@ -143,7 +171,7 @@ def fetch_user_data(request):
             'outlier_check': get_outlier_color(False)
     }
 
-    if metrics['items']:
+    if metrics['items'] is not None:
         items_interval = get_items_interval(metrics['items']['mean'], metrics['items']['std'])
         items = {
             'total_items': metrics['items']['value'],
@@ -154,37 +182,47 @@ def fetch_user_data(request):
 
     result['itens_orcamentarios'] = items
 
+    register_project_metric('itens_orcamentarios', items['total_items'], str(items), financial_complexity_indicator.name, int(pronac))
+
     # valor_captado
     raised_funds = {
         'value': float_to_money(0.0),
+        'float_value': 0.0,
         'maximum_expected_value': float_to_money(0.0),
         'outlier_check': get_outlier_color(False)
     }
 
-    if metrics['raised_funds']:
+    if metrics['raised_funds'] is not None:
         raised_funds = {
             'value': float_to_money(metrics['raised_funds']['total_verified_funds']),
+            'float_value': metrics['raised_funds']['total_verified_funds'],
             'maximum_expected_value': float_to_money(metrics['raised_funds']['maximum_expected_funds']),
             'outlier_check': get_outlier_color(metrics['raised_funds']['is_outlier'])
         }
 
     result['valor_captado'] = raised_funds
 
+    register_project_metric('raised_funds', raised_funds['float_value'], str(raised_funds), financial_complexity_indicator.name, int(pronac))
+
     # valor_comprovado
     verified_funds = {
         'value': float_to_money(0.0),
+        'float_value': 0.0,
         'maximum_expected_value': float_to_money(0.0),
         'outlier_check': get_outlier_color(False)
     }
 
-    if metrics['verified_funds']:
+    if metrics['verified_funds'] is not None:
         verified_funds = {
             'value': float_to_money(metrics['verified_funds']['total_verified_funds']),
+            'float_value': metrics['verified_funds']['total_verified_funds'],
             'maximum_expected_value': float_to_money(metrics['verified_funds']['maximum_expected_funds']),
             'outlier_check': get_outlier_color(metrics['verified_funds']['is_outlier'])
         }
 
     result['valor_comprovado'] = verified_funds
+
+    register_project_metric('valor_comprovado', verified_funds['float_value'], str(verified_funds), financial_complexity_indicator.name, int(pronac))
 
     project_indicators = [
         {
