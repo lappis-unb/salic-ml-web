@@ -12,8 +12,6 @@ HTML{
 	font-weight: bold;
 }
 
-
-
 /*************************** 
  ******* Sticky Menu *******
  ***************************/
@@ -60,7 +58,6 @@ HTML{
  ***************************/
 
 #Summary{
-	margin: 6em -40px 2em;
 	display: table;
 }
 
@@ -75,8 +72,6 @@ HTML{
 	margin: 0;
 	vertical-align: middle;
 }
-
-
 
 /*************************** 
  ** Diagnostic Accordion ***
@@ -156,10 +151,12 @@ HTML{
 }
 
 .Metric-good {
-	color: #666 !important;
+	color: #1B5E20 !important;
 }
 .Metric-good .ui.ribbon.label{
-	color: #666;
+	/* color: #666; */
+	background-color: #1B5E20;
+	border-color: #1B5E20;
 }
 .Metric-good .icon:before{
 	content: "\f2cb"; /* Thermometer empty */
@@ -244,7 +241,7 @@ HTML{
  ***************************/
 
 .form .divider{
-	margin-top: 5em;
+	margin-top: 2em;
 }
 
 .ui.form .header{
@@ -270,6 +267,10 @@ HTML{
 	margin: 2em;
 }
 
-.borda-vermela{
+.project-feedback-container{
+	margin-bottom: 2em;
+}
+.borda-vermelha {
 	border: solid 2px red !important;
+	border-radius: 5px;
 }

@@ -35,19 +35,19 @@ def show_metrics(request, pronac):
     try:
         project = Entity.objects.get(pronac=pronac)
     except:
-        # string_pronac = "{:06}".format(pronac)
-        # project_query = "SELECT CONCAT(AnoProjeto, Sequencial), NomeProjeto \
-        # FROM SAC.dbo.Projetos WHERE CONCAT(AnoProjeto, Sequencial) = '{0}'".format(string_pronac)
-        # project_raw_data = make_query_from_db(project_query)
-        # project_data = {
-        #         'pronac': project_raw_data[0][0],
-        #         'project_name': project_raw_data[0][1]
-        # }
-
+        string_pronac = "{:06}".format(pronac)
+        project_query = "SELECT CONCAT(AnoProjeto, Sequencial), NomeProjeto \
+        FROM SAC.dbo.Projetos WHERE CONCAT(AnoProjeto, Sequencial) = '{0}'".format(string_pronac)
+        project_raw_data = make_query_from_db(project_query)
         project_data = {
-            'pronac': pronac,
-            'project_name': 'Mock'
+                'pronac': project_raw_data[0][0],
+                'project_name': project_raw_data[0][1]
         }
+
+        # project_data = {
+        #     'pronac': pronac,
+        #     'project_name': 'Mock'
+        # }
         project = Entity.objects.create(pronac=int(project_data['pronac']), name=project_data['project_name'])
 
     current_user = None
@@ -110,27 +110,22 @@ def float_to_money(value):
 
 def register_project_indicator(pronac, name, value):
     entity = Entity.objects.get(pronac=pronac)
+    indicator = Indicator.objects.get_or_create(entity=entity, name=name)
+    indicator = indicator[0]
+    indicator.value = value
+    indicator.save()
     
-    if Indicator.objects.filter(entity=entity, name=name).count() is not 0:
-        indicator = Indicator.objects.get(entity=entity, name=name)
-        indicator.value = value
-        indicator.save()
-    else:
-        indicator = Indicator.objects.create(entity=entity, name=name, value=value)
-
     return indicator
 
 def register_project_metric(name, value, reason, indicator_name, pronac):
     entity = Entity.objects.get(pronac=pronac)
     indicator = Indicator.objects.get(name=indicator_name, entity=entity)
-    if Metric.objects.filter(name=name, indicator=indicator) is not 0:
-        metric = Metric.objects.get(name=name, indicator=indicator)
-        metric.value = value
-        metric.reason = reason
-        metric.save()
-    else:
-        metric = Metric.objects.create(name=name, value=value, reason=reason, indicator=indicator)
-
+    metric = Metric.objects.get_or_create(name=name, indicator=indicator)
+    metric = metric[0]
+    metric.value = value
+    metric.reason = reason
+    metric.save()
+    
     return metric
 
 def fetch_user_data(request):
@@ -231,9 +226,9 @@ def fetch_user_data(request):
             'metrics': [
                 {
                     'name': 'itens_orcamentarios',
-                    'value': result['itens_orcamentarios']['total_items'],  # e porcentagem? Valor em reais ?...
+                    'value': result['itens_orcamentarios']['total_items'],
                     'reason': 'any reason',
-                    'outlier_check': result['itens_orcamentarios']['outlier_check'],  # E outlier?,
+                    'outlier_check': result['itens_orcamentarios']['outlier_check'],
                     'interval_start': result['itens_orcamentarios']['interval_start'],
                     'interval_end': result['itens_orcamentarios']['interval_end']
                 },
