@@ -134,7 +134,7 @@ def set_width_bar(min_interval,max_interval, value):
     value = 40
     max_value = max_interval*2
     
-    return {'max_value': max_interval, 'min_interval': ((min_interval/max_value)*100)/2, 'project': ((value/max_value)*100)-12}
+    return {'max_value': max_interval, 'min_interval': ((min_interval/max_value)*100)/2, 'project': ((value/max_value)*100)}
     
 def fetch_user_data(request):
     user_email = request.POST['user_email'] + '@cultura.gov.br'

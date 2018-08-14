@@ -87,21 +87,19 @@
                 <div class="ui pointing below label" id="MedianDisplay-Project">
                     Este projeto
                 </div>
-                <!-- <div class="ui progress">
-                    <div class="bar" id="MedianDisplay-TotalItems">
-                        <div class="progress">{{indicator.metrics.0.interval_start}} - {{indicator.metrics.0.interval_end}}</div>
-                    </div>
-                    <div class="label">Média de itens orçamentários para Jogos Eletrônicos</div>
-                </div> -->
                 <!-- {{indicator.metrics.0.max_interval}} -->
                 <div class="ui progress" data-value="15" data-total="{{indicator.metrics.0.interval.max_value}}" id="MedianDisplay-TotalItems">
                     <div class="bar" id="barra">
                         <div class="progress">{{indicator.metrics.0.interval_start}} de {{indicator.metrics.0.interval_end}} Média de itens</div>
                     </div>
-                    <div class="label">{{indicator.metrics.0.reason}}</div>
                 </div>
 
                 <div>
+                    <p>
+                        Esta quantidade de item orçamentários está {% if indicator.metrics.0.outlier_check != "Metric-good" %} fora {% else %} dentro
+                        {% endif %} da margem considerada como normal sendo esta: {{indicator.metrics.0.interval_start}}
+                        de {{indicator.metrics.0.interval_end}}.
+                    </p>
                     <!-- <p>Valor da métrica: {{indicator.metrics.0.value}}</p> -->
                     <!-- <p>Explicação do resultado da métrica: {{indicator.metrics.0.reason}}</p>
                     <p>É um outlier: {{indicator.metrics.0.outlier_check}}</p> -->
@@ -196,7 +194,21 @@
                 </div>
             </div>
             <div class="content active">
-                <h3>(Barra de distribuição de da quant de comprovantes nesse projeto em relação à média do segmento)</h3>
+                <div class="ui pointing below label" id="MedianDisplay-Project">
+                    Este projeto
+                </div>
+                <div class="ui progress" data-value="15" data-total="{{indicator.metrics.2.interval.max_value}}" id="MedianDisplay-TotalItems">
+                    <div class="bar" id="barra">
+                        <div class="progress">{{indicator.metrics.2.interval_start}} de {{indicator.metrics.2.interval_end}} Média de itens</div>
+                    </div>
+                </div>
+                <div>
+                    <p>
+                        Esta quantidade de item orçamentários está {% if indicator.metrics.2.outlier_check != "Metric-good" %} fora {% else %} dentro
+                        {% endif %} da margem considerada como normal sendo esta: {{indicator.metrics.2.interval_start}}
+                        de {{indicator.metrics.2.interval_end}}.
+                    </p>
+                </div>
                 <div class="ui fedback form">
                     <div class="ui divider"></div>
                     <div class="header">Quanto essa informação é útil para você?</div>
@@ -230,7 +242,21 @@
                 </div>
             </div>
             <div class="content active">
-                <h3>(Barra de distribuição em relação à média)</h3>
+                <div class="ui pointing below label" id="MedianDisplay-Project">
+                    Este projeto
+                </div>
+                <div class="ui progress" data-value="15" data-total="{{indicator.metrics.3.interval.max_value}}" id="MedianDisplay-TotalItems">
+                    <div class="bar" id="barra">
+                        <div class="progress">{{indicator.metrics.3.interval_start}} de {{indicator.metrics.3.interval_end}} Média de itens</div>
+                    </div>
+                </div>
+                <div>
+                    <p>
+                        Esta quantidade de item orçamentários está {% if indicator.metrics.3.outlier_check != "Metric-good" %} fora {% else %} dentro
+                        {% endif %} da margem considerada como normal sendo esta: {{indicator.metrics.3.interval_start}}
+                        de {{indicator.metrics.3.interval_end}}.
+                    </p>
+                </div>
                 <div class="ui fedback form">
                     <div class="ui divider"></div>
                     <div class="header">Quanto essa informação é útil para você?</div>
