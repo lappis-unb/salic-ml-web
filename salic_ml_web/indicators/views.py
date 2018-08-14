@@ -197,7 +197,7 @@ def fetch_user_data(request):
 
     result['valor_captado'] = raised_funds
 
-    register_project_metric('raised_funds', raised_funds['float_value'], str(raised_funds), financial_complexity_indicator.name, int(pronac))
+    register_project_metric('valor_captado', raised_funds['float_value'], str(raised_funds), financial_complexity_indicator.name, int(pronac))
 
     # valor_comprovado
     verified_funds = {
@@ -474,4 +474,4 @@ def post_metrics_feedback(request):
                 'reason': saved_metric_feedback.reason
             })
 
-    return HttpResponse(str(saved_data))
+    return HttpResponse(status=201)
