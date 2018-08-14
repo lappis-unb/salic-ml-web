@@ -19,7 +19,7 @@ build:
         - docker push $WEB_IMAGE
         - docker push $CI_REGISTRY_IMAGE/web:latest
     only:
-        - /master|homolog_minc|gitlab-ci/
+        - /master|homolog/
     tags:
         - docker
 
@@ -36,4 +36,4 @@ deploy_homolog_minc:
         - ssh-keyscan -H $SSH_IP >> ~/.ssh/known_hosts
         - sshpass -p $SSH_PASSWORD ssh $SSH_USER@$SSH_IP "sshpass -p $SSH_VPN_PASSWORD ssh $SSH_VPN_USER@$SSH_VPN_IP 'cd salic-ml-web/; echo $SSH_VPN_PASSWORD | sudo -S docker-compose pull; echo $SSH_VPN_PASSWORD | sudo -S docker-compose up -d'"
     only:
-        - /homolog_minc|gitlab-ci/
+        - /homolog/
