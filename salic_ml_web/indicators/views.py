@@ -10,7 +10,7 @@ from core.finance.financial_metrics import FinancialMetrics
 financial_metrics = FinancialMetrics()
 
 # Uncomment line below when deploying
-# financial_metrics.save()
+financial_metrics.save()
 
 def index(request):
     # projects = [
@@ -140,7 +140,16 @@ def fetch_user_data(request):
     pronac = request.POST['project_pronac']
     project = get_object_or_404(Entity, pronac=int(pronac))
 
-    metrics_list = ['items', 'raised_funds', 'verified_funds']
+    metrics_list = [
+        'items',
+        'raised_funds',
+        'verified_funds',
+        'approved_funds',
+        'common_items_ratio',
+        'total_receipts',
+        'new_providers',
+        'proponent_projects'
+        ]
 
     metrics = {}
 
@@ -434,8 +443,8 @@ def fetch_user_data(request):
     project_feedback_list = ['Muito simples',
                              'Simples', 'Normal', 'Complexo', 'Muito complexo']
 
-    return render(request, 'show_metrics.html', {'project': project, 'user': user, 'project_indicators': project_indicators, 'project_feedback_list': project_feedback_list})
-    # return HttpResponse(str(result))
+    # return render(request, 'show_metrics.html', {'project': project, 'user': user, 'project_indicators': project_indicators, 'project_feedback_list': project_feedback_list})
+    return HttpResponse(str(result))
 
 def post_metrics_feedback(request):
 
