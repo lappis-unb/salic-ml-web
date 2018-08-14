@@ -131,12 +131,10 @@ def register_project_metric(name, value, reason, indicator_name, pronac):
 def set_width_bar(min_interval,max_interval, value):
     max_interval = 50
     min_interval = 30
-    value = 60
-    max_value = (max(max_interval, value))*2
-    x_value = ((max_interval-min_interval)/max_value)*100
-    y_value = (value/max_value)*100
-    a = ((max_value-max_interval)/4)
-    return {'interval': x_value, 'left': y_value, 'project': y_value}
+    value = 40
+    max_value = max_interval*2
+    
+    return {'max_value': max_interval, 'min_interval': ((min_interval/max_value)*100)/2, 'project': ((value/max_value)*100)-12}
     
 def fetch_user_data(request):
     user_email = request.POST['user_email'] + '@cultura.gov.br'

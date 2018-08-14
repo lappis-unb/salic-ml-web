@@ -82,24 +82,31 @@
                 </div>
             </div>
 
-            <div class="content active Metric-bad">
+            <div class="content active {{indicator.metrics.0.outlier_check}}">
                 <!-- Barra de distribuição de itens nesse projeto em relação à média do segmento -->
                 <div class="ui pointing below label" id="MedianDisplay-Project">
                     Este projeto
                 </div>
-                <div class="ui progress">
+                <!-- <div class="ui progress">
                     <div class="bar" id="MedianDisplay-TotalItems">
                         <div class="progress">{{indicator.metrics.0.interval_start}} - {{indicator.metrics.0.interval_end}}</div>
                     </div>
                     <div class="label">Média de itens orçamentários para Jogos Eletrônicos</div>
+                </div> -->
+                <!-- {{indicator.metrics.0.max_interval}} -->
+                <div class="ui progress" data-value="15" data-total="{{indicator.metrics.0.interval.max_value}}" id="MedianDisplay-TotalItems">
+                    <div class="bar" id="barra">
+                        <div class="progress">{{indicator.metrics.0.interval_start}} de {{indicator.metrics.0.interval_end}} Média de itens</div>
+                    </div>
+                    <div class="label">{{indicator.metrics.0.reason}}</div>
                 </div>
 
                 <div>
-                    <p>Valor da métrica: {{indicator.metrics.0.value}}</p>
-                    <p>Explicação do resultado da métrica: {{indicator.metrics.0.reason}}</p>
-                    <p>É um outlier: {{indicator.metrics.0.outlier_check}}</p>
-                    <p>Valor inicial do intervalo: {{indicator.metrics.0.interval_start}}</p>
-                    <p>Valor final do intervalo: {{indicator.metrics.0.interval}}</p>
+                    <!-- <p>Valor da métrica: {{indicator.metrics.0.value}}</p> -->
+                    <!-- <p>Explicação do resultado da métrica: {{indicator.metrics.0.reason}}</p>
+                    <p>É um outlier: {{indicator.metrics.0.outlier_check}}</p> -->
+                    <!-- <p>Valor inicial do intervalo: {{indicator.metrics.0.interval_start}}</p>
+                    <p>Valor final do intervalo: {{indicator.metrics.0.interval}}</p> -->
                 </div>
 
                 <div class="ui fedback form">
@@ -558,16 +565,12 @@
         $('#modal-sucess').modal('show')
     }
 
-    var x = document.getElementById("MedianDisplay-TotalItems");
-    x.addEventListener("load", changeWidthBar(
-        document.getElementById("MedianDisplay-TotalItems"),
-        document.getElementById("MedianDisplay-Project"))
-    );
-    
-    function changeWidthBar(x,y){
-        x.style.width = "{{project_indicators.0.metrics.0.interval.interval}}" + "%";
-        x.style.left = "{{project_indicators.0.metrics.0.interval.left}}" + "%";
-        y.style.left = "{{project_indicators.0.metrics.0.interval.project}}" + "%";
+    var mark_project = document.getElementById("MedianDisplay-Project");
+    mark_project.addEventListener("load", changeWidthBar(mark_project, document.getElementById("barra")));
+
+    function changeWidthBar(x, y) {
+        y.style.left = "{{project_indicators.0.metrics.0.interval.min_interval}}" + "%";
+        x.style.left = "{{project_indicators.0.metrics.0.interval.project}}" + "%";
     }
 
     var toTop = document.getElementById("confirmation-rating");
@@ -575,6 +578,11 @@
         scrollToTop(2000);
     });
 
+    $('#MedianDisplay-TotalItems')
+        .progress({
+            label: "oi",
+        })
+        ;
     function scrollToTop(scrollDuration) {
         var scrollStep = -window.scrollY / (scrollDuration / 15),
             scrollInterval = setInterval(function () {

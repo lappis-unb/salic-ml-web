@@ -171,8 +171,6 @@ HTML{
 	display: inline;
 }
 
-
-
 .helper .question.icon{
 	color: #999;
 	font-size: 0.8em;
@@ -213,28 +211,28 @@ HTML{
 	font-weight: normal;
 	max-width: 5em;
 	text-align: center;
+	background-color: #1B5E20;
 }
 
 .Metric-bad .ui.pointing.below.label{
 	background-color: #db2828;
-	left: 93%;
 }
-
+/* 
 .ui.progress{
 	margin: 0 auto;
-} 
+}  */
 /* 
 .ui.progress .bar{
 	left: 5%;
 	width: 50%;
 } */
 
-.ui.progress .bar > .progress{
+/* .ui.progress .bar > .progress{
 	color: #FFF;
 	left: 0;
 	right: 0;
 	text-align: center;
-}
+} */
 
 /*************************** 
  ********** Forms **********
