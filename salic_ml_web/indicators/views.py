@@ -128,6 +128,16 @@ def register_project_metric(name, value, reason, indicator_name, pronac):
     
     return metric
 
+def set_width_bar(min_interval,max_interval, value):
+    max_interval = 50
+    min_interval = 30
+    value = 60
+    max_value = (max(max_interval, value))*2
+    x_value = ((max_interval-min_interval)/max_value)*100
+    y_value = (value/max_value)*100
+    a = ((max_value-max_interval)/4)
+    return {'interval': x_value, 'left': y_value, 'project': y_value}
+    
 def fetch_user_data(request):
     user_email = request.POST['user_email'] + '@cultura.gov.br'
     try:
@@ -239,7 +249,10 @@ def fetch_user_data(request):
                     'reason': 'any reason',
                     'outlier_check': result['itens_orcamentarios']['outlier_check'],
                     'interval_start': result['itens_orcamentarios']['interval_start'],
-                    'interval_end': result['itens_orcamentarios']['interval_end']
+                    'interval_end': result['itens_orcamentarios']['interval_end'],
+                    'interval': set_width_bar(result['itens_orcamentarios']['interval_start'], 
+                                    result['itens_orcamentarios']['interval_end'],
+                                    result['itens_orcamentarios']['interval_end'])
                 },
                 {
                     'name': 'itens_orcamentarios_fora_do_comum',
@@ -443,8 +456,8 @@ def fetch_user_data(request):
     project_feedback_list = ['Muito simples',
                              'Simples', 'Normal', 'Complexo', 'Muito complexo']
 
-    # return render(request, 'show_metrics.html', {'project': project, 'user': user, 'project_indicators': project_indicators, 'project_feedback_list': project_feedback_list})
-    return HttpResponse(str(result))
+    return render(request, 'show_metrics.html', {'project': project, 'user': user, 'project_indicators': project_indicators, 'project_feedback_list': project_feedback_list})
+    #return HttpResponse(str(result))
 
 def post_metrics_feedback(request):
 

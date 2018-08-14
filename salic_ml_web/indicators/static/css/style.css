@@ -217,17 +217,17 @@ HTML{
 
 .Metric-bad .ui.pointing.below.label{
 	background-color: #db2828;
-	left: 38%;
+	left: 93%;
 }
 
 .ui.progress{
 	margin: 0 auto;
 } 
-
+/* 
 .ui.progress .bar{
 	left: 5%;
 	width: 50%;
-}
+} */
 
 .ui.progress .bar > .progress{
 	color: #FFF;

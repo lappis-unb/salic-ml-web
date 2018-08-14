@@ -84,12 +84,12 @@
 
             <div class="content active Metric-bad">
                 <!-- Barra de distribuição de itens nesse projeto em relação à média do segmento -->
-                <div class="ui pointing below label">
+                <div class="ui pointing below label" id="MedianDisplay-Project">
                     Este projeto
                 </div>
-                <div class="ui progress" data-percent="12" data-total="1000" id="MedianDisplay-TotalItems">
-                    <div class="bar">
-                        <div class="progress">50 - 170</div>
+                <div class="ui progress">
+                    <div class="bar" id="MedianDisplay-TotalItems">
+                        <div class="progress">{{indicator.metrics.0.interval_start}} - {{indicator.metrics.0.interval_end}}</div>
                     </div>
                     <div class="label">Média de itens orçamentários para Jogos Eletrônicos</div>
                 </div>
@@ -99,7 +99,7 @@
                     <p>Explicação do resultado da métrica: {{indicator.metrics.0.reason}}</p>
                     <p>É um outlier: {{indicator.metrics.0.outlier_check}}</p>
                     <p>Valor inicial do intervalo: {{indicator.metrics.0.interval_start}}</p>
-                    <p>Valor final do intervalo: {{indicator.metrics.0.interval_end}}</p>
+                    <p>Valor final do intervalo: {{indicator.metrics.0.interval}}</p>
                 </div>
 
                 <div class="ui fedback form">
@@ -556,6 +556,18 @@
 
     function showModal() {
         $('#modal-sucess').modal('show')
+    }
+
+    var x = document.getElementById("MedianDisplay-TotalItems");
+    x.addEventListener("load", changeWidthBar(
+        document.getElementById("MedianDisplay-TotalItems"),
+        document.getElementById("MedianDisplay-Project"))
+    );
+    
+    function changeWidthBar(x,y){
+        x.style.width = "{{project_indicators.0.metrics.0.interval.interval}}" + "%";
+        x.style.left = "{{project_indicators.0.metrics.0.interval.left}}" + "%";
+        y.style.left = "{{project_indicators.0.metrics.0.interval.project}}" + "%";
     }
 
     var toTop = document.getElementById("confirmation-rating");
