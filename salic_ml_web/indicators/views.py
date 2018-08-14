@@ -10,7 +10,7 @@ from core.finance.financial_metrics import FinancialMetrics
 financial_metrics = FinancialMetrics()
 
 # Uncomment line below when deploying
-# financial_metrics.save()
+financial_metrics.save()
 
 def index(request):
     # projects = [
@@ -35,19 +35,19 @@ def show_metrics(request, pronac):
     try:
         project = Entity.objects.get(pronac=pronac)
     except:
-        # string_pronac = "{:06}".format(pronac)
-        # project_query = "SELECT CONCAT(AnoProjeto, Sequencial), NomeProjeto \
-        # FROM SAC.dbo.Projetos WHERE CONCAT(AnoProjeto, Sequencial) = '{0}'".format(string_pronac)
-        # project_raw_data = make_query_from_db(project_query)
-        # project_data = {
-        #         'pronac': project_raw_data[0][0],
-        #         'project_name': project_raw_data[0][1]
-        # }
-
+        string_pronac = "{:06}".format(pronac)
+        project_query = "SELECT CONCAT(AnoProjeto, Sequencial), NomeProjeto \
+        FROM SAC.dbo.Projetos WHERE CONCAT(AnoProjeto, Sequencial) = '{0}'".format(string_pronac)
+        project_raw_data = make_query_from_db(project_query)
         project_data = {
-            'pronac': pronac,
-            'project_name': 'Mock'
+                'pronac': project_raw_data[0][0],
+                'project_name': project_raw_data[0][1]
         }
+
+        # project_data = {
+        #     'pronac': pronac,
+        #     'project_name': 'Mock'
+        # }
         project = Entity.objects.create(pronac=int(project_data['pronac']), name=project_data['project_name'])
 
     current_user = None
@@ -108,6 +108,26 @@ def float_to_money(value):
     c_value = v_value.replace('.',',')
     return 'R$' + c_value.replace('v','.')
 
+def register_project_indicator(pronac, name, value):
+    entity = Entity.objects.get(pronac=pronac)
+    indicator = Indicator.objects.get_or_create(entity=entity, name=name)
+    indicator = indicator[0]
+    indicator.value = value
+    indicator.save()
+    
+    return indicator
+
+def register_project_metric(name, value, reason, indicator_name, pronac):
+    entity = Entity.objects.get(pronac=pronac)
+    indicator = Indicator.objects.get(name=indicator_name, entity=entity)
+    metric = Metric.objects.get_or_create(name=name, indicator=indicator)
+    metric = metric[0]
+    metric.value = value
+    metric.reason = reason
+    metric.save()
+    
+    return metric
+
 def fetch_user_data(request):
     user_email = request.POST['user_email'] + '@cultura.gov.br'
     try:
@@ -120,7 +140,16 @@ def fetch_user_data(request):
     pronac = request.POST['project_pronac']
     project = get_object_or_404(Entity, pronac=int(pronac))
 
-    metrics_list = ['items', 'raised_funds', 'verified_funds']
+    metrics_list = [
+        'items',
+        'raised_funds',
+        'verified_funds',
+        'approved_funds',
+        'common_items_ratio',
+        'total_receipts',
+        'new_providers',
+        'proponent_projects'
+        ]
 
     metrics = {}
 
@@ -135,6 +164,9 @@ def fetch_user_data(request):
         'received_metrics': metrics
     }
 
+    #complexidade_financeira
+    financial_complexity_indicator = register_project_indicator(int(pronac), 'complexidade_financeira', 0)
+
     # itens_orcamentarios
     items = {
             'total_items': 0,
@@ -143,7 +175,7 @@ def fetch_user_data(request):
             'outlier_check': get_outlier_color(False)
     }
 
-    if metrics['items']:
+    if metrics['items'] is not None:
         items_interval = get_items_interval(metrics['items']['mean'], metrics['items']['std'])
         items = {
             'total_items': metrics['items']['value'],
@@ -154,37 +186,47 @@ def fetch_user_data(request):
 
     result['itens_orcamentarios'] = items
 
+    register_project_metric('itens_orcamentarios', items['total_items'], str(items), financial_complexity_indicator.name, int(pronac))
+
     # valor_captado
     raised_funds = {
         'value': float_to_money(0.0),
+        'float_value': 0.0,
         'maximum_expected_value': float_to_money(0.0),
         'outlier_check': get_outlier_color(False)
     }
 
-    if metrics['raised_funds']:
+    if metrics['raised_funds'] is not None:
         raised_funds = {
             'value': float_to_money(metrics['raised_funds']['total_verified_funds']),
+            'float_value': metrics['raised_funds']['total_verified_funds'],
             'maximum_expected_value': float_to_money(metrics['raised_funds']['maximum_expected_funds']),
             'outlier_check': get_outlier_color(metrics['raised_funds']['is_outlier'])
         }
 
     result['valor_captado'] = raised_funds
 
+    register_project_metric('valor_captado', raised_funds['float_value'], str(raised_funds), financial_complexity_indicator.name, int(pronac))
+
     # valor_comprovado
     verified_funds = {
         'value': float_to_money(0.0),
+        'float_value': 0.0,
         'maximum_expected_value': float_to_money(0.0),
         'outlier_check': get_outlier_color(False)
     }
 
-    if metrics['verified_funds']:
+    if metrics['verified_funds'] is not None:
         verified_funds = {
             'value': float_to_money(metrics['verified_funds']['total_verified_funds']),
+            'float_value': metrics['verified_funds']['total_verified_funds'],
             'maximum_expected_value': float_to_money(metrics['verified_funds']['maximum_expected_funds']),
             'outlier_check': get_outlier_color(metrics['verified_funds']['is_outlier'])
         }
 
     result['valor_comprovado'] = verified_funds
+
+    register_project_metric('valor_comprovado', verified_funds['float_value'], str(verified_funds), financial_complexity_indicator.name, int(pronac))
 
     project_indicators = [
         {
@@ -401,8 +443,8 @@ def fetch_user_data(request):
     project_feedback_list = ['Muito simples',
                              'Simples', 'Normal', 'Complexo', 'Muito complexo']
 
-    return render(request, 'show_metrics.html', {'project': project, 'user': user, 'project_indicators': project_indicators, 'project_feedback_list': project_feedback_list})
-    # return HttpResponse(str(result))
+    # return render(request, 'show_metrics.html', {'project': project, 'user': user, 'project_indicators': project_indicators, 'project_feedback_list': project_feedback_list})
+    return HttpResponse(str(result))
 
 def post_metrics_feedback(request):
 
@@ -441,4 +483,4 @@ def post_metrics_feedback(request):
                 'reason': saved_metric_feedback.reason
             })
 
-    return HttpResponse(str(saved_data))
+    return HttpResponse(status=201)
