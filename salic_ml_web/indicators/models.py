@@ -77,7 +77,14 @@ class MetricFeedback(models.Model):
     reason = models.TextField(max_length=500)
 
     def __str__(self):
-        return "{0} - {1}".format(self.metric.name, self.user.name)
+        return "{0} <{1}> {2}/{3} - {4} <{5}>".format(
+            self.metric.indicator.entity.name, 
+            self.metric.indicator.entity.pronac, 
+            self.metric.indicator.name, 
+            self.metric.name, 
+            self.user.name, 
+            self.user.email
+            )
 
 class ProjectFeedback(models.Model):
     user = models.ForeignKey(
@@ -93,4 +100,9 @@ class ProjectFeedback(models.Model):
     grade = models.IntegerField(default=1)
 
     def __str__(self):
-        return "{0} - {1}".format(self.entity.name, self.user.name)
+        return "{0} <{1}> - {2} <{3}> ".format(
+            self.entity.name, 
+            self.entity.pronac, 
+            self.user.name, 
+            self.user.email
+            )
