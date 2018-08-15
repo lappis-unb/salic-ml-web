@@ -5,6 +5,7 @@ from django.http import HttpResponse
 from .models import Entity, User, ProjectFeedback, MetricFeedback, Metric, Indicator
 from salic_db.utils import test_connection, make_query_from_db
 from core.finance.financial_metrics import FinancialMetrics
+from core.utils.get_project_info_from_pronac import GetProjectInfoFromPronac
 
 # Instanciating FinancialMetrics global module
 financial_metrics = FinancialMetrics()
@@ -12,6 +13,7 @@ financial_metrics = FinancialMetrics()
 # Uncomment line below when deploying
 financial_metrics.save()
 
+submitted_projects_info = GetProjectInfoFromPronac()
 def index(request, submit_success=False):
     # projects = [
     #     {"pronac": "1234", "complexity": 25,
@@ -362,20 +364,35 @@ def fetch_user_data(request):
         'cnpj_cpf': '',
         'submitted_projects': [],
         'analyzed_projects': [],
-        'outlier_check': get_outlier_color(False) 
+        'outlier_check': get_outlier_color(False)
     }
 
     if metrics['proponent_projects'] is not None:
         submitted_projects_list = []
         analyzed_projects_list = []
 
+        all_pronacs = metrics['proponent_projects']['submitted_projects']['pronacs_of_this_proponent']
+
+        projects_information = submitted_projects_info.get_projects_name(all_pronacs)
         for project_pronac in metrics['proponent_projects']['submitted_projects']['pronacs_of_this_proponent']:
             submitted_projects_list.append({
-                'project_pronac': project_pronac,
+                'pronac': project_pronac,
+                'name': projects_information[project_pronac],
+                'link': '#'
+            })
+
+        for project_pronac in metrics['proponent_projects']['analyzed_projects']['pronacs_of_this_proponent']:
+            analyzed_projects_list.append({
+                'pronac': project_pronac,
+                'name': projects_information[project_pronac],
+                'link': '#'
             })
 
         proponent_projects = {
             'cnpj_cpf': metrics['proponent_projects']['cnpj_cpf'],
+            'submitted_projects': submitted_projects_list,
+            'analyzed_projects': analyzed_projects_list,
+            'outlier_check': get_outlier_color(False)
         }
 
     result['projetos_mesmo_proponente'] = proponent_projects
@@ -440,23 +457,10 @@ def fetch_user_data(request):
                 },
                 {
                     'name': 'projetos_mesmo_proponente',
-                    'value': '80',
+                    'value': len(result['projetos_mesmo_proponente']['submitted_projects']),
                     'reason': 'any reason',
-                    'outlier_check': '',
-                    'proponent_projects': [
-                        {
-                            'name': 'Projeto 1',
-                            'link': '#',
-                        },
-                        {
-                            'name': 'Projeto 2',
-                            'link': '#',
-                        },
-                        {
-                            'name': 'Projeto 3',
-                            'link': '#',
-                        },
-                    ],
+                    'outlier_check': result['projetos_mesmo_proponente']['outlier_check'],
+                    'proponent_projects': result['projetos_mesmo_proponente']['submitted_projects'],
                 },
                 {
                     'name': 'novos_fornecedores',
