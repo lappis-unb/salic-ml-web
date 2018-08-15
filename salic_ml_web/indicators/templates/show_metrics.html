@@ -606,8 +606,9 @@
     mark_project.addEventListener("load", changeWidthBar(mark_project, document.getElementById("barra")));
 
     function changeWidthBar(x, y) {
-        y.style.left = "{{project_indicators.0.metrics.0.interval.min_interval}}" + "%";
-        x.style.left = "{{project_indicators.0.metrics.0.interval.project}}" + "%";
+        y.style.left = "{{project_indicators.0.metrics.0.bar.min_interval}}" + "%";
+        var value = "{{project_indicators.0.metrics.0.bar.project}}";
+        x.style.left = (value-3) + "%";
     }
 
     var toTop = document.getElementById("confirmation-rating");

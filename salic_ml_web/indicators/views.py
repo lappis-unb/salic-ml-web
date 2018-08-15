@@ -38,19 +38,19 @@ def show_metrics(request, pronac):
     try:
         project = Entity.objects.get(pronac=pronac)
     except:
-        # string_pronac = "{:06}".format(pronac)
-        # project_query = "SELECT CONCAT(AnoProjeto, Sequencial), NomeProjeto \
-        # FROM SAC.dbo.Projetos WHERE CONCAT(AnoProjeto, Sequencial) = '{0}'".format(string_pronac)
-        # project_raw_data = make_query_from_db(project_query)
-        # project_data = {
-        #         'pronac': project_raw_data[0][0],
-        #         'project_name': project_raw_data[0][1]
-        # }
-
+        string_pronac = "{:06}".format(pronac)
+        project_query = "SELECT CONCAT(AnoProjeto, Sequencial), NomeProjeto \
+        FROM SAC.dbo.Projetos WHERE CONCAT(AnoProjeto, Sequencial) = '{0}'".format(string_pronac)
+        project_raw_data = make_query_from_db(project_query)
         project_data = {
-            'pronac': pronac,
-            'project_name': 'Mock'
+                'pronac': project_raw_data[0][0],
+                'project_name': project_raw_data[0][1]
         }
+
+        # project_data = {
+        #     'pronac': pronac,
+        #     'project_name': 'Mock'
+        # }
         project = Entity.objects.create(pronac=int(project_data['pronac']), name=project_data['project_name'])
 
     current_user = None
@@ -117,7 +117,7 @@ def register_project_indicator(pronac, name, value):
     indicator = indicator[0]
     indicator.value = value
     indicator.save()
-    
+     
     return indicator
 
 def register_project_metric(name, value, reason, indicator_name, pronac):
