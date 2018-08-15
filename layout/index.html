@@ -1,81 +1,80 @@
 <!DOCTYPE html>
 <html lang="en">
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>ML Salic</title>
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<meta http-equiv="X-UA-Compatible" content="ie=edge">
+		<title>Diagnóstico de Complexidade</title>
 
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.3.1/semantic.min.css">
-    <link rel="stylesheet" href="https://cdn.datatables.net/1.10.19/css/dataTables.semanticui.min.css">
-    <link rel="stylesheet" href="./static/css/style.css">
-    <link rel="stylesheet" href="./static/css/circle.css">
-    
-    <script src="https://code.jquery.com/jquery-3.3.1.js"></script>
-    <script src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
-    <script src="https://cdn.datatables.net/1.10.19/js/dataTables.semanticui.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.3.1/semantic.min.js"></script>
-</head>
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.3.1/semantic.min.css">
+		<link rel="stylesheet" href="https://cdn.datatables.net/1.10.19/css/dataTables.semanticui.min.css">
+		<link rel="stylesheet" href="./static/css/style.css">
 
-<body>
-    <div class="container-application">
-        <h1 class="ui header">Projetos em análise de resultados</h1>
-        <table id="example" style="text-align: center" class="ui celled table striped">
-            <thead>
-                <tr>
-                    <th>Pronac</th>
-                    <th>Complexidade</th>
-                    <th>Título</th>
-                    <th>Responsável</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>
-                        <button class="ui positive button">
-                             project.pronac
-                        </button>
-                    </td>
-                    <td> project.complexity </td>
-                    <td> project.title </td>
-                    <td> project.responsible </td>
-                </tr>
-            </tbody>
-            <tfoot>
-                <tr>
-                    <th>Pronac</th>
-                    <th>Complexidade</th>
-                    <th>Título</th>
-                    <th>Responsável</th>
-                </tr>
-            </tfoot>
-        </table>
+		<script src="https://code.jquery.com/jquery-3.3.1.js"></script>
+		<script src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
+		<script src="https://cdn.datatables.net/1.10.19/js/dataTables.semanticui.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.3.1/semantic.min.js"></script>
+	</head>
 
-        <script>
-            $(document).ready(function () {
-                $('#example').DataTable({
-                    "ordering": true,
-                    "searching": true,
-                    "paging": true,
-                    "info": true,
-                    //"dom": '<"top"f>rt<"bottom"><"clear">',
-                });
-            });
+	<body>
+		<div class="container-application">
+			<div class="ui fixed inverted menu" id="ProjectID">
+				<h1>Projetos com Diagnóstico de complexidade</h1>
+			</div>
 
-        </script>
-    </div>
-</body>
+			<table id="ProjectList" class="ui single line selectable striped table">
+				<thead>
+					<tr>
+						<th>PRONAC</th>
+						<th>Complexidade</th>
+						<th>Título</th>
+						<th>Responsável</th>
+					</tr>
+				</thead>
+				<tbody>
+
+					<tr>
+						<td class="collapsing">
+							<button class="ui positive button">
+								project.pronac
+							</button>
+						</td>
+						<td class="collapsing">project.complexity</td>
+						<td>project.title</td>
+						<td class="collapsing">project.responsible</td>
+					</tr>
+				</tbody>
+
+			</table>
+
+			<script>
+				$(document).ready(function () {
+					$('table').DataTable({
+						"ordering": true,
+						"searching": true,
+						"paging": true,
+						"pagingType": "first_last_numbers",
+						"info": false,
+						"order": [[ 1, "desc" ]],
+						"language": {
+							"lengthMenu": "Mostrar _MENU_ projetos por página",
+							"zeroRecords": "Nenhum projeto encontrado",
+							"info": "Página _PAGE_ de _PAGES_",
+							"infoEmpty": "Nenhum projeto disponível",
+							"infoFiltered": "(filtrado de _MAX_ projetos no total)",
+							"paginate":{
+								"previous": "Anterior",
+								"next": "Próximo",
+								"first": "Primeiro",
+								"last": "Último",
+							}
+						},
+						"dom": '<"ui stackable grid"<"row"<"sixteen wide column"f>><"row dt-table"<"sixteen wide column"rt>><"row"<"six wide column"l><"right aligned ten wide column"p>>>',
+					});
+				});
+			</script>
+		</div>
+	</body>
 
 </html>
-<script>
-    $('.ui.accordion')
-        .accordion()
-        ;
-    $('.ui.rating')
-        .rating({
-            initialRating: 3,
-            maxRating: 5
-        })
-        ;
-</script>
