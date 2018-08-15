@@ -197,19 +197,18 @@
                 </div>
             </div>
             <div class="content active">
-                <div class="ui pointing below label" id="MedianDisplay-Project">
+                <!-- <div class="ui pointing below label" id="MedianDisplay-Project">
                     Este projeto
                 </div>
                 <div class="ui progress" data-value="15" data-total="{{indicator.metrics.2.interval.max_value}}" id="MedianDisplay-TotalItems">
                     <div class="bar" id="barra">
                         <div class="progress">{{indicator.metrics.2.interval_start}} de {{indicator.metrics.2.interval_end}} Média de itens</div>
                     </div>
-                </div>
+                </div> -->
                 <div>
                     <p>
-                        Esta quantidade de comprovantes de pagamento está {% if indicator.metrics.2.outlier_check != "Metric-good" %} fora {% else
-                        %} dentro {% endif %} da margem considerada como normal, sendo esta: {{indicator.metrics.2.interval_start}}
-                        de {{indicator.metrics.2.interval_end}}.
+                        Esta quantidade de comprovantes de pagamento está {% if indicator.metrics.2.outlier_check != "Metric-good" %} acima {% else
+                        %} abaixo {% endif %} do limite esperado, sendo este: {{indicator.metrics.2.maximum_expected_in_segment}}.
                     </p>
                 </div>
                 <div class="ui fedback form">
@@ -292,11 +291,10 @@
                 </div>
             </div>
             <div class="content active">
-                <h3>(Barra de distribuição do valor do projeto em relação à média do segmento)</h3>
                 <div>
                     <p>
-                        Esta valor comprovado {% if indicator.metrics.3.outlier_check != "Metric-good" %}está acima {% else %}não está acima{% endif %} 
-                        do limite considerado, sendo este: {{indicator.metrics.3.interval_start}} de {{indicator.metrics.3.interval_end}}.
+                        Este valor comprovado {% if indicator.metrics.4.outlier_check != "Metric-good" %}está acima {% else %}não está acima{% endif %} 
+                        do limite esperado, sendo este: {{indicator.metrics.4.reason}}.
                     </p>
                 </div>
                 <div class="ui fedback form">
@@ -331,11 +329,11 @@
                 </div>
             </div>
             <div class="content active">
-                <h3>(Barra de distribuição do valor do projeto em relação à média do segmento)</h3>
+                <!-- <h3>(Barra de distribuição do valor do projeto em relação à média do segmento)</h3> -->
                 <div>
                     <p>
-                        Esta valor captado {% if indicator.metrics.3.outlier_check != "Metric-good" %}está acima {% else %}não está acima{% endif %}
-                         do limite considerado, sendo este: {{indicator.metrics.3.interval_start}} de {{indicator.metrics.3.interval_end}}.
+                        Esta valor captado {% if indicator.metrics.5.outlier_check != "Metric-good" %}está acima {% else %}não está acima{% endif %}
+                         do limite esperado, sendo este: {{indicator.metrics.5.reason}}.
                     </p>
                 </div>
 
@@ -495,11 +493,11 @@
                 </div>
             </div>
             <div class="content active">
-                <h3>(Barra de distribuição em relação à média)</h3>
+                <!-- <h3>(Barra de distribuição em relação à média)</h3> -->
                 <div>
                     <p>
-                        Esta valor aprovado {% if indicator.metrics.3.outlier_check != "Metric-good" %}está acima {% else %}não está acima{% endif %}
-                        do limite considerado, sendo este: {{indicator.metrics.3.interval_start}} de {{indicator.metrics.3.interval_end}}.
+                        Esta valor aprovado {% if indicator.metrics.9.outlier_check != "Metric-good" %}está acima {% else %}não está acima{% endif %}
+                        do limite esperado, sendo este: {{indicator.metrics.9.maximum_expected_funds}}.
                     </p>
                 </div>
                 <div class="ui fedback form">
