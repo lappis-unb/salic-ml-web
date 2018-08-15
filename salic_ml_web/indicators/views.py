@@ -128,6 +128,14 @@ def register_project_metric(name, value, reason, indicator_name, pronac):
     
     return metric
 
+def set_width_bar(min_interval,max_interval, value):
+    max_interval = 50
+    min_interval = 30
+    value = 40
+    max_value = max_interval*2
+    
+    return {'max_value': max_interval, 'min_interval': ((min_interval/max_value)*100)/2, 'project': ((value/max_value)*100)}
+    
 def fetch_user_data(request):
     user_email = request.POST['user_email'] + '@cultura.gov.br'
     try:
@@ -380,7 +388,10 @@ def fetch_user_data(request):
                     'reason': 'any reason',
                     'outlier_check': result['itens_orcamentarios']['outlier_check'],
                     'interval_start': result['itens_orcamentarios']['interval_start'],
-                    'interval_end': result['itens_orcamentarios']['interval_end']
+                    'interval_end': result['itens_orcamentarios']['interval_end'],
+                    'interval': set_width_bar(result['itens_orcamentarios']['interval_start'], 
+                                    result['itens_orcamentarios']['interval_end'],
+                                    result['itens_orcamentarios']['interval_end'])
                 },
                 {
                     'name': 'itens_orcamentarios_fora_do_comum',
