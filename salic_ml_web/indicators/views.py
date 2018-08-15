@@ -35,19 +35,19 @@ def show_metrics(request, pronac):
     try:
         project = Entity.objects.get(pronac=pronac)
     except:
-        string_pronac = "{:06}".format(pronac)
-        project_query = "SELECT CONCAT(AnoProjeto, Sequencial), NomeProjeto \
-        FROM SAC.dbo.Projetos WHERE CONCAT(AnoProjeto, Sequencial) = '{0}'".format(string_pronac)
-        project_raw_data = make_query_from_db(project_query)
-        project_data = {
-                'pronac': project_raw_data[0][0],
-                'project_name': project_raw_data[0][1]
-        }
-
+        # string_pronac = "{:06}".format(pronac)
+        # project_query = "SELECT CONCAT(AnoProjeto, Sequencial), NomeProjeto \
+        # FROM SAC.dbo.Projetos WHERE CONCAT(AnoProjeto, Sequencial) = '{0}'".format(string_pronac)
+        # project_raw_data = make_query_from_db(project_query)
         # project_data = {
-        #     'pronac': pronac,
-        #     'project_name': 'Mock'
+        #         'pronac': project_raw_data[0][0],
+        #         'project_name': project_raw_data[0][1]
         # }
+
+        project_data = {
+            'pronac': pronac,
+            'project_name': 'Mock'
+        }
         project = Entity.objects.create(pronac=int(project_data['pronac']), name=project_data['project_name'])
 
     current_user = None
@@ -155,9 +155,12 @@ def fetch_user_data(request):
 
     for metric_name in metrics_list:
         try:
-            metrics[metric_name] = financial_metrics.get_metrics(int(pronac), [metric_name])[metric_name]
+            metrics[metric_name] = financial_metrics.get_metrics("{:06}".format(int(pronac)), [metric_name])[metric_name]
         except:
-            metrics[metric_name] = None
+            if metric_name is '':
+                metrics[metric_name] = financial_metrics.get_metrics("{:06}".format(int(pronac)), [metric_name])[metric_name]
+            else:
+                metrics[metric_name] = None 
 
     result = {
         'pronac': pronac,
@@ -198,8 +201,8 @@ def fetch_user_data(request):
 
     if metrics['raised_funds'] is not None:
         raised_funds = {
-            'value': float_to_money(metrics['raised_funds']['total_verified_funds']),
-            'float_value': metrics['raised_funds']['total_verified_funds'],
+            'value': float_to_money(metrics['raised_funds']['total_raised_funds']),
+            'float_value': metrics['raised_funds']['total_raised_funds'],
             'maximum_expected_value': float_to_money(metrics['raised_funds']['maximum_expected_funds']),
             'outlier_check': get_outlier_color(metrics['raised_funds']['is_outlier'])
         }
@@ -227,6 +230,144 @@ def fetch_user_data(request):
     result['valor_comprovado'] = verified_funds
 
     register_project_metric('valor_comprovado', verified_funds['float_value'], str(verified_funds), financial_complexity_indicator.name, int(pronac))
+
+    # valor_aprovado -> Não implementado
+    approved_funds = {
+
+    }
+
+    if metrics['approved_funds'] is not None:
+        approved_funds = {
+
+        }
+    
+    result['valor_aprovado'] = approved_funds
+
+    # itens_orcamentarios_fora_do_comum
+    
+
+    common_items_ratio = {
+        'outlier_check': get_outlier_color(False),
+        'value': 0.0,
+        'mean': 0.0,
+        'std': 0.0,
+        'uncommon_items': [],
+        'common_items_not_in_project': []
+    }
+
+    if metrics['common_items_ratio'] is not None:
+        common_items_not_in_project_list = []
+        uncommon_items_list = []
+
+        for item_id in metrics['common_items_ratio']['common_items_not_in_project']:
+            common_items_not_in_project_list.append({
+                'item_id': item_id,
+                'item_name': metrics['common_items_ratio']['common_items_not_in_project'][item_id],
+                'item_link': '#'
+            })
+
+        for item_id in metrics['common_items_ratio']['uncommon_items']:
+            uncommon_items_list.append({
+                'item_id': item_id,
+                'item_name': metrics['common_items_ratio']['uncommon_items'][item_id],
+                'item_link': '#'
+            })
+
+        common_items_ratio = {
+            'outlier_check': get_outlier_color(metrics['common_items_ratio']['is_outlier']),
+            'value': metrics['common_items_ratio']['value'],
+            'mean': metrics['common_items_ratio']['mean'],
+            'std': metrics['common_items_ratio']['std'],
+            'uncommon_items': uncommon_items_list,
+            'common_items_not_in_project': common_items_not_in_project_list
+        }
+
+    result['itens_orcamentarios_fora_do_comum'] = common_items_ratio
+
+    register_project_metric('itens_orcamentarios_fora_do_comum', common_items_ratio['value'], "", financial_complexity_indicator.name, int(pronac))
+
+    # comprovantes_pagamento
+    total_receipts = {
+        'outlier_check': get_outlier_color(False),
+        'total_receipts': 0,
+        'maximum_expected_in_segment': 0
+    }
+
+    if metrics['total_receipts'] is not None:
+        total_receipts = {
+            'outlier_check': get_outlier_color(metrics['total_receipts']['is_outlier']),
+            'total_receipts': metrics['total_receipts']['total_receipts'],
+            'maximum_expected_in_segment': metrics['total_receipts']['maximum_expected_in_segment']
+        }
+
+    result['comprovantes_pagamento'] = total_receipts
+
+    register_project_metric('comprovantes_pagamento', total_receipts['total_receipts'], str(total_receipts), financial_complexity_indicator.name, int(pronac))
+
+    # novos_fornecedores
+    new_providers = {
+        'new_providers_list': [],
+        'new_providers_quantity': 0,
+        'new_providers_percentage': 0,
+        'segment_average_percentage': 0,
+        'outlier_check': get_outlier_color(False),
+        'all_projects_average_percentage': 0
+    }
+
+    if metrics['new_providers'] is not None:
+        new_providers_list = []
+
+        for provider_cnpj_cpf in metrics['new_providers']['new_providers']:
+            items_by_provider = []
+
+            for item_id in metrics['new_providers']['new_providers'][provider_cnpj_cpf]['items']:
+                items_by_provider.append({
+                    'item_id': item_id,
+                    'item_name': metrics['new_providers']['new_providers'][provider_cnpj_cpf]['items'][item_id],
+                    'item_link': '#'
+                })
+
+            new_providers_list.append({
+                'provider_cnpj_cpf': provider_cnpj_cpf,
+                'provider_name': metrics['new_providers']['new_providers'][provider_cnpj_cpf]['name'],
+                'provider_items': items_by_provider
+            })
+
+        new_providers = {
+            'new_providers_quantity': len(new_providers_list),
+            'new_providers_list': new_providers_list,
+            'new_providers_percentage': metrics['new_providers']['new_providers_percentage'],
+            'segment_average_percentage': metrics['new_providers']['segment_average_percentage'],
+            'outlier_check': get_outlier_color(metrics['new_providers']['is_outlier']),
+            'all_projects_average_percentage': metrics['new_providers']['all_projects_average_percentage']
+        }
+
+    result['novos_fornecedores'] = new_providers
+
+    register_project_metric('novos_fornecedores', new_providers['new_providers_quantity'], "", financial_complexity_indicator.name, int(pronac))
+
+    # projetos_mesmo_proponente
+    proponent_projects = {
+        'cnpj_cpf': '',
+        'submitted_projects': [],
+        'analyzed_projects': [],
+        'outlier_check': get_outlier_color(False) 
+    }
+
+    if metrics['proponent_projects'] is not None:
+        submitted_projects_list = []
+        analyzed_projects_list = []
+
+        for project_pronac in metrics['proponent_projects']['submitted_projects']['pronacs_of_this_proponent']:
+            submitted_projects_list.append({
+                'project_pronac': project_pronac,
+            })
+
+        proponent_projects = {
+            'cnpj_cpf': metrics['proponent_projects']['cnpj_cpf'],
+        }
+
+    result['projetos_mesmo_proponente'] = proponent_projects
 
     project_indicators = [
         {
@@ -344,107 +485,28 @@ def fetch_user_data(request):
                 },
                 {
                     'name': 'novos_fornecedores',
-                    'value': '90',
+                    'value': result['novos_fornecedores']['new_providers_quantity'],
                     'reason': 'any reason',
-                    'outlier_check': '',
-                    'providers': [
-                        {
-                            'name': 'Ferdinando',
-                            'itens_list': [
-                                {
-                                    'name': 'Nome do Item 1',
-                                    'link': '#',
-                                },
-                                {
-                                    'name': 'Nome do Item 2',
-                                    'link': '#',
-                                },
-                                {
-                                    'name': 'Nome do Item 3',
-                                    'link': '#',
-                                },
-                                {
-                                    'name': 'Nome do Item 4',
-                                    'link': '#',
-                                },
-                                {
-                                    'name': 'Nome do Item 5',
-                                    'link': '#',
-                                },
-                            ]
-                        },
-                        {
-                            'name': 'Bruce Wayne',
-                            'itens_list': [
-                                {
-                                    'name': 'Nome do Item 1',
-                                    'link': '#',
-                                },
-                                {
-                                    'name': 'Nome do Item 2',
-                                    'link': '#',
-                                },
-                                {
-                                    'name': 'Nome do Item 3',
-                                    'link': '#',
-                                },
-                                {
-                                    'name': 'Nome do Item 4',
-                                    'link': '#',
-                                },
-                                {
-                                    'name': 'Nome do Item 5',
-                                    'link': '#',
-                                },
-                            ]
-                        },
-                        {
-                            'name': 'Frank Castle',
-                            'itens_list': [
-                                {
-                                    'name': 'Nome do Item 1',
-                                    'link': '#',
-                                },
-                                {
-                                    'name': 'Nome do Item 2',
-                                    'link': '#',
-                                },
-                                {
-                                    'name': 'Nome do Item 3',
-                                    'link': '#',
-                                },
-                                {
-                                    'name': 'Nome do Item 4',
-                                    'link': '#',
-                                },
-                                {
-                                    'name': 'Nome do Item 5',
-                                    'link': '#',
-                                },
-                            ]
-                        },
-                    ]
+                    'providers': result['novos_fornecedores']['new_providers_list'],
+                    'new_providers_percentage': result['novos_fornecedores']['new_providers_percentage'],
+                    'segment_average_percentage': result['novos_fornecedores']['segment_average_percentage'],
+                    'outlier_check': result['novos_fornecedores']['outlier_check'],
+                    'all_projects_average_percentage': result['novos_fornecedores']['all_projects_average_percentage']
                 },
                 {
                     'name': 'valor_aprovado',
                     'value': '100',
                     'reason': 'any reason',
                     'outlier_check': ''
-                },
-                {
-                    'name': 'nome_da_métrica',
-                    'value': '12',  # É porcentagem? Dinheiro? Confirmar informações
-                    'reason': 'any reason',  # Texto se necessário
-                    'outlier_check': 'Metric-bad'  # E outlier?
-                },
+                }
             ]
         },
     ]
     project_feedback_list = ['Muito simples',
                              'Simples', 'Normal', 'Complexo', 'Muito complexo']
 
-    # return render(request, 'show_metrics.html', {'project': project, 'user': user, 'project_indicators': project_indicators, 'project_feedback_list': project_feedback_list})
-    return HttpResponse(str(result))
+    return render(request, 'show_metrics.html', {'project': project, 'user': user, 'project_indicators': project_indicators, 'project_feedback_list': project_feedback_list})
+    # return HttpResponse(str(result))
 
 def post_metrics_feedback(request):
 
