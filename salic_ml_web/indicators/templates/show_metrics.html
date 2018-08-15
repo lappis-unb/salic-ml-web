@@ -433,7 +433,7 @@
                 <div class="ui ribbon label">
                     <i class="icon"></i>
                 </div>
-                <span>Novos fornecedores: {{indicator.metrics.8.value}}%</span>
+                <span>Novos fornecedores: {{indicator.metrics.8.value}}</span>
                 <i class="dropdown icon"></i>
                 <div class="helper">
                     <i class="question circle outline icon"></i>
@@ -450,13 +450,13 @@
                     {% for provider in indicator.metrics.8.providers %}
                     <div class="title">
                         <i class="dropdown icon"></i>
-                        {{provider.name}}
+                        {{provider.provider_name}}
                     </div>
                     <div class="content">
                         <div class="ui bulleted list">
-                            {% for itens in provider.itens_list %}
+                            {% for itens in provider.provider_items %}
                             <div class="item">
-                                <a href="{{itens.link}}">{{itens.name}}</a>
+                                <a href="{{item.item_link}}">{{itens.item_name}}</a>
                             </div>
                             {% endfor %}
                         </div>

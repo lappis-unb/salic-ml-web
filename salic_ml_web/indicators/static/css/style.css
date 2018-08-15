@@ -151,12 +151,12 @@ HTML{
 }
 
 .Metric-good {
-	color: #1B5E20 !important;
+	color: #666 !important;
 }
 .Metric-good .ui.ribbon.label{
-	/* color: #666; */
-	background-color: #1B5E20;
-	border-color: #1B5E20;
+	color: #666;
+	background-color: #E7E7E7;
+	border-color: #E7E7E7;
 }
 .Metric-good .icon:before{
 	content: "\f2cb"; /* Thermometer empty */
