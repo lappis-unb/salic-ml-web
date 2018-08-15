@@ -162,7 +162,8 @@ def fetch_user_data(request):
         'total_receipts',
         'new_providers',
         'proponent_projects',
-        'easiness'
+        'easiness',
+        'items_prices'
         ]
 
     metrics = {}
@@ -182,6 +183,8 @@ def fetch_user_data(request):
         'pronac': pronac,
         'received_metrics': metrics
     }
+
+    # return HttpResponse(str(result))
 
     #complexidade_financeira
     financial_complexity_indicator = register_project_indicator(int(pronac), 'complexidade_financeira', 0)
@@ -419,6 +422,36 @@ def fetch_user_data(request):
 
     result['projetos_mesmo_proponente'] = proponent_projects
 
+    # precos_acima_media
+    items_prices = {
+        'value': 0,
+        'outlier_check': get_outlier_color(False),
+        'items': [],
+        'total_items': 0,
+        'maximum_expected': 0
+    }
+
+    if metrics['items_prices'] is not None:
+        items_list = []
+
+        for item_id in metrics['items_prices']['outlier_items']:
+            items_list.append({
+                'item_id': item_id,
+                'item_name': metrics['items_prices']['outlier_items'][item_id],
+                'link': '#'
+            })
+
+        items_prices = {
+            'value': metrics['items_prices']['number_items_outliers'],
+            'outlier_check': get_outlier_color(metrics['items_prices']['is_outlier']),
+            'items': items_list,
+            'total_items': metrics['items_prices']['total_items'],
+            'maximum_expected': int(metrics['items_prices']['maximum_expected'])
+        }
+
+    result['precos_acima_media'] = items_prices
+
+
     project_indicators = [
         {
             'name': 'complexidade_financeira',
@@ -455,9 +488,12 @@ def fetch_user_data(request):
                 },
                 {
                     'name': 'precos_acima_media',
-                    'value': '40',
                     'reason': 'any reason',
-                    'outlier_check': ''
+                    'value': metrics['items_prices']['number_items_outliers'],
+                    'outlier_check': get_outlier_color(metrics['items_prices']['is_outlier']),
+                    'items': items_list,
+                    'total_items': metrics['items_prices']['total_items'],
+                    'maximum_expected': int(metrics['items_prices']['maximum_expected'])
                 },
                 {
                     'name': 'valor_comprovado',

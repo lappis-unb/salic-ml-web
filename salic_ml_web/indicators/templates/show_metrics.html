@@ -228,37 +228,28 @@
 
             <!-- METRIC -->
             <!-- 5 Porcentagem de itens acima da mediana histórica, média do desvio da mediana, ou o próprio vetor de diferença em relação a mediana -->
-            <!-- <div class="title active {{indicator.metrics.3.outlier_check}}">
+            <div class="title active {{indicator.metrics.3.outlier_check}}">
                 <div class="ui ribbon label">
                     <i class="icon"></i>
                 </div>
-                <span>Preços acima da média: {{indicator.metrics.3.value}}%</span>
+                <span>Preços acima da média: {{indicator.metrics.3.value}}</span>
                 <i class="dropdown icon"></i>
                 <div class="helper">
                     <i class="question circle outline icon"></i>
                     <div class="ui floating message">
-                        <p>Verifica a porcentagem de itens com valor acima da mediana histórica neste projeto e compara com
+                        <p>Verifica a quantidade de itens com valor acima da mediana histórica neste projeto e compara com
                             a
-                            <strong>porcentagem mais frequente</strong> de itens acima da mediana em projetos do mesmo segmento</p>
+                            <strong>quantidade mais frequente</strong> de itens acima da mediana em projetos do mesmo segmento</p>
                     </div>
                 </div>
             </div>
             <div class="content active">
-                <div class="ui pointing below label" id="MedianDisplay-Project">
-                    Este projeto
-                </div>
-                <div class="ui progress" data-value="15" data-total="{{indicator.metrics.3.interval.max_value}}" id="MedianDisplay-TotalItems">
-                    <div class="bar" id="barra">
-                        <div class="progress">{{indicator.metrics.3.interval_start}} de {{indicator.metrics.3.interval_end}} Média de itens</div>
-                    </div>
-                </div>
-                <div>
-                    <p>
-                        Esta quantidade de item orçamentários está {% if indicator.metrics.3.outlier_check != "Metric-good" %} fora {% else %} dentro
-                        {% endif %} da margem considerada como normal sendo esta: {{indicator.metrics.3.interval_start}}
-                        de {{indicator.metrics.3.interval_end}}.
-                    </p>
-                </div>
+                {% for item in indicator.metrics.3.items %}
+                    <ul class="item">
+                        <li><a href="{{item.link}}">{{item.item_name}}</a></li>
+                    </ul>
+                {% endfor %}
+                
                 <div class="ui fedback form">
                     <div class="ui divider"></div>
                     <div class="header">Quanto essa informação é útil para você?</div>
@@ -271,7 +262,7 @@
                         </div>
                     </div>
                 </div>
-            </div> -->
+            </div>
 
 
             <!-- METRIC -->
