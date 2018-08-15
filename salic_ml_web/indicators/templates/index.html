@@ -1,4 +1,15 @@
 {% extends 'base.html' %} {% block content %}
+{% if submit_success %}
+<div class="ui info message">
+    <i class="close icon"></i>
+    <div class="header">
+        Sucesso ao enviar o feedback
+    </div>
+    <ul class="list">
+        <li>Agradecemos pelo seu feedback!</li>
+    </ul>
+</div>
+{% endif %}
 <h1 class="ui header">Projetos em análise de resultados</h1>
 <table id="example" style="text-align: center" class="ui celled table striped">
     <thead>
@@ -43,4 +54,8 @@
             //"dom": '<"top"f>rt<"bottom"><"clear">',
         });
     });
+
+    $('.message .close').on('click', function () {
+        $(this).closest('.message').transition('fade')
+    })
 </script> {% endblock %}

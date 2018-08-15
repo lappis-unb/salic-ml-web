@@ -88,7 +88,8 @@
                     Este projeto
                 </div>
                 <!-- {{indicator.metrics.0.max_interval}} -->
-                <div class="ui progress" data-value="15" data-total="{{indicator.metrics.0.interval.max_value}}" id="MedianDisplay-TotalItems">
+                <div class="ui progress" data-value="{{indicator.metrics.0.bar.interval}}" data-total="{{indicator.metrics.0.bar.max_value}}"
+                    id="MedianDisplay-TotalItems">
                     <div class="bar" id="barra">
                         <div class="progress">{{indicator.metrics.0.interval_start}} de {{indicator.metrics.0.interval_end}} Média de itens</div>
                     </div>
@@ -100,11 +101,12 @@
                         {% endif %} da margem considerada como normal sendo esta: {{indicator.metrics.0.interval_start}}
                         de {{indicator.metrics.0.interval_end}}.
                     </p>
-                    <!-- <p>Valor da métrica: {{indicator.metrics.0.value}}</p> -->
-                    <!-- <p>Explicação do resultado da métrica: {{indicator.metrics.0.reason}}</p>
-                    <p>É um outlier: {{indicator.metrics.0.outlier_check}}</p> -->
-                    <!-- <p>Valor inicial do intervalo: {{indicator.metrics.0.interval_start}}</p>
-                    <p>Valor final do intervalo: {{indicator.metrics.0.interval}}</p> -->
+                    <!-- <p>Valor da métrica: {{indicator.metrics.0.value}}</p>
+                    <p>Explicação do resultado da métrica: {{indicator.metrics.0.reason}}</p>
+                    <p>É um outlier: {{indicator.metrics.0.outlier_check}}</p>
+                    <p>Valor inicial do intervalo: {{indicator.metrics.0.interval_start}}</p>
+                    <p>Valor final do intervalo: {{indicator.metrics.0.interval_end}}</p>
+                    <p>Valor bar: {{indicator.metrics.0.bar}}</p> -->
                 </div>
 
                 <div class="ui fedback form">
@@ -121,9 +123,10 @@
                 </div>
             </div>
 
+
             <!-- METRIC -->
             <!-- 1 Porcentagem de itens do projeto em relação a distribuição dos itens mais comuns para aquele segmento ou area -->
-            <div class="title active Metric-average">
+            <div class="title active {{indicator.metrics.1.outlier_check}}">
                 <div class="ui ribbon label">
                     <i class="icon"></i>
                 </div>
@@ -179,7 +182,7 @@
 
             <!-- METRIC -->
             <!-- Número de comprovantes do projeto-->
-            <div class="title active Metric-good">
+            <div class="title active {{indicator.metrics.2.outlier_check}}">
                 <div class="ui ribbon label">
                     <i class="icon"></i>
                 </div>
@@ -204,8 +207,8 @@
                 </div>
                 <div>
                     <p>
-                        Esta quantidade de item orçamentários está {% if indicator.metrics.2.outlier_check != "Metric-good" %} fora {% else %} dentro
-                        {% endif %} da margem considerada como normal sendo esta: {{indicator.metrics.2.interval_start}}
+                        Esta quantidade de comprovantes de pagamento está {% if indicator.metrics.2.outlier_check != "Metric-good" %} fora {% else
+                        %} dentro {% endif %} da margem considerada como normal, sendo esta: {{indicator.metrics.2.interval_start}}
                         de {{indicator.metrics.2.interval_end}}.
                     </p>
                 </div>
@@ -226,7 +229,7 @@
 
             <!-- METRIC -->
             <!-- 5 Porcentagem de itens acima da mediana histórica, média do desvio da mediana, ou o próprio vetor de diferença em relação a mediana -->
-            <div class="title active Metric-bad">
+            <!-- <div class="title active {{indicator.metrics.3.outlier_check}}">
                 <div class="ui ribbon label">
                     <i class="icon"></i>
                 </div>
@@ -269,12 +272,12 @@
                         </div>
                     </div>
                 </div>
-            </div>
+            </div> -->
 
 
             <!-- METRIC -->
             <!-- Total do valor comprovado do projeto -->
-            <div class="title active Metric-bad">
+            <div class="title active {{indicator.metrics.4.outlier_check}}">
                 <div class="ui ribbon label">
                     <i class="icon"></i>
                 </div>
@@ -290,6 +293,12 @@
             </div>
             <div class="content active">
                 <h3>(Barra de distribuição do valor do projeto em relação à média do segmento)</h3>
+                <div>
+                    <p>
+                        Esta valor comprovado {% if indicator.metrics.3.outlier_check != "Metric-good" %}está acima {% else %}não está acima{% endif %} 
+                        do limite considerado, sendo este: {{indicator.metrics.3.interval_start}} de {{indicator.metrics.3.interval_end}}.
+                    </p>
+                </div>
                 <div class="ui fedback form">
                     <div class="ui divider"></div>
                     <div class="header">Quanto essa informação é útil para você?</div>
@@ -307,7 +316,7 @@
 
             <!-- METRIC -->
             <!-- Total do valor captado do projeto-->
-            <div class="title active Metric-average">
+            <div class="title active {{indicator.metrics.5.outlier_check}}">
                 <div class="ui ribbon label">
                     <i class="icon"></i>
                 </div>
@@ -323,6 +332,13 @@
             </div>
             <div class="content active">
                 <h3>(Barra de distribuição do valor do projeto em relação à média do segmento)</h3>
+                <div>
+                    <p>
+                        Esta valor captado {% if indicator.metrics.3.outlier_check != "Metric-good" %}está acima {% else %}não está acima{% endif %}
+                         do limite considerado, sendo este: {{indicator.metrics.3.interval_start}} de {{indicator.metrics.3.interval_end}}.
+                    </p>
+                </div>
+
                 <div class="ui fedback form">
                     <div class="ui divider"></div>
                     <div class="header">Quanto essa informação é útil para você?</div>
@@ -340,7 +356,7 @@
 
             <!-- METRIC -->
             <!-- 3 Como a planilha, incluindo itens e preços, mudam ao longo do tempo em termos de rubrica ou outra categoria -->
-            <div class="title active Metric-good">
+            <!-- <div class="title active Metric-good">
                 <div class="ui ribbon label">
                     <i class="icon"></i>
                 </div>
@@ -370,12 +386,12 @@
                         </div>
                     </div>
                 </div>
-            </div>
+            </div> -->
 
 
             <!-- METRIC -->
             <!-- 2 Número de projetos já enviados por aquele proponente ou outros "escritores" da proposta -->
-            <div class="title active Metric-good">
+            <div class="title active {{indicator.metrics.7.outlier_check}}">
                 <div class="ui ribbon label">
                     <i class="icon"></i>
                 </div>
@@ -413,7 +429,7 @@
 
             <!-- METRIC -->
             <!-- 4 Porcentagem ou distribuição dos fornecedores do projeto em relação a fornecedores já conhecidos -->
-            <div class="title active Metric-good">
+            <div class="title active {{indicator.metrics.8.outlier_check}}">
                 <div class="ui ribbon label">
                     <i class="icon"></i>
                 </div>
@@ -464,7 +480,7 @@
 
             <!-- METRIC -->
             <!-- Total do valor aprovado do projeto -->
-            <div class="title active Metric-good">
+            <div class="title active {{indicator.metrics.9.outlier_check}}">
                 <div class="ui ribbon label">
                     <i class="icon"></i>
                 </div>
@@ -480,6 +496,12 @@
             </div>
             <div class="content active">
                 <h3>(Barra de distribuição em relação à média)</h3>
+                <div>
+                    <p>
+                        Esta valor aprovado {% if indicator.metrics.3.outlier_check != "Metric-good" %}está acima {% else %}não está acima{% endif %}
+                        do limite considerado, sendo este: {{indicator.metrics.3.interval_start}} de {{indicator.metrics.3.interval_end}}.
+                    </p>
+                </div>
                 <div class="ui fedback form">
                     <div class="ui divider"></div>
                     <div class="header">Quanto essa informação é útil para você?</div>

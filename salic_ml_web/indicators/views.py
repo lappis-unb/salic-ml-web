@@ -1,6 +1,6 @@
 # Remove this import when has a valid complexity value
 import random
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponse
 from .models import Entity, User, ProjectFeedback, MetricFeedback, Metric, Indicator
 from salic_db.utils import test_connection, make_query_from_db
@@ -12,7 +12,7 @@ financial_metrics = FinancialMetrics()
 # Uncomment line below when deploying
 financial_metrics.save()
 
-def index(request):
+def index(request, submit_success=False):
     # projects = [
     #     {"pronac": "1234", "complexity": 25,
     #         "project_name": "Show do Tiririca", "analist": "Florentina"},
@@ -519,4 +519,7 @@ def post_metrics_feedback(request):
                 'reason': saved_metric_feedback.reason
             })
 
-    return HttpResponse(status=201)
+    # return HttpResponse(status=201)
+    projects = projects_to_analyse(request)
+    # return redirect(index, submit_success = True)
+    return render(request, 'index.html', {'submit_success': True, 'projects': projects})
