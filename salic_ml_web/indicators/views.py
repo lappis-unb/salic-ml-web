@@ -1,5 +1,5 @@
 # Remove this import when has a valid complexity value
-import random
+import random, json
 from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponse
 from .models import Entity, User, ProjectFeedback, MetricFeedback, Metric, Indicator
@@ -26,8 +26,9 @@ def index(request, submit_success=False):
     #         "project_name": "Projeto modelo", "analist": "Modelo"},
     # ]
     projects = projects_to_analyse(request)
-
-    return render(request, 'index.html', {'projects': projects})
+    json_dict = projects
+    
+    return render(request, 'index.html', {'projects': projects, 'projects_json': json.dumps(json_dict)})
 
 
 def show_metrics(request, pronac):

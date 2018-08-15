@@ -1,5 +1,4 @@
-{% extends 'base.html' %} {% block content %}
-{% if submit_success %}
+{% extends 'base.html' %} {% block content %} {% if submit_success %}
 <div class="ui info message">
     <i class="close icon"></i>
     <div class="header">
@@ -11,7 +10,7 @@
 </div>
 {% endif %}
 <h1 class="ui header">Projetos em análise de resultados</h1>
-<table id="example" style="text-align: center" class="ui celled table striped">
+<!-- <table id="example" style="text-align: center" class="ui celled table striped">
     <thead>
         <tr>
             <th>Pronac</th>
@@ -42,20 +41,82 @@
             <th>Responsável</th>
         </tr>
     </tfoot>
+</table> -->
+
+<table id="myTable" style="text-align: center" class="ui celled table striped">
+    <thead>
+        <tr>
+            <th>Pronac</th>
+            <th>Complexidade</th>
+            <th>Título</th>
+            <th>Responsável</th>
+        </tr>
+    </thead>
+    <tbody>
+    </tbody>
 </table>
 
 <script>
-    $(document).ready(function () {
-        $('#example').DataTable({
-            "ordering": true,
-            "searching": true,
-            "paging": true,
-            "info": true,
-            //"dom": '<"top"f>rt<"bottom"><"clear">',
-        });
-    });
+    // $(document).ready(function () {
+    //     $('#example').DataTable({
+    //         "ordering": true,
+    //         "searching": true,
+    //         "paging": true,
+    //         "info": true,
+    //         //"dom": '<"top"f>rt<"bottom"><"clear">',
+    //     });
+    // });
 
     $('.message .close').on('click', function () {
         $(this).closest('.message').transition('fade')
     })
+
+    function populate() {
+        console.time('populate');
+        var t = $('#myTable').dataTable();
+        var projetos = {{projects_json | safe}};
+        console.log(projetos)
+        for (var irow = 0, size = projetos.length; irow < size; irow++) {
+            var cells = new Array();
+            var component = '<a class="ui positive button" href="'+ '/indicators/' + projetos[irow].pronac + '">' + projetos[irow].pronac +'</a>'
+            cells[0] = component;
+            cells[1] = projetos[irow].complexity;
+            cells[2] = projetos[irow].project_name;
+            cells[3] = projetos[irow].analist;
+            var ai = t.fnAddData(cells, false);
+        }
+        t.fnDraw();
+        console.timeEnd('populate');
+    }
+
+    window.onload = populate();
+
+    console.time('render');
+    jQuery('#myTable').dataTable(
+        {
+            'bDestroy': true,
+            "bInfo": true,
+            "bProcessing": true,
+            "bDeferRender": true,
+            'iDisplayLength': 10,
+            'sPaginationType': 'full_numbers',
+            'sDom': '<"top"i> T<"clear">lfrtip',
+            'sPageButtonActive': "paginate_active",
+            'sPageButtonStaticDisabled': "paginate_button",
+            "oLanguage": {
+                "sSearch": "Futher Filter Search results:",
+                "sInfo": "Got a total of _TOTAL_ results to show (_START_ to _END_)",
+                "sLengthMenu": 'Show <select>' +
+                    '<option value="5">5</option>' +
+                    '<option value="10">10</option>' +
+                    '<option value="15">15</option>' +
+                    '<option value="20">20</option>' +
+                    '<option value="25">25</option>' +
+                    '</select> results'
+            },
+            "bSort": false
+        }
+    );
+    console.timeEnd('render');
+
 </script> {% endblock %}
