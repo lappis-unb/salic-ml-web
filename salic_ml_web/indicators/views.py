@@ -269,16 +269,16 @@ def fetch_user_data(request):
 
         for item_id in metrics['common_items_ratio']['common_items_not_in_project']:
             common_items_not_in_project_list.append({
-                'item_id': item_id,
-                'item_name': metrics['common_items_ratio']['common_items_not_in_project'][item_id],
-                'item_link': '#'
+                'id': item_id,
+                'name': metrics['common_items_ratio']['common_items_not_in_project'][item_id],
+                'link': '#'
             })
 
         for item_id in metrics['common_items_ratio']['uncommon_items']:
             uncommon_items_list.append({
-                'item_id': item_id,
-                'item_name': metrics['common_items_ratio']['uncommon_items'][item_id],
-                'item_link': '#'
+                'id': item_id,
+                'name': metrics['common_items_ratio']['uncommon_items'][item_id],
+                'link': '#'
             })
 
         common_items_ratio = {
@@ -395,59 +395,20 @@ def fetch_user_data(request):
                 },
                 {
                     'name': 'itens_orcamentarios_fora_do_comum',
-                    'value': '20',
+                    'value': result['itens_orcamentarios_fora_do_comum']['value'],
                     'reason': 'any reason',
-                    'outlier_check': 'Metric-average',
-                    'expected_itens': [
-                        {
-                            'name': 'Nome do Item 1',
-                            'link': '#',
-                        },
-                        {
-                            'name': 'Nome do Item 2',
-                            'link': '#',
-                        },
-                        {
-                            'name': 'Nome do Item 3',
-                            'link': '#',
-                        },
-                        {
-                            'name': 'Nome do Item 4',
-                            'link': '#',
-                        },
-                        {
-                            'name': 'Nome do Item 5',
-                            'link': '#',
-                        },
-                    ],
-                    'missing_itens': [
-                        {
-                            'name': 'Nome do Item 1',
-                            'link': '#',
-                        },
-                        {
-                            'name': 'Nome do Item 2',
-                            'link': '#',
-                        },
-                        {
-                            'name': 'Nome do Item 3',
-                            'link': '#',
-                        },
-                        {
-                            'name': 'Nome do Item 4',
-                            'link': '#',
-                        },
-                        {
-                            'name': 'Nome do Item 5',
-                            'link': '#',
-                        },
-                    ]
+                    'outlier_check': result['itens_orcamentarios_fora_do_comum']['outlier_check'],
+                    'mean': result['itens_orcamentarios_fora_do_comum']['mean'],
+                    'std': result['itens_orcamentarios_fora_do_comum']['std'],
+                    'expected_itens': result['itens_orcamentarios_fora_do_comum']['common_items_not_in_project'],
+                    'missing_itens': result['itens_orcamentarios_fora_do_comum']['uncommon_items']
                 },
                 {
                     'name': 'comprovantes_pagamento',
-                    'value': '30',
+                    'value': result['comprovantes_pagamento']['total_receipts'],
                     'reason': 'any reason',
-                    'outlier_check': 'Metric-bad',
+                    'outlier_check': result['comprovantes_pagamento']['outlier_check'],
+                    'maximum_expected_in_segment': result['comprovantes_pagamento']['maximum_expected_in_segment']
                 },
                 {
                     'name': 'precos_acima_media',
