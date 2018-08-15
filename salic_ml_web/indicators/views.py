@@ -257,6 +257,7 @@ def fetch_user_data(request):
     common_items_ratio = {
         'outlier_check': get_outlier_color(False),
         'value': 0.0,
+        'float_value': 0.0,
         'mean': 0.0,
         'std': 0.0,
         'uncommon_items': [],
@@ -283,7 +284,8 @@ def fetch_user_data(request):
 
         common_items_ratio = {
             'outlier_check': get_outlier_color(metrics['common_items_ratio']['is_outlier']),
-            'value': metrics['common_items_ratio']['value'],
+            'value': "{0:.2f}".format((metrics['common_items_ratio']['value'])*100),
+            'float_value': metrics['common_items_ratio']['value'] * 100,
             'mean': metrics['common_items_ratio']['mean'],
             'std': metrics['common_items_ratio']['std'],
             'uncommon_items': uncommon_items_list,
