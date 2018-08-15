@@ -159,19 +159,22 @@ def fetch_user_data(request):
         'common_items_ratio',
         'total_receipts',
         'new_providers',
-        'proponent_projects'
+        'proponent_projects',
+        'easiness'
         ]
 
     metrics = {}
 
+    total_metrics = financial_metrics.get_metrics("{:06}".format(int(pronac)))
+
     for metric_name in metrics_list:
         try:
-            metrics[metric_name] = financial_metrics.get_metrics("{:06}".format(int(pronac)), [metric_name])[metric_name]
+            metrics[metric_name] = total_metrics[metric_name]
         except:
             if metric_name is '':
-                metrics[metric_name] = financial_metrics.get_metrics("{:06}".format(int(pronac)), [metric_name])[metric_name]
+                metrics[metric_name] = total_metrics[metric_name]
             else:
-                metrics[metric_name] = None 
+                metrics[metric_name] = None
 
     result = {
         'pronac': pronac,
@@ -180,6 +183,17 @@ def fetch_user_data(request):
 
     #complexidade_financeira
     financial_complexity_indicator = register_project_indicator(int(pronac), 'complexidade_financeira', 0)
+
+    easiness = {
+        'value': 0,
+    }
+
+    if metrics['easiness'] is not None:
+        easiness = {
+            'value': float("{0:.2f}".format(metrics['easiness']['easiness'] * 100))
+        }
+
+    result['easiness'] = easiness
 
     # itens_orcamentarios
     items = {
@@ -242,14 +256,20 @@ def fetch_user_data(request):
 
     register_project_metric('valor_comprovado', verified_funds['float_value'], str(verified_funds), financial_complexity_indicator.name, int(pronac))
 
-    # valor_aprovado -> Não implementado
+    # valor_aprovado
     approved_funds = {
-
+        'value': float_to_money(0),
+        'float_value': 0.0,
+        'maximum_expected_funds': float_to_money(0.0),
+        'outlier_check': get_outlier_color(False)
     }
 
     if metrics['approved_funds'] is not None:
         approved_funds = {
-
+            'value': float_to_money(metrics['approved_funds']['total_approved_funds']),
+            'float_value': metrics['approved_funds']['total_approved_funds'],
+            'maximum_expected_funds': float_to_money(metrics['approved_funds']['maximum_expected_funds']),
+            'outlier_check': get_outlier_color(metrics['approved_funds']['is_outlier'])
         }
     
     result['valor_aprovado'] = approved_funds
@@ -400,7 +420,7 @@ def fetch_user_data(request):
     project_indicators = [
         {
             'name': 'complexidade_financeira',
-            'value': '80',
+            'value': result['easiness']['value'],
             'metrics': [
                 {
                     'name': 'itens_orcamentarios',
@@ -474,9 +494,10 @@ def fetch_user_data(request):
                 },
                 {
                     'name': 'valor_aprovado',
-                    'value': '100',
+                    'value': result['valor_aprovado']['value'],
                     'reason': 'any reason',
-                    'outlier_check': ''
+                    'outlier_check': result['valor_aprovado']['outlier_check'],
+                    'maximum_expected_funds': result['valor_aprovado']['maximum_expected_funds']
                 }
             ]
         },
