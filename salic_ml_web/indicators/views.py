@@ -15,19 +15,25 @@ financial_metrics.save()
 
 submitted_projects_info = GetProjectInfoFromPronac()
 def index(request, submit_success=False):
-    # projects = [
-    #     {"pronac": "1234", "complexity": 25,
-    #         "project_name": "Show do Tiririca", "analist": "Florentina"},
-    #     {"pronac": "4321", "complexity": 75,
-    #         "project_name": "Show do ex Calipso", "analist": "Chimbinha"},
-    #     {"pronac": "1324", "complexity": 95,
-    #         "project_name": "Projeto da Cláudia Leitte", "analist": "Cláudia Leitte"},
-    #     {"pronac": "1243", "complexity": 15,
-    #         "project_name": "Tourada", "analist": "Ferdinando"},
-    #     {"pronac": "2143", "complexity": 5,
-    #         "project_name": "Projeto modelo", "analist": "Modelo"},
-    # ]
-    projects = projects_to_analyse(request)
+    try:
+        projects = projects_to_analyse(request)
+    except:
+        projects = [
+        {"pronac": "90021", "complexity": 25,
+            "project_name": "Indie 2009 - Mostra de Cinema Mundial", "analist": "Florentina"},
+        {"pronac": "153833", "complexity": 75,
+            "project_name": "TRES SOMBREROS DE COPA", "analist": "Chimbinha"},
+        {"pronac": "160443", "complexity": 95,
+            "project_name": "SERGIO REIS – CORAÇÃO ESTRADEIRO", "analist": "Cláudia Leitte"},
+        {"pronac": "118593", "complexity": 15,
+            "project_name": "ÁGUIA  CARNAVAL 2012: TROPICÁLIA! O MOVIMENTO QUE NÃO TERMINOU", "analist": "Ferdinando"},
+        {"pronac": "161533", "complexity": 5,
+            "project_name": "“Livro sobre Serafim Derenzi” (título provisório)", "analist": "Modelo"},
+        {"pronac": "171372", "complexity": 5,
+            "project_name": "“Paisagismo Brasileiro, Roberto Burle Marx e Haruyoshi Ono – 60 anos de história”.", "analist": "Modelo"},
+        {"pronac": "92739", "complexity": 5,
+            "project_name": "Circulação de oficinas e shows - Claudia Cimbleris", "analist": "Modelo"},
+    ]
     json_dict = projects
     
     return render(request, 'index.html', {'projects': projects, 'projects_json': json.dumps(json_dict)})
