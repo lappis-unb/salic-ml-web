@@ -63,7 +63,7 @@ def show_metrics(request, pronac):
 
     current_user = None
     metrics = []
-    return render(request, 'show_metrics.html', {'project': project, 'user': current_user, 'metrics': metrics})
+    return render(request, 'show_metrics.html', {'project': project, 'user': current_user, 'metrics': metrics, 'string_pronac': string_pronac})
 
 def db_connection_test(request):
     connection_result = test_connection()
@@ -559,7 +559,9 @@ def fetch_user_data(request):
     project_feedback_list = ['Muito simples',
                              'Simples', 'Normal', 'Complexo', 'Muito complexo']
 
-    return render(request, 'show_metrics.html', {'project': project, 'user': user, 'project_indicators': project_indicators, 'project_feedback_list': project_feedback_list})
+    string_pronac = "{:06}".format(int(pronac))
+
+    return render(request, 'show_metrics.html', {'project': project, 'user': user, 'project_indicators': project_indicators, 'project_feedback_list': project_feedback_list, 'string_pronac': string_pronac})
     # return HttpResponse(str(result))
 
 def post_metrics_feedback(request):
