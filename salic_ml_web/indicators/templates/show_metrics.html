@@ -207,8 +207,12 @@
                 </div> -->
                 <div>
                     <p>
-                        Esta quantidade de comprovantes de pagamento está {% if indicator.metrics.2.outlier_check != "Metric-good" %} acima {% else
-                        %} abaixo {% endif %} do limite esperado, sendo este: {{indicator.metrics.2.maximum_expected_in_segment}}.
+                        Esta quantidade de comprovantes de pagamento está {% if indicator.metrics.2.outlier_check != "Metric-good" %} 
+                        acima 
+                        {% else %} 
+                        abaixo 
+                        {% endif %} 
+                        do limite esperado, sendo este: {{indicator.metrics.2.maximum_expected_in_segment}}.
                     </p>
                 </div>
                 <div class="ui fedback form">
@@ -249,7 +253,14 @@
                         <li><a href="{{item.link}}">{{item.item_name}}</a></li>
                     </ul>
                 {% endfor %}
-                
+                <p>
+                        Esta quantidade de itens com valor acima da média está {% if indicator.metrics.3.outlier_check != "Metric-good" %} 
+                        acima 
+                        {% else %} 
+                        abaixo 
+                        {% endif %} 
+                        do limite esperado, sendo este: {{indicator.metrics.3.maximum_expected}}.
+                    </p>
                 <div class="ui fedback form">
                     <div class="ui divider"></div>
                     <div class="header">Quanto essa informação é útil para você?</div>
@@ -632,7 +643,8 @@
     }
 
     $('.ui.accordion').accordion({ exclusive: false });
-    radialObj.value("{{project_indicators.0.value}}")
+    var comp = 100 - "{{project_indicators.0.value}}"
+    radialObj.value(comp)
 
 
 </script> {% endblock %}

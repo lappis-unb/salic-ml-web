@@ -39,18 +39,26 @@ def show_metrics(request, pronac):
         project = Entity.objects.get(pronac=pronac)
     except:
         string_pronac = "{:06}".format(pronac)
-        project_query = "SELECT CONCAT(AnoProjeto, Sequencial), NomeProjeto \
-        FROM SAC.dbo.Projetos WHERE CONCAT(AnoProjeto, Sequencial) = '{0}'".format(string_pronac)
-        project_raw_data = make_query_from_db(project_query)
-        project_data = {
-                'pronac': project_raw_data[0][0],
-                'project_name': project_raw_data[0][1]
-        }
+        # project_query = "SELECT CONCAT(AnoProjeto, Sequencial), NomeProjeto \
+        # FROM SAC.dbo.Projetos WHERE CONCAT(AnoProjeto, Sequencial) = '{0}'".format(string_pronac)
+        # project_raw_data = make_query_from_db(project_query)
+        # project_data = {
+        #         'pronac': project_raw_data[0][0],
+        #         'project_name': project_raw_data[0][1]
+        # }
 
         # project_data = {
         #     'pronac': pronac,
         #     'project_name': 'Mock'
         # }
+
+        info = submitted_projects_info.get_projects_name([string_pronac])
+
+        project_data = {
+            'pronac': pronac,
+            'project_name': info[string_pronac]
+        }
+
         project = Entity.objects.create(pronac=int(project_data['pronac']), name=project_data['project_name'])
 
     current_user = None
@@ -133,6 +141,9 @@ def register_project_metric(name, value, reason, indicator_name, pronac):
 
 def set_width_bar(min_interval, max_interval, value):
     max_value = max_interval*2
+
+    if max_value is 0:
+        max_value = 1
 
     return {
         'max_value': max_value, 
@@ -312,8 +323,8 @@ def fetch_user_data(request):
 
         common_items_ratio = {
             'outlier_check': get_outlier_color(metrics['common_items_ratio']['is_outlier']),
-            'value': "{0:.2f}".format((metrics['common_items_ratio']['value'])*100),
-            'float_value': metrics['common_items_ratio']['value'] * 100,
+            'value': "{0:.2f}".format(100 - metrics['common_items_ratio']['value'] * 100),
+            'float_value': (100 - metrics['common_items_ratio']['value'] * 100),
             'mean': metrics['common_items_ratio']['mean'],
             'std': metrics['common_items_ratio']['std'],
             'uncommon_items': uncommon_items_list,
