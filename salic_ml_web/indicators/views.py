@@ -41,10 +41,10 @@ def index(request, submit_success=False):
 
 def show_metrics(request, pronac):
     pronac = int(pronac)
+    string_pronac = "{:06}".format(pronac)
     try:
         project = Entity.objects.get(pronac=pronac)
     except:
-        string_pronac = "{:06}".format(pronac)
         # project_query = "SELECT CONCAT(AnoProjeto, Sequencial), NomeProjeto \
         # FROM SAC.dbo.Projetos WHERE CONCAT(AnoProjeto, Sequencial) = '{0}'".format(string_pronac)
         # project_raw_data = make_query_from_db(project_query)
