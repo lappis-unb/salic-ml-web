@@ -25,7 +25,7 @@ SECRET_KEY = '+q%t%hhg1n7(i&1iazpbrsvmomjs((_274=4m(f@r&@t=9d9a#'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['*', 'minc-homolog.dev.lappis.rocks']
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition

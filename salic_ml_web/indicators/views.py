@@ -79,9 +79,13 @@ def projects_to_analyse(request):
         'L10', 'L11' \
     "
 
-    query = "SELECT CONCAT(AnoProjeto, Sequencial), NomeProjeto, Analista \
+    # query = "SELECT CONCAT(AnoProjeto, Sequencial), NomeProjeto, Analista \
+    #          FROM SAC.dbo.Projetos WHERE DtFimExecucao < GETDATE() \
+    #          AND Situacao NOT IN ({})".format(end_situations)
+
+    query = "SELECT TOP 2000 CONCAT(AnoProjeto, Sequencial), NomeProjeto, Analista \
              FROM SAC.dbo.Projetos WHERE DtFimExecucao < GETDATE() \
-             AND Situacao NOT IN ({})".format(end_situations)
+             AND Situacao NOT IN ({}) ORDER BY DtFimExecucao DESC".format(end_situations)
 
     query_result = make_query_from_db(query)
 
@@ -487,8 +491,8 @@ def fetch_user_data(request):
                     'outlier_check': result['itens_orcamentarios_fora_do_comum']['outlier_check'],
                     'mean': result['itens_orcamentarios_fora_do_comum']['mean'],
                     'std': result['itens_orcamentarios_fora_do_comum']['std'],
-                    'expected_itens': result['itens_orcamentarios_fora_do_comum']['common_items_not_in_project'],
-                    'missing_itens': result['itens_orcamentarios_fora_do_comum']['uncommon_items']
+                    'expected_itens': result['itens_orcamentarios_fora_do_comum']['uncommon_items'],
+                    'missing_itens': result['itens_orcamentarios_fora_do_comum']['common_items_not_in_project']
                 },
                 {
                     'name': 'comprovantes_pagamento',
@@ -500,11 +504,11 @@ def fetch_user_data(request):
                 {
                     'name': 'precos_acima_media',
                     'reason': 'any reason',
-                    'value': metrics['items_prices']['number_items_outliers'],
-                    'outlier_check': get_outlier_color(metrics['items_prices']['is_outlier']),
-                    'items': items_list,
-                    'total_items': metrics['items_prices']['total_items'],
-                    'maximum_expected': int(metrics['items_prices']['maximum_expected'])
+                    'value': result['precos_acima_media']['value'],
+                    'outlier_check': result['precos_acima_media']['outlier_check'],
+                    'items': result['precos_acima_media']['items'],
+                    'total_items': result['precos_acima_media']['total_items'],
+                    'maximum_expected': result['precos_acima_media']['maximum_expected']
                 },
                 {
                     'name': 'valor_comprovado',
