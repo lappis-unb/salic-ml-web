@@ -1,4 +1,5 @@
 Django==2.0.7
+djangorestframework
 psycopg2
 pyodbc
 salic-ml-dev==0.0.11
