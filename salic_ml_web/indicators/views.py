@@ -6,6 +6,52 @@ from .models import Entity, User, ProjectFeedback, MetricFeedback, Metric, Indic
 from salic_db.utils import test_connection, make_query_from_db
 from core.finance.financial_metrics import FinancialMetrics
 from core.utils.get_project_info_from_pronac import GetProjectInfoFromPronac
+from rest_framework import viewsets
+from .serializers import CustomUserSerializer, EntitySerializer, IndicatorSerializer, MetricSerializer, MetricFeedbackSerializer, ProjectFeedbackSerializer
+
+class CustomUserViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows custom users to be viewed or edited.
+    """
+    queryset = User.objects.all().order_by('name')
+    serializer_class = CustomUserSerializer
+
+
+class EntityViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows entities to be viewed or edited.
+    """
+    queryset = Entity.objects.all()
+    serializer_class = EntitySerializer
+
+class IndicatorViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows indicators to be viewed or edited.
+    """
+    queryset = Indicator.objects.all()
+    serializer_class = IndicatorSerializer
+
+class MetricViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows metrics to be viewed or edited.
+    """
+    queryset = Metric.objects.all()
+    serializer_class = MetricSerializer
+
+class MetricFeedbackViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows metric feedbacks to be viewed or edited.
+    """
+    queryset = MetricFeedback.objects.all()
+    serializer_class = MetricFeedbackSerializer
+
+class ProjectFeedbackViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows project feedbacks to be viewed or edited.
+    """
+    queryset = ProjectFeedback.objects.all()
+    serializer_class = ProjectFeedbackSerializer
+
 
 # Instanciating FinancialMetrics global module
 financial_metrics = FinancialMetrics()

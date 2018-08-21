@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'indicators.apps.IndicatorsConfig',
     'salic_db.apps.SalicDbConfig',
+    'rest_framework',
 ]
 
 MIDDLEWARE = [
