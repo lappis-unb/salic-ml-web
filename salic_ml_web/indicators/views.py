@@ -86,13 +86,13 @@ def projects_to_analyse(request):
         'L10', 'L11' \
     "
 
-    # query = "SELECT CONCAT(AnoProjeto, Sequencial), NomeProjeto, Analista \
-    #          FROM SAC.dbo.Projetos WHERE DtFimExecucao < GETDATE() \
-    #          AND Situacao NOT IN ({})".format(end_situations)
-
-    query = "SELECT TOP 2000 CONCAT(AnoProjeto, Sequencial), NomeProjeto, Analista \
+    query = "SELECT CONCAT(AnoProjeto, Sequencial), NomeProjeto, Analista \
              FROM SAC.dbo.Projetos WHERE DtFimExecucao < GETDATE() \
-             AND Situacao NOT IN ({}) ORDER BY DtFimExecucao DESC".format(end_situations)
+             AND Situacao NOT IN ({})".format(end_situations)
+
+    # query = "SELECT TOP 2000 CONCAT(AnoProjeto, Sequencial), NomeProjeto, Analista \
+    #          FROM SAC.dbo.Projetos WHERE DtFimExecucao < GETDATE() \
+    #          AND Situacao NOT IN ({}) ORDER BY DtFimExecucao DESC".format(end_situations)
 
     query_result = make_query_from_db(query)
 
