@@ -1,6 +1,8 @@
 from django.db import models
 
 class Entity(models.Model):
+    class Meta:
+        verbose_name_plural = "Entities"
     pronac = models.IntegerField(default=0)
     name = models.CharField(max_length=200)
     created_at = models.DateTimeField(auto_now_add=True)
