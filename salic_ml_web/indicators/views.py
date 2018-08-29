@@ -4,10 +4,10 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponse
 from .models import Entity, User, ProjectFeedback, MetricFeedback, Metric, Indicator
 from salic_db.utils import test_connection, make_query_from_db
-from core.finance.financial_metrics import FinancialMetrics
 from core.utils.get_project_info_from_pronac import GetProjectInfoFromPronac
 from rest_framework import viewsets
-from .serializers import CustomUserSerializer, EntitySerializer, IndicatorSerializer, MetricSerializer, MetricFeedbackSerializer, ProjectFeedbackSerializer
+from indicators.financial_metrics_instance import financial_metrics
+from indicators.serializers import CustomUserSerializer, EntitySerializer, IndicatorSerializer, MetricSerializer, MetricFeedbackSerializer, ProjectFeedbackSerializer
 
 class CustomUserViewSet(viewsets.ModelViewSet):
     """
@@ -51,13 +51,6 @@ class ProjectFeedbackViewSet(viewsets.ModelViewSet):
     """
     queryset = ProjectFeedback.objects.all()
     serializer_class = ProjectFeedbackSerializer
-
-
-# Instanciating FinancialMetrics global module
-financial_metrics = FinancialMetrics()
-
-# Uncomment line below when deploying
-financial_metrics.save()
 
 submitted_projects_info = GetProjectInfoFromPronac()
 def index(request, submit_success=False):

@@ -20,12 +20,12 @@ from rest_framework import routers
 from django.conf.urls import url, include
 
 router = routers.DefaultRouter()
-router.register(r'users', views.UserViewSet)
-router.register(r'groups', views.GroupViewSet)
+router.register(r'users', views.UserViewSet, 'users')
+router.register(r'groups', views.GroupViewSet, 'groups')
 
 urlpatterns = [
     url(r'', include(router.urls)),
     url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
+    url(r'^indicators/', include('indicators.urls')),
     path('admin/', admin.site.urls),
-    path('indicators/', include('indicators.urls')),
 ]
