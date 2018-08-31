@@ -1,5 +1,7 @@
 Django==2.0.7
 djangorestframework
+markdown
+django-filter
 psycopg2
 pyodbc
 salic-ml==0.0.4

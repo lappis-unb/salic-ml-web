@@ -32,3 +32,6 @@ class ProjectFeedbackSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = ProjectFeedback
         fields = ('grade', 'user', 'entity')
+
+class TestSerializer(serializers.Serializer):
+    test = serializers.CharField()
