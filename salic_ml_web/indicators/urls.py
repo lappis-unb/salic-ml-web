@@ -18,7 +18,7 @@ urlpatterns = [
     url(r'', include(indicators_router.urls)),
     url(r'^projects/search/(?P<keyword>.+)/(?P<page>[0-9]+)', csrf_exempt(api_views.SearchProjectView.as_view()), name='search_project_view'),
     url(r'^projects/(?P<page>[0-9]+)', csrf_exempt(api_views.ProjectsView.as_view()), name='index'),
-    path('project_info/', csrf_exempt(api_views.ProjectInfoView.as_view()), name='project_info_view'),
+    url(r'^project_info/(?P<pronac>[0-9]+)', csrf_exempt(api_views.ProjectInfoView.as_view()), name='project_info_view'),
     path('send_metric_feedback/', csrf_exempt(api_views.SendMetricFeedbackView.as_view()), name='send_metric_feedback_view'),
     path('send_project_feedback/', csrf_exempt(api_views.SendProjectFeedbackView.as_view()), name='send_project_feedback_view'),
     # path('<str:pronac>', api_views.SearchProjectView, name='single_project_view'),
