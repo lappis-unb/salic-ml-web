@@ -309,9 +309,10 @@ class ProjectInfoView(APIView):
                 'outlier_check': get_outlier_color(metrics['items']['is_outlier'])
             }
 
-        result['itens_orcamentarios'] = items
+        itens_orcamentarios = register_project_metric('itens_orcamentarios', items['total_items'], str(items), financial_complexity_indicator.name, int(pronac))
+        items['metric_id'] = itens_orcamentarios.id
 
-        register_project_metric('itens_orcamentarios', items['total_items'], str(items), financial_complexity_indicator.name, int(pronac))
+        result['itens_orcamentarios'] = items
 
         # valor_captado
         raised_funds = {
@@ -329,9 +330,10 @@ class ProjectInfoView(APIView):
                 'outlier_check': get_outlier_color(metrics['raised_funds']['is_outlier'])
             }
 
-        result['valor_captado'] = raised_funds
+        valor_captado = register_project_metric('valor_captado', raised_funds['float_value'], str(raised_funds), financial_complexity_indicator.name, int(pronac))        
+        raised_funds['metric_id'] = valor_captado.id
 
-        register_project_metric('valor_captado', raised_funds['float_value'], str(raised_funds), financial_complexity_indicator.name, int(pronac))
+        result['valor_captado'] = raised_funds
 
         # valor_comprovado
         verified_funds = {
@@ -349,9 +351,10 @@ class ProjectInfoView(APIView):
                 'outlier_check': get_outlier_color(metrics['verified_funds']['is_outlier'])
             }
 
-        result['valor_comprovado'] = verified_funds
+        valor_comprovado = register_project_metric('valor_comprovado', verified_funds['float_value'], str(verified_funds), financial_complexity_indicator.name, int(pronac))
+        verified_funds['metric_id'] = valor_comprovado.id
 
-        register_project_metric('valor_comprovado', verified_funds['float_value'], str(verified_funds), financial_complexity_indicator.name, int(pronac))
+        result['valor_comprovado'] = verified_funds
 
         # valor_aprovado
         approved_funds = {
@@ -369,11 +372,12 @@ class ProjectInfoView(APIView):
                 'outlier_check': get_outlier_color(metrics['approved_funds']['is_outlier'])
             }
         
+        valor_aprovado = register_project_metric('valor_aprovado', approved_funds['float_value'], str(approved_funds), financial_complexity_indicator.name, int(pronac))
+        approved_funds['metric_id'] = valor_aprovado.id
+
         result['valor_aprovado'] = approved_funds
 
         # itens_orcamentarios_fora_do_comum
-        
-
         common_items_ratio = {
             'outlier_check': get_outlier_color(False),
             'value': 0.0,
@@ -412,9 +416,10 @@ class ProjectInfoView(APIView):
                 'common_items_not_in_project': common_items_not_in_project_list
             }
 
-        result['itens_orcamentarios_fora_do_comum'] = common_items_ratio
+        itens_orcamentarios_fora_do_comum = register_project_metric('itens_orcamentarios_fora_do_comum', common_items_ratio['value'], "", financial_complexity_indicator.name, int(pronac))
+        common_items_ratio['metric_id'] = itens_orcamentarios_fora_do_comum.id
 
-        register_project_metric('itens_orcamentarios_fora_do_comum', common_items_ratio['value'], "", financial_complexity_indicator.name, int(pronac))
+        result['itens_orcamentarios_fora_do_comum'] = common_items_ratio
 
         # comprovantes_pagamento
         total_receipts = {
@@ -430,9 +435,10 @@ class ProjectInfoView(APIView):
                 'maximum_expected_in_segment': int(metrics['total_receipts']['maximum_expected_in_segment'])
             }
 
-        result['comprovantes_pagamento'] = total_receipts
+        comprovantes_pagamento = register_project_metric('comprovantes_pagamento', total_receipts['total_receipts'], str(total_receipts), financial_complexity_indicator.name, int(pronac))
+        total_receipts['metric_id'] = comprovantes_pagamento.id
 
-        register_project_metric('comprovantes_pagamento', total_receipts['total_receipts'], str(total_receipts), financial_complexity_indicator.name, int(pronac))
+        result['comprovantes_pagamento'] = total_receipts
 
         # novos_fornecedores
         new_providers = {
@@ -472,9 +478,10 @@ class ProjectInfoView(APIView):
                 'all_projects_average_percentage': metrics['new_providers']['all_projects_average_percentage']
             }
 
-        result['novos_fornecedores'] = new_providers
+        novos_fornecedores = register_project_metric('novos_fornecedores', new_providers['new_providers_quantity'], "", financial_complexity_indicator.name, int(pronac))
+        new_providers['metric_id'] = novos_fornecedores.id
 
-        register_project_metric('novos_fornecedores', new_providers['new_providers_quantity'], "", financial_complexity_indicator.name, int(pronac))
+        result['novos_fornecedores'] = new_providers
 
         # projetos_mesmo_proponente
         proponent_projects = {
@@ -512,6 +519,9 @@ class ProjectInfoView(APIView):
                 'outlier_check': get_outlier_color(False)
             }
 
+        projetos_mesmo_proponente = register_project_metric('projetos_mesmo_proponente', len(proponent_projects['submitted_projects']), "", financial_complexity_indicator.name, int(pronac))
+        proponent_projects['metric_id'] = projetos_mesmo_proponente.id
+
         result['projetos_mesmo_proponente'] = proponent_projects
 
         # precos_acima_media
@@ -541,8 +551,10 @@ class ProjectInfoView(APIView):
                 'maximum_expected': int(metrics['items_prices']['maximum_expected'])
             }
 
-        result['precos_acima_media'] = items_prices
+        precos_acima_media = register_project_metric('precos_acima_media', items_prices['value'], "", financial_complexity_indicator.name, int(pronac))
+        items_prices['metric_id'] = precos_acima_media.id
 
+        result['precos_acima_media'] = items_prices
 
         project_indicators = [
             {
@@ -551,6 +563,7 @@ class ProjectInfoView(APIView):
                 'metrics': [
                     {
                         'name': 'itens_orcamentarios',
+                        'metric_id': result['itens_orcamentarios']['metric_id'],
                         'value': result['itens_orcamentarios']['total_items'],
                         'reason': 'any reason',
                         'outlier_check': result['itens_orcamentarios']['outlier_check'],
@@ -563,6 +576,7 @@ class ProjectInfoView(APIView):
                     },
                     {
                         'name': 'itens_orcamentarios_fora_do_comum',
+                        'metric_id': result['itens_orcamentarios_fora_do_comum']['metric_id'],
                         'value': result['itens_orcamentarios_fora_do_comum']['value'],
                         'reason': 'any reason',
                         'outlier_check': result['itens_orcamentarios_fora_do_comum']['outlier_check'],
@@ -573,6 +587,7 @@ class ProjectInfoView(APIView):
                     },
                     {
                         'name': 'comprovantes_pagamento',
+                        'metric_id': result['comprovantes_pagamento']['metric_id'],
                         'value': result['comprovantes_pagamento']['total_receipts'],
                         'reason': 'any reason',
                         'outlier_check': result['comprovantes_pagamento']['outlier_check'],
@@ -580,6 +595,7 @@ class ProjectInfoView(APIView):
                     },
                     {
                         'name': 'precos_acima_media',
+                        'metric_id': result['precos_acima_media']['metric_id'],
                         'reason': 'any reason',
                         'value': result['precos_acima_media']['value'],
                         'outlier_check': result['precos_acima_media']['outlier_check'],
@@ -589,25 +605,28 @@ class ProjectInfoView(APIView):
                     },
                     {
                         'name': 'valor_comprovado',
+                        'metric_id': result['valor_comprovado']['metric_id'],
                         'value': result['valor_comprovado']['value'],
                         'reason': result['valor_comprovado']['maximum_expected_value'],
                         'outlier_check': result['valor_comprovado']['outlier_check']
                     },
                     {
                         'name': 'valor_captado',
+                        'metric_id': result['valor_captado']['metric_id'],
                         'value': result['valor_captado']['value'],
                         'reason': result['valor_captado']['maximum_expected_value'],
                         'outlier_check': result['valor_captado']['outlier_check']
                     },
-                    {
-                        'name': 'mudancas_planilha_orcamentaria',
-                        'value': '70',
-                        'reason': 'any reason',
-                        'outlier_check': '',
-                        'document_version': 14,
-                    },
+                    # {
+                    #     'name': 'mudancas_planilha_orcamentaria',
+                    #     'value': '70',
+                    #     'reason': 'any reason',
+                    #     'outlier_check': '',
+                    #     'document_version': 14,
+                    # },
                     {
                         'name': 'projetos_mesmo_proponente',
+                        'metric_id': result['projetos_mesmo_proponente']['metric_id'],
                         'value': len(result['projetos_mesmo_proponente']['submitted_projects']),
                         'reason': 'any reason',
                         'outlier_check': result['projetos_mesmo_proponente']['outlier_check'],
@@ -615,6 +634,7 @@ class ProjectInfoView(APIView):
                     },
                     {
                         'name': 'novos_fornecedores',
+                        'metric_id': result['novos_fornecedores']['metric_id'],
                         'value': result['novos_fornecedores']['new_providers_quantity'],
                         'reason': 'any reason',
                         'providers': result['novos_fornecedores']['new_providers_list'],
@@ -625,6 +645,7 @@ class ProjectInfoView(APIView):
                     },
                     {
                         'name': 'valor_aprovado',
+                        'metric_id': result['valor_aprovado']['metric_id'],
                         'value': result['valor_aprovado']['value'],
                         'reason': 'any reason',
                         'outlier_check': result['valor_aprovado']['outlier_check'],
