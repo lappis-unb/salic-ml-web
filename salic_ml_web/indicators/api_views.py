@@ -9,6 +9,28 @@ from django.views import generic
 from django.http import JsonResponse
 import json
 from .serializers import TestSerializer
+import difflib
+
+def calculate_search_cutoff(keyword_len):
+    if keyword_len >= 6:
+        cutoff = 0.3
+    else:
+        cutoff = keyword_len * 0.05
+    
+    return cutoff
+
+def paginate_by_10(full_list):
+    paginated_list = [full_list[i:i+10] for i in range(0, len(full_list), 10)]
+    
+    return paginated_list
+
+def get_page(paginated_list, page):
+    try:
+        required_list = paginated_list[page - 1]
+    except:
+        required_list = []
+
+    return required_list
 
 class ProjectsView(APIView):
     """
@@ -16,7 +38,7 @@ class ProjectsView(APIView):
     """
     renderer_classes = (JSONRenderer, )
     @csrf_exempt
-    def get(self, request, format=None):
+    def get(self, request, format=None, **kwargs):
         
         try:
             projects = projects_to_analyse(request)
@@ -38,8 +60,11 @@ class ProjectsView(APIView):
                 "project_name": "Circulação de oficinas e shows - Claudia Cimbleris", "analist": "Modelo"},
             ]
 
-        json_dict = projects
-        content = {'projects': projects}
+        paginated_list = paginate_by_10(projects)
+
+        projects_list = get_page(paginated_list, int(kwargs['page']))
+
+        content = {'projects': projects_list, 'last_page':len(paginated_list)}
         
         return Response(content)
 
@@ -49,7 +74,7 @@ class SearchProjectView(APIView):
     """
     renderer_classes = (JSONRenderer, )
     @csrf_exempt
-    def get(self, request, format=None):
+    def get(self, request, format=None, **kwargs):
         
         try:
             projects = projects_to_analyse(request)
@@ -71,8 +96,37 @@ class SearchProjectView(APIView):
                 "project_name": "Circulação de oficinas e shows - Claudia Cimbleris", "analist": "Modelo"},
             ]
 
-        json_dict = projects
-        content = {'projects': projects, 'request': request.content}
+        projects_processed = [{
+            "pronac": project['pronac'], 
+            "complexity": project['complexity'],
+            "project_name": project['project_name'],
+            "project_name_lowered": project['project_name'].lower(), 
+            "analist": project['analist']
+        } for project in projects]
+
+        NAME_CUTOFF = calculate_search_cutoff(len(kwargs['keyword']))
+
+        name_matches_list = difflib.get_close_matches(
+            kwargs['keyword'].lower(), 
+            [project['project_name_lowered'] for project in projects_processed], 
+            n=len(projects), 
+            cutoff=NAME_CUTOFF
+            )
+
+        pronac_matches_list = difflib.get_close_matches(
+            kwargs['keyword'], 
+            [project['pronac'] for project in projects], 
+            n=len(projects), 
+            cutoff=0.2
+            )
+
+        result_list = [project for project in projects_processed if project['pronac'] in pronac_matches_list or project['project_name_lowered'] in name_matches_list]
+
+        paginated_list = paginate_by_10(result_list)
+
+        projects_list = get_page(paginated_list, int(kwargs['page']))
+        
+        content = {'projects': projects_list, 'last_page': len(paginated_list)}
         
         return Response(content)
 
