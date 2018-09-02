@@ -719,5 +719,21 @@ class SendProjectFeedbackView(APIView):
 
     @csrf_exempt
     def post(self, request, format=None):
+        request_data = json.loads(request.body)
 
-        return JsonResponse(request.content)
+        user = get_object_or_404(User, email=request_data['user_email'])
+        entity = get_object_or_404(Entity, pronac=int(request_data['pronac']))
+        project_feedback_grade = int(request_data['project_feedback_grade'])
+
+        saved_project_feedback = ProjectFeedback.objects.create(
+            user=user, 
+            entity=entity,
+            grade=project_feedback_grade
+            )
+
+        request_response = {
+            'feedback_id': saved_project_feedback.id,
+            'feedback_grade': saved_project_feedback.grade,
+        }    
+
+        return JsonResponse(request_response)
