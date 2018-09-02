@@ -11,7 +11,7 @@ import json
 import difflib
 from indicators.financial_metrics_instance import financial_metrics, submitted_projects_info
 from core.utils.get_project_info_from_pronac import GetProjectInfoFromPronac
-from indicators.models import Entity, Indicator, Metric, User
+from indicators.models import Entity, Indicator, Metric, User, MetricFeedback, ProjectFeedback
 from django.shortcuts import get_object_or_404
 
 def fetch_entity(pronac):
@@ -665,6 +665,7 @@ class ProjectInfoView(APIView):
                 'pronac': string_pronac
             },
             'user': {
+                'user_id': user.id,
                 'name': user.name,
                 'email': user.email
             },
@@ -679,16 +680,43 @@ class SendMetricFeedbackView(APIView):
     A view that receives a single metric feedback
     """
     renderer_classes = (JSONRenderer, )
+    @method_decorator(csrf_exempt)
+    def dispatch(self, request, *args, **kwargs):
+        return generic.View.dispatch(self, request, *args, **kwargs)
+
     @csrf_exempt
     def post(self, request, format=None):
+        request_data = json.loads(request.body)
 
-        return JsonResponse(request.content)
+        user = get_object_or_404(User, email=request_data['user_email'])
+        metric = get_object_or_404(Metric, id=int(request_data['metric_id']))
+        metric_feedback_rating = int(request_data['metric_feedback_rating'])
+        metric_feedback_text = request_data['metric_feedback_text']
+
+        saved_metric_feedback = MetricFeedback.objects.create(
+            user=user, 
+            metric=metric, 
+            grade=metric_feedback_rating, 
+            reason=metric_feedback_text
+            )
+
+        request_response = {
+            'feedback_id': saved_metric_feedback.id,
+            'feedback_grade': saved_metric_feedback.grade,
+            'feedback_reason': saved_metric_feedback.reason
+        }       
+
+        return JsonResponse(request_response)
 
 class SendProjectFeedbackView(APIView):
     """
     A view that receives a single metric feedback
     """
     renderer_classes = (JSONRenderer, )
+    @method_decorator(csrf_exempt)
+    def dispatch(self, request, *args, **kwargs):
+        return generic.View.dispatch(self, request, *args, **kwargs)
+
     @csrf_exempt
     def post(self, request, format=None):
 
