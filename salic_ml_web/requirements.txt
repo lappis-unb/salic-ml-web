@@ -5,3 +5,4 @@ django-filter
 psycopg2
 pyodbc
 salic-ml-dev==0.0.11
+django-cors-headers
