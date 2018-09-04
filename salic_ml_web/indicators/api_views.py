@@ -124,33 +124,39 @@ def get_page(paginated_list, page):
 
     return required_list
 
-def reason_text_formatter(value, expected_max_value, prefix="", descriptor=""):
+def reason_text_formatter(value, expected_max_value, prefix="", descriptor="", to_show_value=None, to_show_expected_max_value=None):
     # "O valor de {0}{1}{2} está abaixo/acima do valor médio de {3}{4} {5}"
+    if to_show_value is None:
+        to_show_value = value
+    
+    if to_show_expected_max_value is None:
+        to_show_expected_max_value = expected_max_value
+
     if value > expected_max_value:
-        reason_text = "O valor de {0}{1} {2} está acima do valor médio de {3}{4} {5}".format(
+        reason_text = "O valor de {0}{1}{2} está acima do valor máximo esperado de {3}{4}{5}".format(
             prefix, 
-            value, 
+            to_show_value, 
             descriptor, 
             prefix, 
-            expected_max_value, 
+            to_show_expected_max_value, 
             descriptor
             )
     elif value < expected_max_value:
-        reason_text = "O valor de {0}{1} {2} está abaixo do valor médio de {3}{4} {5}".format(
+        reason_text = "O valor de {0}{1}{2} está abaixo do valor máximo esperado de {3}{4}{5}".format(
             prefix, 
-            value, 
+            to_show_value, 
             descriptor, 
             prefix, 
-            expected_max_value, 
+            to_show_expected_max_value, 
             descriptor
             )
     else:
-        reason_text = "O valor de {0}{1} {2} está correspondente ao valor médio de {3}{4} {5}".format(
+        reason_text = "O valor de {0}{1}{2} está correspondente ao valor máximo esperado de {3}{4}{5}".format(
             prefix, 
-            value, 
+            to_show_value, 
             descriptor, 
             prefix, 
-            expected_max_value, 
+            to_show_expected_max_value, 
             descriptor
             )
 
@@ -444,7 +450,7 @@ class ProjectInfoView(APIView):
                 'total_items': int(metrics['items']['value']),
                 'interval_start': int(items_interval['start']),
                 'interval_end': int(items_interval['end']),
-                'reason': reason_text_formatter(int(metrics['items']['value']), int(items_interval['end']), descriptor="itens"),
+                'reason': reason_text_formatter(int(metrics['items']['value']), int(items_interval['end']), descriptor=" item(ns)"),
                 'outlier_check': get_outlier_color(metrics['items']['is_outlier'])
             }
 
@@ -457,6 +463,7 @@ class ProjectInfoView(APIView):
         raised_funds = {
             'value': float_to_money(0.0),
             'float_value': 0.0,
+            'reason': "Não há registros desta métrica para este projeto",
             'maximum_expected_value': float_to_money(0.0),
             'outlier_check': get_outlier_color(False)
         }
@@ -465,6 +472,12 @@ class ProjectInfoView(APIView):
             raised_funds = {
                 'value': float_to_money(metrics['raised_funds']['total_raised_funds']),
                 'float_value': metrics['raised_funds']['total_raised_funds'],
+                'reason': reason_text_formatter(
+                    metrics['raised_funds']['total_raised_funds'], 
+                    metrics['raised_funds']['maximum_expected_funds'], 
+                    to_show_value=float_to_money(metrics['raised_funds']['total_raised_funds']),
+                    to_show_expected_max_value=float_to_money(metrics['raised_funds']['maximum_expected_funds'])
+                    ),
                 'maximum_expected_value': float_to_money(metrics['raised_funds']['maximum_expected_funds']),
                 'outlier_check': get_outlier_color(metrics['raised_funds']['is_outlier'])
             }
@@ -479,7 +492,8 @@ class ProjectInfoView(APIView):
             'value': float_to_money(0.0),
             'float_value': 0.0,
             'maximum_expected_value': float_to_money(0.0),
-            'outlier_check': get_outlier_color(False)
+            'outlier_check': get_outlier_color(False),
+            'reason': "Não há registros desta métrica para este projeto"
         }
 
         if metrics['verified_funds'] is not None:
@@ -487,7 +501,13 @@ class ProjectInfoView(APIView):
                 'value': float_to_money(metrics['verified_funds']['total_verified_funds']),
                 'float_value': metrics['verified_funds']['total_verified_funds'],
                 'maximum_expected_value': float_to_money(metrics['verified_funds']['maximum_expected_funds']),
-                'outlier_check': get_outlier_color(metrics['verified_funds']['is_outlier'])
+                'outlier_check': get_outlier_color(metrics['verified_funds']['is_outlier']),
+                'reason': reason_text_formatter(
+                    metrics['verified_funds']['total_verified_funds'], 
+                    metrics['verified_funds']['maximum_expected_funds'], 
+                    to_show_value=float_to_money(metrics['verified_funds']['total_verified_funds']),
+                    to_show_expected_max_value=float_to_money(metrics['verified_funds']['maximum_expected_funds'])
+                    ),
             }
 
         valor_comprovado = register_project_metric('valor_comprovado', verified_funds['float_value'], str(verified_funds), financial_complexity_indicator.name, int(pronac))
@@ -500,7 +520,8 @@ class ProjectInfoView(APIView):
             'value': float_to_money(0),
             'float_value': 0.0,
             'maximum_expected_funds': float_to_money(0.0),
-            'outlier_check': get_outlier_color(False)
+            'outlier_check': get_outlier_color(False),
+            'reason': "Não há registros desta métrica para este projeto"
         }
 
         if metrics['approved_funds'] is not None:
@@ -508,7 +529,13 @@ class ProjectInfoView(APIView):
                 'value': float_to_money(metrics['approved_funds']['total_approved_funds']),
                 'float_value': metrics['approved_funds']['total_approved_funds'],
                 'maximum_expected_funds': float_to_money(metrics['approved_funds']['maximum_expected_funds']),
-                'outlier_check': get_outlier_color(metrics['approved_funds']['is_outlier'])
+                'outlier_check': get_outlier_color(metrics['approved_funds']['is_outlier']),
+                'reason': reason_text_formatter(
+                    metrics['approved_funds']['total_approved_funds'],
+                    metrics['approved_funds']['maximum_expected_funds'], 
+                    to_show_value=float_to_money(metrics['approved_funds']['total_approved_funds']),
+                    to_show_expected_max_value=float_to_money(metrics['approved_funds']['maximum_expected_funds'])
+                    ),
             }
         
         valor_aprovado = register_project_metric('valor_aprovado', approved_funds['float_value'], str(approved_funds), financial_complexity_indicator.name, int(pronac))
@@ -519,7 +546,7 @@ class ProjectInfoView(APIView):
         # itens_orcamentarios_fora_do_comum
         common_items_ratio = {
             'outlier_check': get_outlier_color(False),
-            'value': 0.0,
+            'value': '0.0%',
             'float_value': 0.0,
             'mean': 0.0,
             'std': 0.0,
@@ -548,16 +575,21 @@ class ProjectInfoView(APIView):
 
             common_items_ratio = {
                 'outlier_check': get_outlier_color(metrics['common_items_ratio']['is_outlier']),
-                'value': "{0:.2f}".format(100 - metrics['common_items_ratio']['value'] * 100),
+                'value': "{0:.2f}%".format(100 - metrics['common_items_ratio']['value'] * 100),
                 'float_value': (100 - metrics['common_items_ratio']['value'] * 100),
                 'mean': metrics['common_items_ratio']['mean'],
                 'std': metrics['common_items_ratio']['std'],
                 'uncommon_items': uncommon_items_list,
-                'reason': reason_text_formatter((100 - metrics['common_items_ratio']['value'] * 100), metrics['common_items_ratio']['mean'], descriptor="itens"),
+                'reason': reason_text_formatter(
+                    (100 - metrics['common_items_ratio']['value'] * 100), 
+                    metrics['common_items_ratio']['mean'] * 100, 
+                    to_show_value="{0:.2f}%".format(100 - metrics['common_items_ratio']['value'] * 100),
+                    to_show_expected_max_value="{0:.2f}%".format(100 - metrics['common_items_ratio']['mean'] * 100)
+                    ),
                 'common_items_not_in_project': common_items_not_in_project_list
             }
 
-        itens_orcamentarios_fora_do_comum = register_project_metric('itens_orcamentarios_fora_do_comum', common_items_ratio['value'], "", financial_complexity_indicator.name, int(pronac))
+        itens_orcamentarios_fora_do_comum = register_project_metric('itens_orcamentarios_fora_do_comum', common_items_ratio['float_value'], "", financial_complexity_indicator.name, int(pronac))
         common_items_ratio['metric_id'] = itens_orcamentarios_fora_do_comum.id
 
         result['itens_orcamentarios_fora_do_comum'] = common_items_ratio
@@ -566,14 +598,16 @@ class ProjectInfoView(APIView):
         total_receipts = {
             'outlier_check': get_outlier_color(False),
             'total_receipts': 0,
-            'maximum_expected_in_segment': 0
+            'maximum_expected_in_segment': 0,
+            'reason': "Não há registros desta métrica para este projeto"
         }
 
         if metrics['total_receipts'] is not None:
             total_receipts = {
                 'outlier_check': get_outlier_color(metrics['total_receipts']['is_outlier']),
                 'total_receipts': int(metrics['total_receipts']['total_receipts']),
-                'maximum_expected_in_segment': int(metrics['total_receipts']['maximum_expected_in_segment'])
+                'maximum_expected_in_segment': int(metrics['total_receipts']['maximum_expected_in_segment']),
+                'reason': reason_text_formatter(int(metrics['total_receipts']['total_receipts']), int(metrics['total_receipts']['maximum_expected_in_segment']), descriptor=" item(ns)")
             }
 
         comprovantes_pagamento = register_project_metric('comprovantes_pagamento', total_receipts['total_receipts'], str(total_receipts), financial_complexity_indicator.name, int(pronac))
@@ -585,10 +619,11 @@ class ProjectInfoView(APIView):
         new_providers = {
             'new_providers_list': [],
             'new_providers_quantity': 0,
-            'new_providers_percentage': 0,
+            'new_providers_percentage': "0.0%",
             'segment_average_percentage': 0,
             'outlier_check': get_outlier_color(False),
-            'all_projects_average_percentage': 0
+            'all_projects_average_percentage': 0,
+            'reason': "Não há registros desta métrica para este projeto"
         }
 
         if metrics['new_providers'] is not None:
@@ -613,10 +648,16 @@ class ProjectInfoView(APIView):
             new_providers = {
                 'new_providers_quantity': len(new_providers_list),
                 'new_providers_list': new_providers_list,
-                'new_providers_percentage': metrics['new_providers']['new_providers_percentage'],
+                'new_providers_percentage': "{0:.2f}%".format(metrics['new_providers']['new_providers_percentage']),
                 'segment_average_percentage': metrics['new_providers']['segment_average_percentage'],
                 'outlier_check': get_outlier_color(metrics['new_providers']['is_outlier']),
-                'all_projects_average_percentage': metrics['new_providers']['all_projects_average_percentage']
+                'all_projects_average_percentage': metrics['new_providers']['all_projects_average_percentage'],
+                'reason': reason_text_formatter(
+                    metrics['new_providers']['new_providers_percentage'], 
+                    metrics['new_providers']['all_projects_average_percentage'], 
+                    to_show_value="{0:.2f}%".format(metrics['new_providers']['new_providers_percentage'] * 100),
+                    to_show_expected_max_value="{0:.2f}%".format(metrics['new_providers']['all_projects_average_percentage'] * 100)
+                    )
             }
 
         novos_fornecedores = register_project_metric('novos_fornecedores', new_providers['new_providers_quantity'], "", financial_complexity_indicator.name, int(pronac))
@@ -629,7 +670,8 @@ class ProjectInfoView(APIView):
             'cnpj_cpf': '',
             'submitted_projects': [],
             'analyzed_projects': [],
-            'outlier_check': get_outlier_color(False)
+            'outlier_check': get_outlier_color(False),
+            'reason': "Não há registros desta métrica para este projeto"
         }
 
         if metrics['proponent_projects'] is not None:
@@ -657,7 +699,8 @@ class ProjectInfoView(APIView):
                 'cnpj_cpf': metrics['proponent_projects']['cnpj_cpf'],
                 'submitted_projects': submitted_projects_list,
                 'analyzed_projects': analyzed_projects_list,
-                'outlier_check': get_outlier_color(False)
+                'outlier_check': get_outlier_color(False),
+                'reason': ""
             }
 
         projetos_mesmo_proponente = register_project_metric('projetos_mesmo_proponente', len(proponent_projects['submitted_projects']), "", financial_complexity_indicator.name, int(pronac))
@@ -671,7 +714,8 @@ class ProjectInfoView(APIView):
             'outlier_check': get_outlier_color(False),
             'items': [],
             'total_items': 0,
-            'maximum_expected': 0
+            'maximum_expected': 0,
+            'reason': "Não há registros desta métrica para este projeto"
         }
 
         if metrics['items_prices'] is not None:
@@ -689,7 +733,8 @@ class ProjectInfoView(APIView):
                 'outlier_check': get_outlier_color(metrics['items_prices']['is_outlier']),
                 'items': items_list,
                 'total_items': int(metrics['items_prices']['total_items']),
-                'maximum_expected': int(metrics['items_prices']['maximum_expected'])
+                'maximum_expected': int(metrics['items_prices']['maximum_expected']),
+                'reason': reason_text_formatter(int(metrics['items_prices']['number_items_outliers']), int(metrics['items_prices']['maximum_expected']), descriptor=" item(ns)")
             }
 
         precos_acima_media = register_project_metric('precos_acima_media', items_prices['value'], "", financial_complexity_indicator.name, int(pronac))
@@ -706,7 +751,7 @@ class ProjectInfoView(APIView):
                         'name': 'itens_orcamentarios',
                         'name_title': 'Itens orçamentários',
                         'type': 'bar',
-                        'helper_text':'<HELPER_TEXT>',
+                        'helper_text':'Indica a quantidade de itens orçamentários contidos neste projeto',
                         'metric_id': result['itens_orcamentarios']['metric_id'],
                         'value': result['itens_orcamentarios']['total_items'],
                         'reason': result['itens_orcamentarios']['reason'],
@@ -722,10 +767,10 @@ class ProjectInfoView(APIView):
                         'name': 'itens_orcamentarios_fora_do_comum',
                         'name_title': 'Itens orçamentários fora do comum',
                         'type': 'items-list',
-                        'helper_text':'<HELPER_TEXT>',
+                        'helper_text':'Baseado em uma lista de itens geralmente presentes, indica o que há de incomum neste projeto',
                         'metric_id': result['itens_orcamentarios_fora_do_comum']['metric_id'],
                         'value': result['itens_orcamentarios_fora_do_comum']['value'],
-                        'reason': result['itens_orcamentarios']['reason'],
+                        'reason': result['itens_orcamentarios_fora_do_comum']['reason'],
                         'outlier_check': result['itens_orcamentarios_fora_do_comum']['outlier_check'],
                         'mean': result['itens_orcamentarios_fora_do_comum']['mean'],
                         'std': result['itens_orcamentarios_fora_do_comum']['std'],
@@ -736,10 +781,10 @@ class ProjectInfoView(APIView):
                         'name': 'comprovantes_pagamento',
                         'name_title': 'Comprovantes de pagamento',
                         'type': 'bar',
-                        'helper_text':'<HELPER_TEXT>',
+                        'helper_text':'Indica a quantidade de comprovantes de pagamento contidos neste projeto',
                         'metric_id': result['comprovantes_pagamento']['metric_id'],
                         'value': result['comprovantes_pagamento']['total_receipts'],
-                        'reason': 'any reason',
+                        'reason': result['comprovantes_pagamento']['reason'],
                         'outlier_check': result['comprovantes_pagamento']['outlier_check'],
                         'maximum_expected_in_segment': result['comprovantes_pagamento']['maximum_expected_in_segment']
                     },
@@ -747,9 +792,9 @@ class ProjectInfoView(APIView):
                         'name': 'precos_acima_media',
                         'name_title': 'Preços acima da média',
                         'type': 'bar',
-                        'helper_text':'<HELPER_TEXT>',
+                        'helper_text':'Indica a quantidade de itens deste projeto que apresenta preço acima da média',
                         'metric_id': result['precos_acima_media']['metric_id'],
-                        'reason': 'any reason',
+                        'reason': result['precos_acima_media']['reason'],
                         'value': result['precos_acima_media']['value'],
                         'outlier_check': result['precos_acima_media']['outlier_check'],
                         'items': result['precos_acima_media']['items'],
@@ -760,20 +805,20 @@ class ProjectInfoView(APIView):
                         'name': 'valor_comprovado',
                         'name_title': 'Valor comprovado',
                         'type': 'bar',
-                        'helper_text':'<HELPER_TEXT>',
+                        'helper_text':'Indica os gastos comprovados por este projeto',
                         'metric_id': result['valor_comprovado']['metric_id'],
                         'value': result['valor_comprovado']['value'],
-                        'reason': result['valor_comprovado']['maximum_expected_value'],
+                        'reason': result['valor_comprovado']['reason'],
                         'outlier_check': result['valor_comprovado']['outlier_check']
                     },
                     {
                         'name': 'valor_captado',
                         'name_title': 'Valor captado',
                         'type': 'bar',
-                        'helper_text':'<HELPER_TEXT>',
+                        'helper_text':'Indica os recursos captados por este projeto',
                         'metric_id': result['valor_captado']['metric_id'],
                         'value': result['valor_captado']['value'],
-                        'reason': result['valor_captado']['maximum_expected_value'],
+                        'reason': result['valor_captado']['reason'],
                         'outlier_check': result['valor_captado']['outlier_check']
                     },
                     # {
@@ -787,10 +832,10 @@ class ProjectInfoView(APIView):
                         'name': 'projetos_mesmo_proponente',
                         'name_title': 'Projetos do mesmo proponente',
                         'type': 'proponents-list',
-                        'helper_text':'<HELPER_TEXT>',
+                        'helper_text':'Apresenta uma lista de projetos de autoria do mesmo proponente deste projeto',
                         'metric_id': result['projetos_mesmo_proponente']['metric_id'],
                         'value': len(result['projetos_mesmo_proponente']['submitted_projects']),
-                        'reason': 'any reason',
+                        'reason': result['projetos_mesmo_proponente']['reason'],
                         'outlier_check': result['projetos_mesmo_proponente']['outlier_check'],
                         'proponent_projects': result['projetos_mesmo_proponente']['submitted_projects'],
                     },
@@ -798,10 +843,10 @@ class ProjectInfoView(APIView):
                         'name': 'novos_fornecedores',
                         'name_title': 'Novos fornecedores',
                         'type': 'providers-list',
-                        'helper_text':'<HELPER_TEXT>',
+                        'helper_text':'Apresenta uma lista de itens fornecidos por fontes ainda não verificadas no SALIC',
                         'metric_id': result['novos_fornecedores']['metric_id'],
                         'value': result['novos_fornecedores']['new_providers_quantity'],
-                        'reason': 'any reason',
+                        'reason': result['novos_fornecedores']['reason'],
                         'providers': result['novos_fornecedores']['new_providers_list'],
                         'new_providers_percentage': result['novos_fornecedores']['new_providers_percentage'],
                         'segment_average_percentage': result['novos_fornecedores']['segment_average_percentage'],
@@ -812,10 +857,10 @@ class ProjectInfoView(APIView):
                         'name': 'valor_aprovado',
                         'name_title': 'Valor aprovado',
                         'type': 'bar',
-                        'helper_text':'<HELPER_TEXT>',
+                        'helper_text':'Indica o valor aprovado para este projeto',
                         'metric_id': result['valor_aprovado']['metric_id'],
                         'value': result['valor_aprovado']['value'],
-                        'reason': 'any reason',
+                        'reason': result['valor_aprovado']['reason'],
                         'outlier_check': result['valor_aprovado']['outlier_check'],
                         'maximum_expected_funds': result['valor_aprovado']['maximum_expected_funds']
                     }
