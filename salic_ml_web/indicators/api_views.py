@@ -182,24 +182,43 @@ class ProjectsView(APIView):
                 "project_name": "“Paisagismo Brasileiro, Roberto Burle Marx e Haruyoshi Ono – 60 anos de história”.", "analist": "Modelo"},
             {"pronac": "92739", "complexity": 5,
                 "project_name": "Circulação de oficinas e shows - Claudia Cimbleris", "analist": "Modelo"},
+            {"pronac": "90021", "complexity": 25,
+                "project_name": "Indie 2009 - Mostra de Cinema Mundial", "analist": "Florentina"},
+            {"pronac": "153833", "complexity": 75,
+                "project_name": "TRES SOMBREROS DE COPA", "analist": "Chimbinha"},
+            {"pronac": "160443", "complexity": 95,
+                "project_name": "SERGIO REIS – CORAÇÃO ESTRADEIRO", "analist": "Cláudia Leitte"},
+            {"pronac": "118593", "complexity": 15,
+                "project_name": "ÁGUIA  CARNAVAL 2012: TROPICÁLIA! O MOVIMENTO QUE NÃO TERMINOU", "analist": "Ferdinando"},
+            {"pronac": "161533", "complexity": 5,
+                "project_name": "“Livro sobre Serafim Derenzi” (título provisório)", "analist": "Modelo"},
+            {"pronac": "171372", "complexity": 5,
+                "project_name": "“Paisagismo Brasileiro, Roberto Burle Marx e Haruyoshi Ono – 60 anos de história”.", "analist": "Modelo"},
+            {"pronac": "92739", "complexity": 5,
+                "project_name": "Circulação de oficinas e shows - Claudia Cimbleris", "analist": "Modelo"},
             ]
 
+        projects_bk = projects
         
+        for i in range(100):
+            projects = projects + projects_bk
 
         paginated_list = paginate_by_10(projects)
 
-        projects_list = get_page(paginated_list, int(kwargs['page']))
+        page = request.GET.get('page')
+        
+        projects_list = get_page(paginated_list, int(page))
 
         # content = {'projects': projects_list, 'last_page':len(paginated_list)}
         
-        next_page_index = int(kwargs['page']) + 1
+        next_page_index = int(page) + 1
 
         if next_page_index > len(paginated_list):
             next_page = None
         else:
             next_page = '/indicators/projects/{0}'.format(next_page_index)
 
-        prev_page_index = int(kwargs['page'] - 1)
+        prev_page_index = int(kwargs['page']) - 1
 
         if prev_page_index < 1:
             prev_page = None
@@ -209,7 +228,7 @@ class ProjectsView(APIView):
         content = {
             'total': len(projects),
             'per_page': 10,
-            'current_page': int(kwargs['page']),
+            'current_page': int(page),
             'last_page': len(paginated_list),
             'next_page_url': next_page,
             'prev_page_url': prev_page,
@@ -246,7 +265,26 @@ class SearchProjectView(APIView):
                 "project_name": "“Paisagismo Brasileiro, Roberto Burle Marx e Haruyoshi Ono – 60 anos de história”.", "analist": "Modelo"},
             {"pronac": "92739", "complexity": 5,
                 "project_name": "Circulação de oficinas e shows - Claudia Cimbleris", "analist": "Modelo"},
+            {"pronac": "90021", "complexity": 25,
+                "project_name": "Indie 2009 - Mostra de Cinema Mundial", "analist": "Florentina"},
+            {"pronac": "153833", "complexity": 75,
+                "project_name": "TRES SOMBREROS DE COPA", "analist": "Chimbinha"},
+            {"pronac": "160443", "complexity": 95,
+                "project_name": "SERGIO REIS – CORAÇÃO ESTRADEIRO", "analist": "Cláudia Leitte"},
+            {"pronac": "118593", "complexity": 15,
+                "project_name": "ÁGUIA  CARNAVAL 2012: TROPICÁLIA! O MOVIMENTO QUE NÃO TERMINOU", "analist": "Ferdinando"},
+            {"pronac": "161533", "complexity": 5,
+                "project_name": "“Livro sobre Serafim Derenzi” (título provisório)", "analist": "Modelo"},
+            {"pronac": "171372", "complexity": 5,
+                "project_name": "“Paisagismo Brasileiro, Roberto Burle Marx e Haruyoshi Ono – 60 anos de história”.", "analist": "Modelo"},
+            {"pronac": "92739", "complexity": 5,
+                "project_name": "Circulação de oficinas e shows - Claudia Cimbleris", "analist": "Modelo"},
             ]
+
+        projects_bk = projects
+        
+        for i in range(100):
+            projects = projects + projects_bk
 
         projects_processed = [{
             "pronac": project['pronac'], 
@@ -256,29 +294,62 @@ class SearchProjectView(APIView):
             "analist": project['analist']
         } for project in projects]
 
-        NAME_CUTOFF = calculate_search_cutoff(len(kwargs['keyword']))
+        keyword = request.GET.get('filter')
 
-        name_matches_list = difflib.get_close_matches(
-            kwargs['keyword'].lower(), 
-            [project['project_name_lowered'] for project in projects_processed], 
-            n=len(projects), 
-            cutoff=NAME_CUTOFF
+        if keyword is not None:
+            NAME_CUTOFF = calculate_search_cutoff(len(keyword))
+
+            name_matches_list = difflib.get_close_matches(
+                keyword.lower(), 
+                [project['project_name_lowered'] for project in projects_processed], 
+                n=len(projects), 
+                cutoff=NAME_CUTOFF
             )
 
-        pronac_matches_list = difflib.get_close_matches(
-            kwargs['keyword'], 
-            [project['pronac'] for project in projects], 
-            n=len(projects), 
-            cutoff=0.2
+            pronac_matches_list = difflib.get_close_matches(
+                keyword, 
+                [project['pronac'] for project in projects], 
+                n=len(projects), 
+                cutoff=0.2
             )
 
-        result_list = [project for project in projects_processed if project['pronac'] in pronac_matches_list or project['project_name_lowered'] in name_matches_list]
+            result_list = [project for project in projects_processed if project['pronac'] in pronac_matches_list or project['project_name_lowered'] in name_matches_list]
+        else:
+            result_list = projects
 
         paginated_list = paginate_by_10(result_list)
 
-        projects_list = get_page(paginated_list, int(kwargs['page']))
+        page = request.GET.get('page')
+
+        projects_list = get_page(paginated_list, int(page))
         
-        content = {'projects': projects_list, 'last_page': len(paginated_list)}
+        # content = {'projects': projects_list, 'last_page': len(paginated_list)}
+
+        next_page_index = int(page) + 1
+
+        if next_page_index > len(paginated_list):
+            next_page = None
+        else:
+            next_page = '/indicators/projects/search/any/{0}'.format(next_page_index)
+
+        prev_page_index = int(kwargs['page']) - 1
+
+        if prev_page_index < 1:
+            prev_page = None
+        else:
+            prev_page = '/indicators/projects/search/any/{0}'.format(prev_page_index)
+
+        content = {
+            'total': len(projects),
+            'per_page': 10,
+            'current_page': int(page),
+            'last_page': len(paginated_list),
+            'next_page_url': next_page,
+            'prev_page_url': prev_page,
+            'from': 1,
+            'to': len(paginated_list),
+            'data': projects_list
+        }
         
         return JsonResponse(content)
 
