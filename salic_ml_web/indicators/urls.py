@@ -21,6 +21,7 @@ urlpatterns = [
     url(r'^project_info/(?P<pronac>[0-9]+)', csrf_exempt(api_views.ProjectInfoView.as_view()), name='project_info_view'),
     url(r'^send_metric_feedback', csrf_exempt(api_views.SendMetricFeedbackView.as_view()), name='send_metric_feedback_view'),
     url(r'^send_project_feedback', csrf_exempt(api_views.SendProjectFeedbackView.as_view()), name='send_project_feedback_view'),
+    url(r'^create_single_user', csrf_exempt(api_views.CreateSingleUserView.as_view()), name='create_single_user_view'),
     # path('<str:pronac>', api_views.SearchProjectView, name='single_project_view'),
     # path('admin/', admin.site.urls),
     # path('db_test', views.db_connection_test, name='db_test'),
