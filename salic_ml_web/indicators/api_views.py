@@ -124,6 +124,38 @@ def get_page(paginated_list, page):
 
     return required_list
 
+def reason_text_formatter(value, expected_max_value, prefix="", descriptor=""):
+    # "O valor de {0}{1}{2} está abaixo/acima do valor médio de {3}{4} {5}"
+    if value > expected_max_value:
+        reason_text = "O valor de {0}{1} {2} está acima do valor médio de {3}{4} {5}".format(
+            prefix, 
+            value, 
+            descriptor, 
+            prefix, 
+            expected_max_value, 
+            descriptor
+            )
+    elif value < expected_max_value:
+        reason_text = "O valor de {0}{1} {2} está abaixo do valor médio de {3}{4} {5}".format(
+            prefix, 
+            value, 
+            descriptor, 
+            prefix, 
+            expected_max_value, 
+            descriptor
+            )
+    else:
+        reason_text = "O valor de {0}{1} {2} está correspondente ao valor médio de {3}{4} {5}".format(
+            prefix, 
+            value, 
+            descriptor, 
+            prefix, 
+            expected_max_value, 
+            descriptor
+            )
+
+    return reason_text
+
 class ProjectsView(APIView):
     """
     A view that returns a list containing all the projects
@@ -152,12 +184,40 @@ class ProjectsView(APIView):
                 "project_name": "Circulação de oficinas e shows - Claudia Cimbleris", "analist": "Modelo"},
             ]
 
+        
+
         paginated_list = paginate_by_10(projects)
 
         projects_list = get_page(paginated_list, int(kwargs['page']))
 
-        content = {'projects': projects_list, 'last_page':len(paginated_list)}
+        # content = {'projects': projects_list, 'last_page':len(paginated_list)}
         
+        next_page_index = int(kwargs['page']) + 1
+
+        if next_page_index > len(paginated_list):
+            next_page = None
+        else:
+            next_page = '/indicators/projects/{0}'.format(next_page_index)
+
+        prev_page_index = int(kwargs['page'] - 1)
+
+        if prev_page_index < 1:
+            prev_page = None
+        else:
+            prev_page = '/indicators/projects/{0}'.format(prev_page_index)
+
+        content = {
+            'total': len(projects),
+            'per_page': 10,
+            'current_page': int(kwargs['page']),
+            'last_page': len(paginated_list),
+            'next_page_url': next_page,
+            'prev_page_url': prev_page,
+            'from': 1,
+            'to': len(paginated_list),
+            'data': projects_list
+        }
+
         return JsonResponse(content)
 
 class SearchProjectView(APIView):
@@ -231,16 +291,17 @@ class ProjectInfoView(APIView):
     def dispatch(self, request, *args, **kwargs):
         return generic.View.dispatch(self, request, *args, **kwargs)
 
-    def post(self, request, format=None, **kwargs):
-        user_data = json.loads(request.body)
+    # def post(self, request, format=None, **kwargs):
+    def get(self, request, format=None, **kwargs):
+        # user_data = json.loads(request.body)
 
-        user_email = user_data['email'] + '@cultura.gov.br'
-        try:
-            user = User.objects.get(email=user_email)
-        except:
-            user_name = user_data['name']
+        # user_email = user_data['email'] + '@cultura.gov.br'
+        # try:
+        #     user = User.objects.get(email=user_email)
+        # except:
+        #     user_name = user_data['name']
 
-            user = User.objects.create(email=user_email, name=user_name)
+        #     user = User.objects.create(email=user_email, name=user_name)
 
         pronac = kwargs['pronac']
         project = fetch_entity(int(pronac))
@@ -282,12 +343,17 @@ class ProjectInfoView(APIView):
         financial_complexity_indicator = register_project_indicator(int(pronac), 'complexidade_financeira', 0)
 
         easiness = {
-            'value': 0,
+            'value': 1,
         }
 
         if metrics['easiness'] is not None:
+            complexity = int((1 - metrics['easiness']['easiness']) * 100) # Converts easiness to complexity
+            
+            if complexity is 0:
+                complexity = 1
+
             easiness = {
-                'value': float("{0:.2f}".format(metrics['easiness']['easiness'] * 100))
+                'value': complexity
             }
 
         result['easiness'] = easiness
@@ -297,6 +363,7 @@ class ProjectInfoView(APIView):
                 'total_items': 0,
                 'interval_start': 0,
                 'interval_end': 0,
+                'reason': "Não há registros desta métrica para este projeto",
                 'outlier_check': get_outlier_color(False)
         }
 
@@ -306,6 +373,7 @@ class ProjectInfoView(APIView):
                 'total_items': int(metrics['items']['value']),
                 'interval_start': int(items_interval['start']),
                 'interval_end': int(items_interval['end']),
+                'reason': reason_text_formatter(int(metrics['items']['value']), int(items_interval['end']), descriptor="itens"),
                 'outlier_check': get_outlier_color(metrics['items']['is_outlier'])
             }
 
@@ -385,7 +453,8 @@ class ProjectInfoView(APIView):
             'mean': 0.0,
             'std': 0.0,
             'uncommon_items': [],
-            'common_items_not_in_project': []
+            'common_items_not_in_project': [],
+            'reason': "Não há registros desta métrica para este projeto"
         }
 
         if metrics['common_items_ratio'] is not None:
@@ -413,6 +482,7 @@ class ProjectInfoView(APIView):
                 'mean': metrics['common_items_ratio']['mean'],
                 'std': metrics['common_items_ratio']['std'],
                 'uncommon_items': uncommon_items_list,
+                'reason': reason_text_formatter((100 - metrics['common_items_ratio']['value'] * 100), metrics['common_items_ratio']['mean'], descriptor="itens"),
                 'common_items_not_in_project': common_items_not_in_project_list
             }
 
@@ -563,9 +633,12 @@ class ProjectInfoView(APIView):
                 'metrics': [
                     {
                         'name': 'itens_orcamentarios',
+                        'name_title': 'Itens orçamentários',
+                        'type': 'bar',
+                        'helper_text':'<HELPER_TEXT>',
                         'metric_id': result['itens_orcamentarios']['metric_id'],
                         'value': result['itens_orcamentarios']['total_items'],
-                        'reason': 'any reason',
+                        'reason': result['itens_orcamentarios']['reason'],
                         'outlier_check': result['itens_orcamentarios']['outlier_check'],
                         'interval_start': result['itens_orcamentarios']['interval_start'],
                         'interval_end': result['itens_orcamentarios']['interval_end'],
@@ -576,17 +649,23 @@ class ProjectInfoView(APIView):
                     },
                     {
                         'name': 'itens_orcamentarios_fora_do_comum',
+                        'name_title': 'Itens orçamentários fora do comum',
+                        'type': 'items-list',
+                        'helper_text':'<HELPER_TEXT>',
                         'metric_id': result['itens_orcamentarios_fora_do_comum']['metric_id'],
                         'value': result['itens_orcamentarios_fora_do_comum']['value'],
-                        'reason': 'any reason',
+                        'reason': result['itens_orcamentarios']['reason'],
                         'outlier_check': result['itens_orcamentarios_fora_do_comum']['outlier_check'],
                         'mean': result['itens_orcamentarios_fora_do_comum']['mean'],
                         'std': result['itens_orcamentarios_fora_do_comum']['std'],
-                        'expected_itens': result['itens_orcamentarios_fora_do_comum']['uncommon_items'],
-                        'missing_itens': result['itens_orcamentarios_fora_do_comum']['common_items_not_in_project']
+                        'uncommon_items': result['itens_orcamentarios_fora_do_comum']['uncommon_items'],
+                        'common_items_not_in_project': result['itens_orcamentarios_fora_do_comum']['common_items_not_in_project']
                     },
                     {
                         'name': 'comprovantes_pagamento',
+                        'name_title': 'Comprovantes de pagamento',
+                        'type': 'bar',
+                        'helper_text':'<HELPER_TEXT>',
                         'metric_id': result['comprovantes_pagamento']['metric_id'],
                         'value': result['comprovantes_pagamento']['total_receipts'],
                         'reason': 'any reason',
@@ -595,6 +674,9 @@ class ProjectInfoView(APIView):
                     },
                     {
                         'name': 'precos_acima_media',
+                        'name_title': 'Preços acima da média',
+                        'type': 'bar',
+                        'helper_text':'<HELPER_TEXT>',
                         'metric_id': result['precos_acima_media']['metric_id'],
                         'reason': 'any reason',
                         'value': result['precos_acima_media']['value'],
@@ -605,6 +687,9 @@ class ProjectInfoView(APIView):
                     },
                     {
                         'name': 'valor_comprovado',
+                        'name_title': 'Valor comprovado',
+                        'type': 'bar',
+                        'helper_text':'<HELPER_TEXT>',
                         'metric_id': result['valor_comprovado']['metric_id'],
                         'value': result['valor_comprovado']['value'],
                         'reason': result['valor_comprovado']['maximum_expected_value'],
@@ -612,6 +697,9 @@ class ProjectInfoView(APIView):
                     },
                     {
                         'name': 'valor_captado',
+                        'name_title': 'Valor captado',
+                        'type': 'bar',
+                        'helper_text':'<HELPER_TEXT>',
                         'metric_id': result['valor_captado']['metric_id'],
                         'value': result['valor_captado']['value'],
                         'reason': result['valor_captado']['maximum_expected_value'],
@@ -626,6 +714,9 @@ class ProjectInfoView(APIView):
                     # },
                     {
                         'name': 'projetos_mesmo_proponente',
+                        'name_title': 'Projetos do mesmo proponente',
+                        'type': 'proponents-list',
+                        'helper_text':'<HELPER_TEXT>',
                         'metric_id': result['projetos_mesmo_proponente']['metric_id'],
                         'value': len(result['projetos_mesmo_proponente']['submitted_projects']),
                         'reason': 'any reason',
@@ -634,6 +725,9 @@ class ProjectInfoView(APIView):
                     },
                     {
                         'name': 'novos_fornecedores',
+                        'name_title': 'Novos fornecedores',
+                        'type': 'providers-list',
+                        'helper_text':'<HELPER_TEXT>',
                         'metric_id': result['novos_fornecedores']['metric_id'],
                         'value': result['novos_fornecedores']['new_providers_quantity'],
                         'reason': 'any reason',
@@ -645,6 +739,9 @@ class ProjectInfoView(APIView):
                     },
                     {
                         'name': 'valor_aprovado',
+                        'name_title': 'Valor aprovado',
+                        'type': 'bar',
+                        'helper_text':'<HELPER_TEXT>',
                         'metric_id': result['valor_aprovado']['metric_id'],
                         'value': result['valor_aprovado']['value'],
                         'reason': 'any reason',
@@ -664,11 +761,11 @@ class ProjectInfoView(APIView):
                 'name': project.name,
                 'pronac': string_pronac
             },
-            'user': {
-                'user_id': user.id,
-                'name': user.name,
-                'email': user.email
-            },
+            # 'user': {
+            #     'user_id': user.id,
+            #     'name': user.name,
+            #     'email': user.email
+            # },
             'project_indicators': project_indicators,
             'project_feedback_possibilities': project_feedback_possibilities,
         }
@@ -688,17 +785,32 @@ class SendMetricFeedbackView(APIView):
     def post(self, request, format=None):
         request_data = json.loads(request.body)
 
-        user = get_object_or_404(User, email=request_data['user_email'])
+        user_email = "{0}@cultura.gov.br".format(request_data['user_email'])
+
+        user = get_object_or_404(User, email=user_email)
         metric = get_object_or_404(Metric, id=int(request_data['metric_id']))
         metric_feedback_rating = int(request_data['metric_feedback_rating'])
         metric_feedback_text = request_data['metric_feedback_text']
 
-        saved_metric_feedback = MetricFeedback.objects.create(
-            user=user, 
-            metric=metric, 
-            grade=metric_feedback_rating, 
-            reason=metric_feedback_text
+        metric_query = MetricFeedback.objects.filter(
+            user=user,
+            metric=metric
+        )
+
+        if len(metric_query) is 0:
+            # Creates metric
+            saved_metric_feedback = MetricFeedback.objects.create(
+                user=user,
+                metric=metric,
+                grade=metric_feedback_rating,
+                reason=metric_feedback_text
             )
+        else:
+            # Updates metric
+            saved_metric_feedback = metric_query[0]
+            saved_metric_feedback.grade = metric_feedback_rating
+            saved_metric_feedback.reason = metric_feedback_text
+            saved_metric_feedback.save()
 
         request_response = {
             'feedback_id': saved_metric_feedback.id,
@@ -721,15 +833,30 @@ class SendProjectFeedbackView(APIView):
     def post(self, request, format=None):
         request_data = json.loads(request.body)
 
-        user = get_object_or_404(User, email=request_data['user_email'])
+        user_email = "{0}@cultura.gov.br".format(request_data['user_email'])
+
+        user = get_object_or_404(User, email=user_email)
         entity = get_object_or_404(Entity, pronac=int(request_data['pronac']))
         project_feedback_grade = int(request_data['project_feedback_grade'])
 
-        saved_project_feedback = ProjectFeedback.objects.create(
+        project_query = ProjectFeedback.objects.filter(
             user=user, 
-            entity=entity,
-            grade=project_feedback_grade
+            entity=entity
+        )
+
+        if len(project_query) is 0:
+            # Creates
+            saved_project_feedback = ProjectFeedback.objects.create(
+                user=user, 
+                entity=entity,
+                grade=project_feedback_grade
             )
+        else:
+            # Updates
+            saved_project_feedback = project_query[0]
+            saved_project_feedback.grade = project_feedback_grade
+            saved_project_feedback.save()
+        
 
         request_response = {
             'feedback_id': saved_project_feedback.id,
@@ -737,3 +864,35 @@ class SendProjectFeedbackView(APIView):
         }    
 
         return JsonResponse(request_response)
+
+class CreateSingleUserView(APIView):
+    """
+    A view that creates a single user if not created
+    """
+    renderer_classes = (JSONRenderer, )
+    @method_decorator(csrf_exempt)
+    def dispatch(self, request, *args, **kwargs):
+        return generic.View.dispatch(self, request, *args, **kwargs)
+
+    @csrf_exempt
+    def post(self, request, format=None):
+        user_data = json.loads(request.body)
+
+        user_email =  '{0}@cultura.gov.br'.format(user_data['email'])
+
+        user_query = User.objects.filter(email=user_email)
+
+        if len(user_query) is 0:
+            user_name = user_data['name']
+
+            user = User.objects.create(email=user_email, name=user_name)
+        else:
+            user = user_query[0]
+
+        user_response = {
+            'id': user.id,
+            'name': user.name,
+            'email': user.email
+        }
+
+        return JsonResponse(user_response)
