@@ -258,39 +258,39 @@ class SearchProjectView(APIView):
         except:
             projects = [
             {"pronac": "90021", "complexity": 25,
-                "project_name": "Indie 2009 - Mostra de Cinema Mundial", "analist": "Florentina"},
+                "project_name": "Indie 2009 - Mostra de Cinema Mundial", "analist": ""},
             {"pronac": "153833", "complexity": 75,
-                "project_name": "TRES SOMBREROS DE COPA", "analist": "Chimbinha"},
+                "project_name": "TRES SOMBREROS DE COPA", "analist": ""},
             {"pronac": "160443", "complexity": 95,
-                "project_name": "SERGIO REIS – CORAÇÃO ESTRADEIRO", "analist": "Cláudia Leitte"},
+                "project_name": "SERGIO REIS – CORAÇÃO ESTRADEIRO", "analist": ""},
             {"pronac": "118593", "complexity": 15,
-                "project_name": "ÁGUIA  CARNAVAL 2012: TROPICÁLIA! O MOVIMENTO QUE NÃO TERMINOU", "analist": "Ferdinando"},
+                "project_name": "ÁGUIA  CARNAVAL 2012: TROPICÁLIA! O MOVIMENTO QUE NÃO TERMINOU", "analist": ""},
             {"pronac": "161533", "complexity": 5,
-                "project_name": "“Livro sobre Serafim Derenzi” (título provisório)", "analist": "Modelo"},
+                "project_name": "“Livro sobre Serafim Derenzi” (título provisório)", "analist": ""},
             {"pronac": "171372", "complexity": 5,
-                "project_name": "“Paisagismo Brasileiro, Roberto Burle Marx e Haruyoshi Ono – 60 anos de história”.", "analist": "Modelo"},
+                "project_name": "“Paisagismo Brasileiro, Roberto Burle Marx e Haruyoshi Ono – 60 anos de história”.", "analist": ""},
             {"pronac": "92739", "complexity": 5,
-                "project_name": "Circulação de oficinas e shows - Claudia Cimbleris", "analist": "Modelo"},
+                "project_name": "Circulação de oficinas e shows - Claudia Cimbleris", "analist": ""},
             {"pronac": "90021", "complexity": 25,
-                "project_name": "Indie 2009 - Mostra de Cinema Mundial", "analist": "Florentina"},
+                "project_name": "Indie 2009 - Mostra de Cinema Mundial", "analist": ""},
             {"pronac": "153833", "complexity": 75,
-                "project_name": "TRES SOMBREROS DE COPA", "analist": "Chimbinha"},
+                "project_name": "TRES SOMBREROS DE COPA", "analist": ""},
             {"pronac": "160443", "complexity": 95,
-                "project_name": "SERGIO REIS – CORAÇÃO ESTRADEIRO", "analist": "Cláudia Leitte"},
+                "project_name": "SERGIO REIS – CORAÇÃO ESTRADEIRO", "analist": ""},
             {"pronac": "118593", "complexity": 15,
-                "project_name": "ÁGUIA  CARNAVAL 2012: TROPICÁLIA! O MOVIMENTO QUE NÃO TERMINOU", "analist": "Ferdinando"},
+                "project_name": "ÁGUIA  CARNAVAL 2012: TROPICÁLIA! O MOVIMENTO QUE NÃO TERMINOU", "analist": ""},
             {"pronac": "161533", "complexity": 5,
-                "project_name": "“Livro sobre Serafim Derenzi” (título provisório)", "analist": "Modelo"},
+                "project_name": "“Livro sobre Serafim Derenzi” (título provisório)", "analist": ""},
             {"pronac": "171372", "complexity": 5,
-                "project_name": "“Paisagismo Brasileiro, Roberto Burle Marx e Haruyoshi Ono – 60 anos de história”.", "analist": "Modelo"},
+                "project_name": "“Paisagismo Brasileiro, Roberto Burle Marx e Haruyoshi Ono – 60 anos de história”.", "analist": ""},
             {"pronac": "92739", "complexity": 5,
-                "project_name": "Circulação de oficinas e shows - Claudia Cimbleris", "analist": "Modelo"},
+                "project_name": "Circulação de oficinas e shows - Claudia Cimbleris", "analist": ""},
             ]
 
-        projects_bk = projects
+            projects_bk = projects
         
-        for i in range(100):
-            projects = projects + projects_bk
+            for i in range(100):
+                projects = projects + projects_bk
 
         projects_processed = [{
             "pronac": project['pronac'], 
@@ -326,6 +326,9 @@ class SearchProjectView(APIView):
         paginated_list = paginate_by_10(result_list)
 
         page = request.GET.get('page')
+
+        if page is None:
+            page = "1"
 
         projects_list = get_page(paginated_list, int(page))
         
