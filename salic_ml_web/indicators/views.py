@@ -212,12 +212,14 @@ def fetch_user_data(request):
     financial_complexity_indicator = register_project_indicator(int(pronac), 'complexidade_financeira', 0)
 
     easiness = {
-        'value': 0,
+        'value': 1,
     }
 
     if metrics['easiness'] is not None:
+        easiness_value = float(metrics['easiness']['easiness']) * 100
+
         easiness = {
-            'value': float("{0:.2f}".format(metrics['easiness']['easiness'] * 100))
+            'value': int(easiness_value)
         }
 
     result['easiness'] = easiness
@@ -301,6 +303,8 @@ def fetch_user_data(request):
     
     result['valor_aprovado'] = approved_funds
 
+    register_project_metric('valor_aprovado', approved_funds['float_value'], str(approved_funds), financial_complexity_indicator.name, int(pronac))
+
     # itens_orcamentarios_fora_do_comum
     
 
@@ -357,7 +361,7 @@ def fetch_user_data(request):
         total_receipts = {
             'outlier_check': get_outlier_color(metrics['total_receipts']['is_outlier']),
             'total_receipts': metrics['total_receipts']['total_receipts'],
-            'maximum_expected_in_segment': metrics['total_receipts']['maximum_expected_in_segment']
+            'maximum_expected_in_segment': int(metrics['total_receipts']['maximum_expected_in_segment'])
         }
 
     result['comprovantes_pagamento'] = total_receipts
@@ -442,6 +446,8 @@ def fetch_user_data(request):
             'outlier_check': get_outlier_color(False)
         }
 
+    register_project_metric('projetos_mesmo_proponente', len(proponent_projects['submitted_projects']), "", financial_complexity_indicator.name, int(pronac))
+
     result['projetos_mesmo_proponente'] = proponent_projects
 
     # precos_acima_media
@@ -470,6 +476,8 @@ def fetch_user_data(request):
             'total_items': metrics['items_prices']['total_items'],
             'maximum_expected': int(metrics['items_prices']['maximum_expected'])
         }
+
+    register_project_metric('precos_acima_media', items_prices['value'], "", financial_complexity_indicator.name, int(pronac))
 
     result['precos_acima_media'] = items_prices
 
