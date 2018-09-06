@@ -65,7 +65,6 @@
 
             <!-- METRIC -->
             <!-- Total do número de itens -->
-            {% if indicator.metrics.0.is_valid %}
                 <div class="title active {{indicator.metrics.0.outlier_check}}">
                     <div class="ui ribbon label">
                         <i class="icon"></i>
@@ -83,6 +82,7 @@
                     </div>
                 </div>
 
+            {% if indicator.metrics.0.is_valid %}
                 <div class="content active {{indicator.metrics.0.outlier_check}}">
                     <!-- Barra de distribuição de itens nesse projeto em relação à média do segmento -->
                     <div class="ui pointing below label" id="MedianDisplay-Project">
@@ -123,28 +123,37 @@
                         </div>
                     </div>
                 </div>
+            {% else %}
+                <div class="content active">
+                    <!-- <h3>(Barra de distribuição do valor do projeto em relação à média do segmento)</h3> -->
+                    <div>
+                        <p>
+                            Não disponível
+                        </p>
+                    </div>
+                </div>
             {% endif %}
 
 
             <!-- METRIC -->
             <!-- 1 Porcentagem de itens do projeto em relação a distribuição dos itens mais comuns para aquele segmento ou area -->
-            {% if indicator.metrics.1.is_valid %}
-                <div class="title active {{indicator.metrics.1.outlier_check}}">
-                    <div class="ui ribbon label">
-                        <i class="icon"></i>
-                    </div>
-                    <span>Itens orçamentários inesperados: {{indicator.metrics.1.value}}%</span>
-                    <i class="dropdown icon"></i>
-                    <div class="helper">
-                        <i class="question circle outline icon"></i>
-                        <div class="ui floating message">
-                            <p>Indica os itens orçamentários deste projeto que
-                                <strong>não estão entre os mais comuns</strong> do segmento.</p>
-                            <p>Também lista os itens que aparecem frequentemente em projetos do segmento, mas que
-                                <strong>não aparecem neste projeto</strong>.</p>
-                        </div>
+            <div class="title active {{indicator.metrics.1.outlier_check}}">
+                <div class="ui ribbon label">
+                    <i class="icon"></i>
+                </div>
+                <span>Itens orçamentários inesperados: {{indicator.metrics.1.value}}%</span>
+                <i class="dropdown icon"></i>
+                <div class="helper">
+                    <i class="question circle outline icon"></i>
+                    <div class="ui floating message">
+                        <p>Indica os itens orçamentários deste projeto que
+                            <strong>não estão entre os mais comuns</strong> do segmento.</p>
+                        <p>Também lista os itens que aparecem frequentemente em projetos do segmento, mas que
+                            <strong>não aparecem neste projeto</strong>.</p>
                     </div>
                 </div>
+            </div>
+            {% if indicator.metrics.1.is_valid %}
                 <div class="content active">
                     <div class="ui grid">
                         <div class="eight wide column">
@@ -181,26 +190,35 @@
                         </div>
                     </div>
                 </div>
+            {% else %}
+                <div class="content active">
+                    <!-- <h3>(Barra de distribuição do valor do projeto em relação à média do segmento)</h3> -->
+                    <div>
+                        <p>
+                            Não disponível
+                        </p>
+                    </div>
+                </div>
             {% endif %}
 
 
             <!-- METRIC -->
             <!-- Número de comprovantes do projeto-->
-            {% if indicator.metrics.2.is_valid %}
-                <div class="title active {{indicator.metrics.2.outlier_check}}">
-                    <div class="ui ribbon label">
-                        <i class="icon"></i>
-                    </div>
-                    Comprovantes de pagamento: {{indicator.metrics.2.value}}
-                    <i class="dropdown icon"></i>
-                    <div class="helper">
-                        <i class="question circle outline icon"></i>
-                        <div class="ui floating message">
-                            <p>Compara a quantidade de comprovantes deste projeto com a
-                                <strong>quantidade mais comum</strong> de comprovantes em projetos do mesmo segmento</p>
-                        </div>
+            <div class="title active {{indicator.metrics.2.outlier_check}}">
+                <div class="ui ribbon label">
+                    <i class="icon"></i>
+                </div>
+                Comprovantes de pagamento: {{indicator.metrics.2.value}}
+                <i class="dropdown icon"></i>
+                <div class="helper">
+                    <i class="question circle outline icon"></i>
+                    <div class="ui floating message">
+                        <p>Compara a quantidade de comprovantes deste projeto com a
+                            <strong>quantidade mais comum</strong> de comprovantes em projetos do mesmo segmento</p>
                     </div>
                 </div>
+            </div>
+            {% if indicator.metrics.2.is_valid %}
                 <div class="content active">
                     <!-- <div class="ui pointing below label" id="MedianDisplay-Project">
                         Este projeto
@@ -233,27 +251,36 @@
                         </div>
                     </div>
                 </div>
+            {% else %}
+                <div class="content active">
+                    <!-- <h3>(Barra de distribuição do valor do projeto em relação à média do segmento)</h3> -->
+                    <div>
+                        <p>
+                            Não disponível
+                        </p>
+                    </div>
+                </div>
             {% endif %}
 
 
             <!-- METRIC -->
             <!-- 5 Porcentagem de itens acima da mediana histórica, média do desvio da mediana, ou o próprio vetor de diferença em relação a mediana -->
-            {% if indicator.metrics.3.is_valid %}
-                <div class="title active {{indicator.metrics.3.outlier_check}}">
-                    <div class="ui ribbon label">
-                        <i class="icon"></i>
-                    </div>
-                    <span>Preços acima da média: {{indicator.metrics.3.value}}</span>
-                    <i class="dropdown icon"></i>
-                    <div class="helper">
-                        <i class="question circle outline icon"></i>
-                        <div class="ui floating message">
-                            <p>Verifica a quantidade de itens com valor acima da mediana histórica neste projeto e compara com
-                                a
-                                <strong>quantidade mais frequente</strong> de itens acima da mediana em projetos do mesmo segmento</p>
-                        </div>
+            <div class="title active {{indicator.metrics.3.outlier_check}}">
+                <div class="ui ribbon label">
+                    <i class="icon"></i>
+                </div>
+                <span>Preços acima da média: {{indicator.metrics.3.value}}</span>
+                <i class="dropdown icon"></i>
+                <div class="helper">
+                    <i class="question circle outline icon"></i>
+                    <div class="ui floating message">
+                        <p>Verifica a quantidade de itens com valor acima da mediana histórica neste projeto e compara com
+                            a
+                            <strong>quantidade mais frequente</strong> de itens acima da mediana em projetos do mesmo segmento</p>
                     </div>
                 </div>
+            </div>
+            {% if indicator.metrics.3.is_valid %}
                 <div class="content active">
                     {% for item in indicator.metrics.3.items %}
                         <ul class="item">
@@ -281,26 +308,35 @@
                         </div>
                     </div>
                 </div>
+            {% else %}
+                <div class="content active">
+                    <!-- <h3>(Barra de distribuição do valor do projeto em relação à média do segmento)</h3> -->
+                    <div>
+                        <p>
+                            Não disponível
+                        </p>
+                    </div>
+                </div>
             {% endif %}
 
 
             <!-- METRIC -->
             <!-- Total do valor comprovado do projeto -->
-            {% if indicator.metrics.4.is_valid %}
-                <div class="title active {{indicator.metrics.4.outlier_check}}">
-                    <div class="ui ribbon label">
-                        <i class="icon"></i>
-                    </div>
-                    <span>Valor comprovado: {{indicator.metrics.4.value}}</span>
-                    <i class="dropdown icon"></i>
-                    <div class="helper">
-                        <i class="question circle outline icon"></i>
-                        <div class="ui floating message">
-                            <p>Compara o valor comprovado neste projeto com o
-                                <strong>valor mais frequentemente</strong> comprovado em projetos do mesmo segmento</p>
-                        </div>
+            <div class="title active {{indicator.metrics.4.outlier_check}}">
+                <div class="ui ribbon label">
+                    <i class="icon"></i>
+                </div>
+                <span>Valor comprovado: {{indicator.metrics.4.value}}</span>
+                <i class="dropdown icon"></i>
+                <div class="helper">
+                    <i class="question circle outline icon"></i>
+                    <div class="ui floating message">
+                        <p>Compara o valor comprovado neste projeto com o
+                            <strong>valor mais frequentemente</strong> comprovado em projetos do mesmo segmento</p>
                     </div>
                 </div>
+            </div>
+            {% if indicator.metrics.4.is_valid %}
                 <div class="content active">
                     <div>
                         <p>
@@ -321,26 +357,35 @@
                         </div>
                     </div>
                 </div>
+            {% else %}
+                <div class="content active">
+                    <!-- <h3>(Barra de distribuição do valor do projeto em relação à média do segmento)</h3> -->
+                    <div>
+                        <p>
+                            Não disponível
+                        </p>
+                    </div>
+                </div>
             {% endif %}
 
 
             <!-- METRIC -->
             <!-- Total do valor captado do projeto-->
-            {% if indicator.metrics.5.is_valid %}
-                <div class="title active {{indicator.metrics.5.outlier_check}}">
-                    <div class="ui ribbon label">
-                        <i class="icon"></i>
-                    </div>
-                    <span>Valor captado: {{indicator.metrics.5.value}}</span>
-                    <i class="dropdown icon"></i>
-                    <div class="helper">
-                        <i class="question circle outline icon"></i>
-                        <div class="ui floating message">
-                            <p>Compara o valor captado neste projeto com o
-                                <strong>valor mais frequentemente</strong> captado em projetos do mesmo segmento</p>
-                        </div>
+            <div class="title active {{indicator.metrics.5.outlier_check}}">
+                <div class="ui ribbon label">
+                    <i class="icon"></i>
+                </div>
+                <span>Valor captado: {{indicator.metrics.5.value}}</span>
+                <i class="dropdown icon"></i>
+                <div class="helper">
+                    <i class="question circle outline icon"></i>
+                    <div class="ui floating message">
+                        <p>Compara o valor captado neste projeto com o
+                            <strong>valor mais frequentemente</strong> captado em projetos do mesmo segmento</p>
                     </div>
                 </div>
+            </div>
+            {% if indicator.metrics.5.is_valid %}
                 <div class="content active">
                     <!-- <h3>(Barra de distribuição do valor do projeto em relação à média do segmento)</h3> -->
                     <div>
@@ -361,6 +406,15 @@
                                 <input placeholder="Por quê?" type="text" size="50" name="valor_captado_text">
                             </div>
                         </div>
+                    </div>
+                </div>
+            {% else %}
+                <div class="content active">
+                    <!-- <h3>(Barra de distribuição do valor do projeto em relação à média do segmento)</h3> -->
+                    <div>
+                        <p>
+                            Não disponível
+                        </p>
                     </div>
                 </div>
             {% endif %}
@@ -403,20 +457,20 @@
 
             <!-- METRIC -->
             <!-- 2 Número de projetos já enviados por aquele proponente ou outros "escritores" da proposta -->
-            {% if indicator.metrics.7.is_valid %}
-                <div class="title active {{indicator.metrics.7.outlier_check}}">
-                    <div class="ui ribbon label">
-                        <i class="icon"></i>
-                    </div>
-                    <span>Projetos do mesmo proponente: {{indicator.metrics.7.value}}</span>
-                    <i class="dropdown icon"></i>
-                    <div class="helper">
-                        <i class="question circle outline icon"></i>
-                        <div class="ui floating message">
-                            <p>Indica os projetos que o proponente já executou no passado.</p>
-                        </div>
+            <div class="title active {{indicator.metrics.7.outlier_check}}">
+                <div class="ui ribbon label">
+                    <i class="icon"></i>
+                </div>
+                <span>Projetos do mesmo proponente: {{indicator.metrics.7.value}}</span>
+                <i class="dropdown icon"></i>
+                <div class="helper">
+                    <i class="question circle outline icon"></i>
+                    <div class="ui floating message">
+                        <p>Indica os projetos que o proponente já executou no passado.</p>
                     </div>
                 </div>
+            </div>
+            {% if indicator.metrics.7.is_valid %}
                 <div class="content active">
                     <div class="ui bulleted list">
                         {% for project in indicator.metrics.7.proponent_projects %}
@@ -438,28 +492,37 @@
                         </div>
                     </div>
                 </div>
+            {% else %}
+                <div class="content active">
+                    <!-- <h3>(Barra de distribuição do valor do projeto em relação à média do segmento)</h3> -->
+                    <div>
+                        <p>
+                            Não disponível
+                        </p>
+                    </div>
+                </div>
             {% endif %}
 
 
             <!-- METRIC -->
             <!-- 4 Porcentagem ou distribuição dos fornecedores do projeto em relação a fornecedores já conhecidos -->
-            {% if indicator.metrics.8.is_valid %}
-                <div class="title active {{indicator.metrics.8.outlier_check}}">
-                    <div class="ui ribbon label">
-                        <i class="icon"></i>
-                    </div>
-                    <span>Novos fornecedores: {{indicator.metrics.8.value}}</span>
-                    <i class="dropdown icon"></i>
-                    <div class="helper">
-                        <i class="question circle outline icon"></i>
-                        <div class="ui floating message">
-                            <p>Indica a proporção de fornecedores que
-                                <strong>nunca participaram de projetos</strong> de incentivo antes em relação ao total de fornecedores
-                                envolvidos com o projeto.</p>
-                            <p>Também lista os itens orçamentários dos novos fornecedores.</p>
-                        </div>
+            <div class="title active {{indicator.metrics.8.outlier_check}}">
+                <div class="ui ribbon label">
+                    <i class="icon"></i>
+                </div>
+                <span>Novos fornecedores: {{indicator.metrics.8.value}}</span>
+                <i class="dropdown icon"></i>
+                <div class="helper">
+                    <i class="question circle outline icon"></i>
+                    <div class="ui floating message">
+                        <p>Indica a proporção de fornecedores que
+                            <strong>nunca participaram de projetos</strong> de incentivo antes em relação ao total de fornecedores
+                            envolvidos com o projeto.</p>
+                        <p>Também lista os itens orçamentários dos novos fornecedores.</p>
                     </div>
                 </div>
+            </div>
+            {% if indicator.metrics.8.is_valid %}
                 <div class="content active">
                     <div class="accordion">
                         {% for provider in indicator.metrics.8.providers %}
@@ -491,26 +554,35 @@
                         </div>
                     </div>
                 </div>
+            {% else %}
+                <div class="content active">
+                    <!-- <h3>(Barra de distribuição do valor do projeto em relação à média do segmento)</h3> -->
+                    <div>
+                        <p>
+                            Não disponível
+                        </p>
+                    </div>
+                </div>
             {% endif %}
 
 
             <!-- METRIC -->
             <!-- Total do valor aprovado do projeto -->
-            {% if indicator.metrics.9.is_valid %}
-                <div class="title active {{indicator.metrics.9.outlier_check}}">
-                    <div class="ui ribbon label">
-                        <i class="icon"></i>
-                    </div>
-                    <span>Valor aprovado: {{indicator.metrics.9.value}}</span>
-                    <i class="dropdown icon"></i>
-                    <div class="helper">
-                        <i class="question circle outline icon"></i>
-                        <div class="ui floating message">
-                            <p>Compara o valor aprovado para este projeto com o
-                                <strong>valor mais frequentemente</strong> aprovado em projetos do mesmo segmento</p>
-                        </div>
+            <div class="title active {{indicator.metrics.9.outlier_check}}">
+                <div class="ui ribbon label">
+                    <i class="icon"></i>
+                </div>
+                <span>Valor aprovado: {{indicator.metrics.9.value}}</span>
+                <i class="dropdown icon"></i>
+                <div class="helper">
+                    <i class="question circle outline icon"></i>
+                    <div class="ui floating message">
+                        <p>Compara o valor aprovado para este projeto com o
+                            <strong>valor mais frequentemente</strong> aprovado em projetos do mesmo segmento</p>
                     </div>
                 </div>
+            </div>
+            {% if indicator.metrics.9.is_valid %}
                 <div class="content active">
                     <!-- <h3>(Barra de distribuição em relação à média)</h3> -->
                     <div>
@@ -530,6 +602,15 @@
                                 <input placeholder="Por quê?" type="text" size="50" name="valor_aprovado_text">
                             </div>
                         </div>
+                    </div>
+                </div>
+            {% else %}
+                <div class="content active">
+                    <!-- <h3>(Barra de distribuição do valor do projeto em relação à média do segmento)</h3> -->
+                    <div>
+                        <p>
+                            Não disponível
+                        </p>
                     </div>
                 </div>
             {% endif %}
