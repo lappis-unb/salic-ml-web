@@ -65,63 +65,74 @@
 
             <!-- METRIC -->
             <!-- Total do número de itens -->
-            <div class="title active {{indicator.metrics.0.outlier_check}}">
-                <div class="ui ribbon label">
-                    <i class="icon"></i>
+                <div class="title active {{indicator.metrics.0.outlier_check}}">
+                    <div class="ui ribbon label">
+                        <i class="icon"></i>
+                    </div>
+                    <span>Itens orçamentários: {{indicator.metrics.0.value}}</span>
+                    <i class="dropdown icon"></i>
+                    <div class="helper">
+                        <i class="question circle outline icon"></i>
+                        <div class="ui floating message">
+                            <p>
+                                Compara a quantidade de itens deste projeto com a
+                                <strong>quantidade mais comum</strong> de itens em projetos do mesmo segmento
+                            </p>
+                        </div>
+                    </div>
                 </div>
-                <span>Itens orçamentários: {{indicator.metrics.0.value}}</span>
-                <i class="dropdown icon"></i>
-                <div class="helper">
-                    <i class="question circle outline icon"></i>
-                    <div class="ui floating message">
+
+            {% if indicator.metrics.0.is_valid %}
+                <div class="content active {{indicator.metrics.0.outlier_check}}">
+                    <!-- Barra de distribuição de itens nesse projeto em relação à média do segmento -->
+                    <div class="ui pointing below label" id="MedianDisplay-Project">
+                        Este projeto
+                    </div>
+                    <!-- {{indicator.metrics.0.max_interval}} -->
+                    <div class="ui progress" data-value="{{indicator.metrics.0.bar.interval}}" data-total="{{indicator.metrics.0.bar.max_value}}"
+                        id="MedianDisplay-TotalItems">
+                        <div class="bar" id="barra">
+                            <div class="progress">{{indicator.metrics.0.interval_start}} de {{indicator.metrics.0.interval_end}} Média de itens</div>
+                        </div>
+                    </div>
+
+                    <div>
                         <p>
-                            Compara a quantidade de itens deste projeto com a
-                            <strong>quantidade mais comum</strong> de itens em projetos do mesmo segmento
+                            Esta quantidade de item orçamentários está {% if indicator.metrics.0.outlier_check != "Metric-good" %} fora {% else %} dentro
+                            {% endif %} da margem considerada como normal sendo esta: {{indicator.metrics.0.interval_start}}
+                            de {{indicator.metrics.0.interval_end}}.
+                        </p>
+                        <!-- <p>Valor da métrica: {{indicator.metrics.0.value}}</p>
+                        <p>Explicação do resultado da métrica: {{indicator.metrics.0.reason}}</p>
+                        <p>É um outlier: {{indicator.metrics.0.outlier_check}}</p>
+                        <p>Valor inicial do intervalo: {{indicator.metrics.0.interval_start}}</p>
+                        <p>Valor final do intervalo: {{indicator.metrics.0.interval_end}}</p>
+                        <p>Valor bar: {{indicator.metrics.0.bar}}</p> -->
+                    </div>
+
+                    <div class="ui fedback form">
+                        <div class="ui divider"></div>
+                        <div class="header">Quanto essa informação é útil para você?</div>
+                        <div class="fields">
+                            <div class="four wide field rating-star" onclick="rmRedBorder(this)">
+                                <div class="ui massive star rating" name="itens_orcamentarios_rating"></div>
+                            </div>
+                            <div class="inline field">
+                                <input placeholder="Por quê?" type="text" size="50" name="itens_orcamentarios_text">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% else %}
+                <div class="content active">
+                    <!-- <h3>(Barra de distribuição do valor do projeto em relação à média do segmento)</h3> -->
+                    <div>
+                        <p>
+                            Não disponível
                         </p>
                     </div>
                 </div>
-            </div>
-
-            <div class="content active {{indicator.metrics.0.outlier_check}}">
-                <!-- Barra de distribuição de itens nesse projeto em relação à média do segmento -->
-                <div class="ui pointing below label" id="MedianDisplay-Project">
-                    Este projeto
-                </div>
-                <!-- {{indicator.metrics.0.max_interval}} -->
-                <div class="ui progress" data-value="{{indicator.metrics.0.bar.interval}}" data-total="{{indicator.metrics.0.bar.max_value}}"
-                    id="MedianDisplay-TotalItems">
-                    <div class="bar" id="barra">
-                        <div class="progress">{{indicator.metrics.0.interval_start}} de {{indicator.metrics.0.interval_end}} Média de itens</div>
-                    </div>
-                </div>
-
-                <div>
-                    <p>
-                        Esta quantidade de item orçamentários está {% if indicator.metrics.0.outlier_check != "Metric-good" %} fora {% else %} dentro
-                        {% endif %} da margem considerada como normal sendo esta: {{indicator.metrics.0.interval_start}}
-                        de {{indicator.metrics.0.interval_end}}.
-                    </p>
-                    <!-- <p>Valor da métrica: {{indicator.metrics.0.value}}</p>
-                    <p>Explicação do resultado da métrica: {{indicator.metrics.0.reason}}</p>
-                    <p>É um outlier: {{indicator.metrics.0.outlier_check}}</p>
-                    <p>Valor inicial do intervalo: {{indicator.metrics.0.interval_start}}</p>
-                    <p>Valor final do intervalo: {{indicator.metrics.0.interval_end}}</p>
-                    <p>Valor bar: {{indicator.metrics.0.bar}}</p> -->
-                </div>
-
-                <div class="ui fedback form">
-                    <div class="ui divider"></div>
-                    <div class="header">Quanto essa informação é útil para você?</div>
-                    <div class="fields">
-                        <div class="four wide field rating-star" onclick="rmRedBorder(this)">
-                            <div class="ui massive star rating" name="itens_orcamentarios_rating"></div>
-                        </div>
-                        <div class="inline field">
-                            <input placeholder="Por quê?" type="text" size="50" name="itens_orcamentarios_text">
-                        </div>
-                    </div>
-                </div>
-            </div>
+            {% endif %}
 
 
             <!-- METRIC -->
@@ -142,42 +153,53 @@
                     </div>
                 </div>
             </div>
-            <div class="content active">
-                <div class="ui grid">
-                    <div class="eight wide column">
-                        <div class="list header">Itens inesperados</div>
-                        <div class="ui bulleted list">
-                            {% for itens in indicator.metrics.1.expected_itens %}
-                            <div class="item">
-                                <a href="{{itens.link}}">{{itens.name}}</a>
+            {% if indicator.metrics.1.is_valid %}
+                <div class="content active">
+                    <div class="ui grid">
+                        <div class="eight wide column">
+                            <div class="list header">Itens inesperados</div>
+                            <div class="ui bulleted list">
+                                {% for itens in indicator.metrics.1.expected_itens %}
+                                <div class="item">
+                                    <a href="{{itens.link}}">{{itens.name}}</a>
+                                </div>
+                                {% endfor %}
                             </div>
-                            {% endfor %}
                         </div>
-                    </div>
-                    <div class="eight wide column">
-                        <div class="list header">Itens ausentes</div>
-                        <div class="ui bulleted list">
-                            {% for itens in indicator.metrics.1.missing_itens %}
-                            <div class="item">
-                                <a href="{{itens.link}}">{{itens.name}}</a>
+                        <div class="eight wide column">
+                            <div class="list header">Itens ausentes</div>
+                            <div class="ui bulleted list">
+                                {% for itens in indicator.metrics.1.missing_itens %}
+                                <div class="item">
+                                    <a href="{{itens.link}}">{{itens.name}}</a>
+                                </div>
+                                {% endfor %}
                             </div>
-                            {% endfor %}
                         </div>
-                    </div>
-                    <div class="ui fedback form">
-                        <div class="ui divider"></div>
-                        <div class="header">Quanto essa informação é útil para você?</div>
-                        <div class="fields">
-                            <div class="five wide field rating-star" onclick="rmRedBorder(this)">
-                                <div class="ui massive star rating" name="itens_orcamentarios_fora_do_comum_rating"></div>
-                            </div>
-                            <div class="inline field">
-                                <input placeholder="Por quê?" type="text" size="50" name="itens_orcamentarios_fora_do_comum_text">
+                        <div class="ui fedback form">
+                            <div class="ui divider"></div>
+                            <div class="header">Quanto essa informação é útil para você?</div>
+                            <div class="fields">
+                                <div class="five wide field rating-star" onclick="rmRedBorder(this)">
+                                    <div class="ui massive star rating" name="itens_orcamentarios_fora_do_comum_rating"></div>
+                                </div>
+                                <div class="inline field">
+                                    <input placeholder="Por quê?" type="text" size="50" name="itens_orcamentarios_fora_do_comum_text">
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
+            {% else %}
+                <div class="content active">
+                    <!-- <h3>(Barra de distribuição do valor do projeto em relação à média do segmento)</h3> -->
+                    <div>
+                        <p>
+                            Não disponível
+                        </p>
+                    </div>
+                </div>
+            {% endif %}
 
 
             <!-- METRIC -->
@@ -196,38 +218,49 @@
                     </div>
                 </div>
             </div>
-            <div class="content active">
-                <!-- <div class="ui pointing below label" id="MedianDisplay-Project">
-                    Este projeto
-                </div>
-                <div class="ui progress" data-value="15" data-total="{{indicator.metrics.2.interval.max_value}}" id="MedianDisplay-TotalItems">
-                    <div class="bar" id="barra">
-                        <div class="progress">{{indicator.metrics.2.interval_start}} de {{indicator.metrics.2.interval_end}} Média de itens</div>
+            {% if indicator.metrics.2.is_valid %}
+                <div class="content active">
+                    <!-- <div class="ui pointing below label" id="MedianDisplay-Project">
+                        Este projeto
                     </div>
-                </div> -->
-                <div>
-                    <p>
-                        Esta quantidade de comprovantes de pagamento está {% if indicator.metrics.2.outlier_check != "Metric-good" %} 
-                        acima 
-                        {% else %} 
-                        abaixo 
-                        {% endif %} 
-                        do limite esperado, sendo este: {{indicator.metrics.2.maximum_expected_in_segment}}.
-                    </p>
-                </div>
-                <div class="ui fedback form">
-                    <div class="ui divider"></div>
-                    <div class="header">Quanto essa informação é útil para você?</div>
-                    <div class="fields">
-                        <div class="four wide field rating-star" onclick="rmRedBorder(this)">
-                            <div class="ui massive star rating" name="comprovantes_pagamento_rating"></div>
+                    <div class="ui progress" data-value="15" data-total="{{indicator.metrics.2.interval.max_value}}" id="MedianDisplay-TotalItems">
+                        <div class="bar" id="barra">
+                            <div class="progress">{{indicator.metrics.2.interval_start}} de {{indicator.metrics.2.interval_end}} Média de itens</div>
                         </div>
-                        <div class="inline field">
-                            <input placeholder="Por quê?" type="text" size="50" name="comprovantes_pagamento_text">
+                    </div> -->
+                    <div>
+                        <p>
+                            Esta quantidade de comprovantes de pagamento está {% if indicator.metrics.2.outlier_check != "Metric-good" %}
+                            acima
+                            {% else %}
+                            abaixo
+                            {% endif %}
+                            do limite esperado, sendo este: {{indicator.metrics.2.maximum_expected_in_segment}}.
+                        </p>
+                    </div>
+                    <div class="ui fedback form">
+                        <div class="ui divider"></div>
+                        <div class="header">Quanto essa informação é útil para você?</div>
+                        <div class="fields">
+                            <div class="four wide field rating-star" onclick="rmRedBorder(this)">
+                                <div class="ui massive star rating" name="comprovantes_pagamento_rating"></div>
+                            </div>
+                            <div class="inline field">
+                                <input placeholder="Por quê?" type="text" size="50" name="comprovantes_pagamento_text">
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
+            {% else %}
+                <div class="content active">
+                    <!-- <h3>(Barra de distribuição do valor do projeto em relação à média do segmento)</h3> -->
+                    <div>
+                        <p>
+                            Não disponível
+                        </p>
+                    </div>
+                </div>
+            {% endif %}
 
 
             <!-- METRIC -->
@@ -247,33 +280,44 @@
                     </div>
                 </div>
             </div>
-            <div class="content active">
-                {% for item in indicator.metrics.3.items %}
-                    <ul class="item">
-                        <li><a href="{{item.link}}">{{item.item_name}}</a></li>
-                    </ul>
-                {% endfor %}
-                <p>
-                        Esta quantidade de itens com valor acima da média está {% if indicator.metrics.3.outlier_check != "Metric-good" %} 
-                        acima 
-                        {% else %} 
-                        abaixo 
-                        {% endif %} 
-                        do limite esperado, sendo este: {{indicator.metrics.3.maximum_expected}}.
-                    </p>
-                <div class="ui fedback form">
-                    <div class="ui divider"></div>
-                    <div class="header">Quanto essa informação é útil para você?</div>
-                    <div class="fields">
-                        <div class="four wide field rating-star" onclick="rmRedBorder(this)">
-                            <div class="ui massive star rating" name="precos_acima_media_rating"></div>
-                        </div>
-                        <div class="inline field">
-                            <input placeholder="Por quê?" type="text" size="50" name="precos_acima_media_text">
+            {% if indicator.metrics.3.is_valid %}
+                <div class="content active">
+                    {% for item in indicator.metrics.3.items %}
+                        <ul class="item">
+                            <li><a href="{{item.link}}">{{item.item_name}}</a></li>
+                        </ul>
+                    {% endfor %}
+                    <p>
+                            Esta quantidade de itens com valor acima da média está {% if indicator.metrics.3.outlier_check != "Metric-good" %}
+                            acima
+                            {% else %}
+                            abaixo
+                            {% endif %}
+                            do limite esperado, sendo este: {{indicator.metrics.3.maximum_expected}}.
+                        </p>
+                    <div class="ui fedback form">
+                        <div class="ui divider"></div>
+                        <div class="header">Quanto essa informação é útil para você?</div>
+                        <div class="fields">
+                            <div class="four wide field rating-star" onclick="rmRedBorder(this)">
+                                <div class="ui massive star rating" name="precos_acima_media_rating"></div>
+                            </div>
+                            <div class="inline field">
+                                <input placeholder="Por quê?" type="text" size="50" name="precos_acima_media_text">
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
+            {% else %}
+                <div class="content active">
+                    <!-- <h3>(Barra de distribuição do valor do projeto em relação à média do segmento)</h3> -->
+                    <div>
+                        <p>
+                            Não disponível
+                        </p>
+                    </div>
+                </div>
+            {% endif %}
 
 
             <!-- METRIC -->
@@ -292,26 +336,37 @@
                     </div>
                 </div>
             </div>
-            <div class="content active">
-                <div>
-                    <p>
-                        Este valor comprovado {% if indicator.metrics.4.outlier_check != "Metric-good" %}está acima {% else %}não está acima{% endif %} 
-                        do limite esperado, sendo este: {{indicator.metrics.4.reason}}.
-                    </p>
-                </div>
-                <div class="ui fedback form">
-                    <div class="ui divider"></div>
-                    <div class="header">Quanto essa informação é útil para você?</div>
-                    <div class="fields">
-                        <div class="four wide field rating-star" onclick="rmRedBorder(this)">
-                            <div class="ui massive star rating" name="valor_comprovado_rating"></div>
-                        </div>
-                        <div class="inline field">
-                            <input placeholder="Por quê?" type="text" size="50" name="valor_comprovado_text">
+            {% if indicator.metrics.4.is_valid %}
+                <div class="content active">
+                    <div>
+                        <p>
+                            Este valor comprovado {% if indicator.metrics.4.outlier_check != "Metric-good" %}está acima {% else %}não está acima{% endif %}
+                            do limite esperado, sendo este: {{indicator.metrics.4.reason}}.
+                        </p>
+                    </div>
+                    <div class="ui fedback form">
+                        <div class="ui divider"></div>
+                        <div class="header">Quanto essa informação é útil para você?</div>
+                        <div class="fields">
+                            <div class="four wide field rating-star" onclick="rmRedBorder(this)">
+                                <div class="ui massive star rating" name="valor_comprovado_rating"></div>
+                            </div>
+                            <div class="inline field">
+                                <input placeholder="Por quê?" type="text" size="50" name="valor_comprovado_text">
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
+            {% else %}
+                <div class="content active">
+                    <!-- <h3>(Barra de distribuição do valor do projeto em relação à média do segmento)</h3> -->
+                    <div>
+                        <p>
+                            Não disponível
+                        </p>
+                    </div>
+                </div>
+            {% endif %}
 
 
             <!-- METRIC -->
@@ -330,28 +385,39 @@
                     </div>
                 </div>
             </div>
-            <div class="content active">
-                <!-- <h3>(Barra de distribuição do valor do projeto em relação à média do segmento)</h3> -->
-                <div>
-                    <p>
-                        Esta valor captado {% if indicator.metrics.5.outlier_check != "Metric-good" %}está acima {% else %}não está acima{% endif %}
-                         do limite esperado, sendo este: {{indicator.metrics.5.reason}}.
-                    </p>
-                </div>
+            {% if indicator.metrics.5.is_valid %}
+                <div class="content active">
+                    <!-- <h3>(Barra de distribuição do valor do projeto em relação à média do segmento)</h3> -->
+                    <div>
+                        <p>
+                            Esta valor captado {% if indicator.metrics.5.outlier_check != "Metric-good" %}está acima {% else %}não está acima{% endif %}
+                             do limite esperado, sendo este: {{indicator.metrics.5.reason}}.
+                        </p>
+                    </div>
 
-                <div class="ui fedback form">
-                    <div class="ui divider"></div>
-                    <div class="header">Quanto essa informação é útil para você?</div>
-                    <div class="fields">
-                        <div class="four wide field rating-star" onclick="rmRedBorder(this)">
-                            <div class="ui massive star rating" name="valor_captado_rating"></div>
-                        </div>
-                        <div class="inline field">
-                            <input placeholder="Por quê?" type="text" size="50" name="valor_captado_text">
+                    <div class="ui fedback form">
+                        <div class="ui divider"></div>
+                        <div class="header">Quanto essa informação é útil para você?</div>
+                        <div class="fields">
+                            <div class="four wide field rating-star" onclick="rmRedBorder(this)">
+                                <div class="ui massive star rating" name="valor_captado_rating"></div>
+                            </div>
+                            <div class="inline field">
+                                <input placeholder="Por quê?" type="text" size="50" name="valor_captado_text">
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
+            {% else %}
+                <div class="content active">
+                    <!-- <h3>(Barra de distribuição do valor do projeto em relação à média do segmento)</h3> -->
+                    <div>
+                        <p>
+                            Não disponível
+                        </p>
+                    </div>
+                </div>
+            {% endif %}
 
 
             <!-- METRIC -->
@@ -404,27 +470,38 @@
                     </div>
                 </div>
             </div>
-            <div class="content active">
-                <div class="ui bulleted list">
-                    {% for project in indicator.metrics.7.proponent_projects %}
-                    <div class="item">
-                        <a href="{{project.link}}">{{project.name}}</a>
-                    </div>
-                    {% endfor %}
-                </div>
-                <div class="ui fedback form">
-                    <div class="ui divider"></div>
-                    <div class="header">Quanto essa informação é útil para você?</div>
-                    <div class="fields">
-                        <div class="four wide field rating-star" onclick="rmRedBorder(this)">
-                            <div class="ui massive star rating" name="projetos_mesmo_proponente_rating"></div>
+            {% if indicator.metrics.7.is_valid %}
+                <div class="content active">
+                    <div class="ui bulleted list">
+                        {% for project in indicator.metrics.7.proponent_projects %}
+                        <div class="item">
+                            <a href="{{project.link}}">{{project.name}}</a>
                         </div>
-                        <div class="inline field">
-                            <input placeholder="Por quê?" type="text" size="50" name="projetos_mesmo_proponente_text">
+                        {% endfor %}
+                    </div>
+                    <div class="ui fedback form">
+                        <div class="ui divider"></div>
+                        <div class="header">Quanto essa informação é útil para você?</div>
+                        <div class="fields">
+                            <div class="four wide field rating-star" onclick="rmRedBorder(this)">
+                                <div class="ui massive star rating" name="projetos_mesmo_proponente_rating"></div>
+                            </div>
+                            <div class="inline field">
+                                <input placeholder="Por quê?" type="text" size="50" name="projetos_mesmo_proponente_text">
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
+            {% else %}
+                <div class="content active">
+                    <!-- <h3>(Barra de distribuição do valor do projeto em relação à média do segmento)</h3> -->
+                    <div>
+                        <p>
+                            Não disponível
+                        </p>
+                    </div>
+                </div>
+            {% endif %}
 
 
             <!-- METRIC -->
@@ -445,37 +522,48 @@
                     </div>
                 </div>
             </div>
-            <div class="content active">
-                <div class="accordion">
-                    {% for provider in indicator.metrics.8.providers %}
-                    <div class="title">
-                        <i class="dropdown icon"></i>
-                        {{provider.provider_name}}
-                    </div>
-                    <div class="content">
-                        <div class="ui bulleted list">
-                            {% for itens in provider.provider_items %}
-                            <div class="item">
-                                <a href="{{item.item_link}}">{{itens.item_name}}</a>
-                            </div>
-                            {% endfor %}
+            {% if indicator.metrics.8.is_valid %}
+                <div class="content active">
+                    <div class="accordion">
+                        {% for provider in indicator.metrics.8.providers %}
+                        <div class="title">
+                            <i class="dropdown icon"></i>
+                            {{provider.provider_name}}
                         </div>
-                    </div>
-                    {% endfor %}
-                    <div class="ui fedback form">
-                        <div class="ui divider"></div>
-                        <div class="header">Quanto essa informação é útil para você?</div>
-                        <div class="fields">
-                            <div class="four wide field rating-star" onclick="rmRedBorder(this)">
-                                <div class="ui massive star rating" name="novos_fornecedores_rating"></div>
+                        <div class="content">
+                            <div class="ui bulleted list">
+                                {% for itens in provider.provider_items %}
+                                <div class="item">
+                                    <a href="{{item.item_link}}">{{itens.item_name}}</a>
+                                </div>
+                                {% endfor %}
                             </div>
-                            <div class="inline field">
-                                <input placeholder="Por quê?" type="text" size="50" name="novos_fornecedores_text">
+                        </div>
+                        {% endfor %}
+                        <div class="ui fedback form">
+                            <div class="ui divider"></div>
+                            <div class="header">Quanto essa informação é útil para você?</div>
+                            <div class="fields">
+                                <div class="four wide field rating-star" onclick="rmRedBorder(this)">
+                                    <div class="ui massive star rating" name="novos_fornecedores_rating"></div>
+                                </div>
+                                <div class="inline field">
+                                    <input placeholder="Por quê?" type="text" size="50" name="novos_fornecedores_text">
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
+            {% else %}
+                <div class="content active">
+                    <!-- <h3>(Barra de distribuição do valor do projeto em relação à média do segmento)</h3> -->
+                    <div>
+                        <p>
+                            Não disponível
+                        </p>
+                    </div>
+                </div>
+            {% endif %}
 
 
             <!-- METRIC -->
@@ -494,27 +582,38 @@
                     </div>
                 </div>
             </div>
-            <div class="content active">
-                <!-- <h3>(Barra de distribuição em relação à média)</h3> -->
-                <div>
-                    <p>
-                        Esta valor aprovado {% if indicator.metrics.9.outlier_check != "Metric-good" %}está acima {% else %}não está acima{% endif %}
-                        do limite esperado, sendo este: {{indicator.metrics.9.maximum_expected_funds}}.
-                    </p>
-                </div>
-                <div class="ui fedback form">
-                    <div class="ui divider"></div>
-                    <div class="header">Quanto essa informação é útil para você?</div>
-                    <div class="fields">
-                        <div class="four wide field rating-star" onclick="rmRedBorder(this)">
-                            <div class="ui massive star rating" name="valor_aprovado_rating"></div>
-                        </div>
-                        <div class="inline field">
-                            <input placeholder="Por quê?" type="text" size="50" name="valor_aprovado_text">
+            {% if indicator.metrics.9.is_valid %}
+                <div class="content active">
+                    <!-- <h3>(Barra de distribuição em relação à média)</h3> -->
+                    <div>
+                        <p>
+                            Esta valor aprovado {% if indicator.metrics.9.outlier_check != "Metric-good" %}está acima {% else %}não está acima{% endif %}
+                            do limite esperado, sendo este: {{indicator.metrics.9.maximum_expected_funds}}.
+                        </p>
+                    </div>
+                    <div class="ui fedback form">
+                        <div class="ui divider"></div>
+                        <div class="header">Quanto essa informação é útil para você?</div>
+                        <div class="fields">
+                            <div class="four wide field rating-star" onclick="rmRedBorder(this)">
+                                <div class="ui massive star rating" name="valor_aprovado_rating"></div>
+                            </div>
+                            <div class="inline field">
+                                <input placeholder="Por quê?" type="text" size="50" name="valor_aprovado_text">
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
+            {% else %}
+                <div class="content active">
+                    <!-- <h3>(Barra de distribuição do valor do projeto em relação à média do segmento)</h3> -->
+                    <div>
+                        <p>
+                            Não disponível
+                        </p>
+                    </div>
+                </div>
+            {% endif %}
         </div>
 
         <div class="ui modal" id="erro-star">

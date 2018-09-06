@@ -35,7 +35,7 @@ def index(request, submit_success=False):
             "project_name": "Circulação de oficinas e shows - Claudia Cimbleris", "analist": "Modelo"},
     ]
     json_dict = projects
-    
+
     return render(request, 'index.html', {'projects': projects, 'projects_json': json.dumps(json_dict)})
 
 
@@ -143,7 +143,7 @@ def register_project_indicator(pronac, name, value):
     indicator = indicator[0]
     indicator.value = value
     indicator.save()
-     
+
     return indicator
 
 def register_project_metric(name, value, reason, indicator_name, pronac, outlier):
@@ -155,7 +155,7 @@ def register_project_metric(name, value, reason, indicator_name, pronac, outlier
     metric.reason = reason
     metric.outlier = outlier
     metric.save()
-    
+
     return metric
 
 def set_width_bar(min_interval, max_interval, value):
@@ -165,8 +165,8 @@ def set_width_bar(min_interval, max_interval, value):
         max_value = 1
 
     return {
-        'max_value': max_value, 
-        'min_interval': (min_interval/max_value)*100, 
+        'max_value': max_value,
+        'min_interval': (min_interval/max_value)*100,
         'project': ((value/max_value)*100),
         'interval': (max_interval-min_interval)
     }
@@ -234,10 +234,11 @@ def fetch_user_data(request):
 
     # itens_orcamentarios
     items = {
-            'total_items': 0,
-            'interval_start': 0,
-            'interval_end': 0,
-            'outlier_check': get_outlier_color(False)
+        'total_items': 0,
+        'interval_start': 0,
+        'interval_end': 0,
+        'outlier_check': get_outlier_color(False),
+        'is_valid': False,
     }
 
     if metrics['items'] is not None:
@@ -246,7 +247,8 @@ def fetch_user_data(request):
             'total_items': metrics['items']['value'],
             'interval_start': items_interval['start'],
             'interval_end': items_interval['end'],
-            'outlier_check': get_outlier_color(metrics['items']['is_outlier'])
+            'outlier_check': get_outlier_color(metrics['items']['is_outlier']),
+            'is_valid': True,
         }
 
     result['itens_orcamentarios'] = items
@@ -258,7 +260,8 @@ def fetch_user_data(request):
         'value': float_to_money(0.0),
         'float_value': 0.0,
         'maximum_expected_value': float_to_money(0.0),
-        'outlier_check': get_outlier_color(False)
+        'outlier_check': get_outlier_color(False),
+        'is_valid': False,
     }
 
     if metrics['raised_funds'] is not None:
@@ -266,7 +269,8 @@ def fetch_user_data(request):
             'value': float_to_money(metrics['raised_funds']['total_raised_funds']),
             'float_value': metrics['raised_funds']['total_raised_funds'],
             'maximum_expected_value': float_to_money(metrics['raised_funds']['maximum_expected_funds']),
-            'outlier_check': get_outlier_color(metrics['raised_funds']['is_outlier'])
+            'outlier_check': get_outlier_color(metrics['raised_funds']['is_outlier']),
+            'is_valid': True,
         }
 
     result['valor_captado'] = raised_funds
@@ -278,7 +282,8 @@ def fetch_user_data(request):
         'value': float_to_money(0.0),
         'float_value': 0.0,
         'maximum_expected_value': float_to_money(0.0),
-        'outlier_check': get_outlier_color(False)
+        'outlier_check': get_outlier_color(False),
+        'is_valid': False,
     }
 
     if metrics['verified_funds'] is not None:
@@ -286,7 +291,8 @@ def fetch_user_data(request):
             'value': float_to_money(metrics['verified_funds']['total_verified_funds']),
             'float_value': metrics['verified_funds']['total_verified_funds'],
             'maximum_expected_value': float_to_money(metrics['verified_funds']['maximum_expected_funds']),
-            'outlier_check': get_outlier_color(metrics['verified_funds']['is_outlier'])
+            'outlier_check': get_outlier_color(metrics['verified_funds']['is_outlier']),
+            'is_valid': True,
         }
 
     result['valor_comprovado'] = verified_funds
@@ -298,7 +304,8 @@ def fetch_user_data(request):
         'value': float_to_money(0),
         'float_value': 0.0,
         'maximum_expected_funds': float_to_money(0.0),
-        'outlier_check': get_outlier_color(False)
+        'outlier_check': get_outlier_color(False),
+        'is_valid': False,
     }
 
     if metrics['approved_funds'] is not None:
@@ -306,15 +313,16 @@ def fetch_user_data(request):
             'value': float_to_money(metrics['approved_funds']['total_approved_funds']),
             'float_value': metrics['approved_funds']['total_approved_funds'],
             'maximum_expected_funds': float_to_money(metrics['approved_funds']['maximum_expected_funds']),
-            'outlier_check': get_outlier_color(metrics['approved_funds']['is_outlier'])
+            'outlier_check': get_outlier_color(metrics['approved_funds']['is_outlier']),
+            'is_valid': True,
         }
-    
+
     result['valor_aprovado'] = approved_funds
 
     register_project_metric('valor_aprovado', approved_funds['float_value'], str(approved_funds), financial_complexity_indicator.name, int(pronac), get_outlier_float(approved_funds['outlier_check']))
 
     # itens_orcamentarios_fora_do_comum
-    
+
 
     common_items_ratio = {
         'outlier_check': get_outlier_color(False),
@@ -323,7 +331,8 @@ def fetch_user_data(request):
         'mean': 0.0,
         'std': 0.0,
         'uncommon_items': [],
-        'common_items_not_in_project': []
+        'common_items_not_in_project': [],
+        'is_valid': False,
     }
 
     if metrics['common_items_ratio'] is not None:
@@ -351,7 +360,8 @@ def fetch_user_data(request):
             'mean': metrics['common_items_ratio']['mean'],
             'std': metrics['common_items_ratio']['std'],
             'uncommon_items': uncommon_items_list,
-            'common_items_not_in_project': common_items_not_in_project_list
+            'common_items_not_in_project': common_items_not_in_project_list,
+            'is_valid': True,
         }
 
     result['itens_orcamentarios_fora_do_comum'] = common_items_ratio
@@ -362,14 +372,16 @@ def fetch_user_data(request):
     total_receipts = {
         'outlier_check': get_outlier_color(False),
         'total_receipts': 0,
-        'maximum_expected_in_segment': 0
+        'maximum_expected_in_segment': 0,
+        'is_valid': False,
     }
 
     if metrics['total_receipts'] is not None:
         total_receipts = {
             'outlier_check': get_outlier_color(metrics['total_receipts']['is_outlier']),
             'total_receipts': metrics['total_receipts']['total_receipts'],
-            'maximum_expected_in_segment': int(metrics['total_receipts']['maximum_expected_in_segment'])
+            'maximum_expected_in_segment': int(metrics['total_receipts']['maximum_expected_in_segment']),
+            'is_valid': True,
         }
 
     result['comprovantes_pagamento'] = total_receipts
@@ -383,7 +395,8 @@ def fetch_user_data(request):
         'new_providers_percentage': 0,
         'segment_average_percentage': 0,
         'outlier_check': get_outlier_color(False),
-        'all_projects_average_percentage': 0
+        'all_projects_average_percentage': 0,
+        'is_valid': False,
     }
 
     if metrics['new_providers'] is not None:
@@ -411,7 +424,8 @@ def fetch_user_data(request):
             'new_providers_percentage': metrics['new_providers']['new_providers_percentage'],
             'segment_average_percentage': metrics['new_providers']['segment_average_percentage'],
             'outlier_check': get_outlier_color(metrics['new_providers']['is_outlier']),
-            'all_projects_average_percentage': metrics['new_providers']['all_projects_average_percentage']
+            'all_projects_average_percentage': metrics['new_providers']['all_projects_average_percentage'],
+            'is_valid': True,
         }
 
     result['novos_fornecedores'] = new_providers
@@ -423,7 +437,8 @@ def fetch_user_data(request):
         'cnpj_cpf': '',
         'submitted_projects': [],
         'analyzed_projects': [],
-        'outlier_check': get_outlier_color(False)
+        'outlier_check': get_outlier_color(False),
+        'is_valid': False,
     }
 
     if metrics['proponent_projects'] is not None:
@@ -451,7 +466,8 @@ def fetch_user_data(request):
             'cnpj_cpf': metrics['proponent_projects']['cnpj_cpf'],
             'submitted_projects': submitted_projects_list,
             'analyzed_projects': analyzed_projects_list,
-            'outlier_check': get_outlier_color(False)
+            'outlier_check': get_outlier_color(False),
+            'is_valid': True,
         }
 
     register_project_metric('projetos_mesmo_proponente', len(proponent_projects['submitted_projects']), "", financial_complexity_indicator.name, int(pronac), get_outlier_float(proponent_projects['outlier_check']))
@@ -464,7 +480,8 @@ def fetch_user_data(request):
         'outlier_check': get_outlier_color(False),
         'items': [],
         'total_items': 0,
-        'maximum_expected': 0
+        'maximum_expected': 0,
+        'is_valid': False,
     }
 
     if metrics['items_prices'] is not None:
@@ -482,7 +499,8 @@ def fetch_user_data(request):
             'outlier_check': get_outlier_color(metrics['items_prices']['is_outlier']),
             'items': items_list,
             'total_items': metrics['items_prices']['total_items'],
-            'maximum_expected': int(metrics['items_prices']['maximum_expected'])
+            'maximum_expected': int(metrics['items_prices']['maximum_expected']),
+            'is_valid': True,
         }
 
     register_project_metric('precos_acima_media', items_prices['value'], "", financial_complexity_indicator.name, int(pronac), get_outlier_float(items_prices['outlier_check']))
@@ -504,7 +522,8 @@ def fetch_user_data(request):
                     'interval_end': result['itens_orcamentarios']['interval_end'],
                     'bar': set_width_bar(result['itens_orcamentarios']['interval_start'],
                                          result['itens_orcamentarios']['interval_end'],
-                                         result['itens_orcamentarios']['total_items'])
+                                         result['itens_orcamentarios']['total_items']),
+                    'is_valid': result['itens_orcamentarios']['is_valid'],
 
                 },
                 {
@@ -515,14 +534,16 @@ def fetch_user_data(request):
                     'mean': result['itens_orcamentarios_fora_do_comum']['mean'],
                     'std': result['itens_orcamentarios_fora_do_comum']['std'],
                     'expected_itens': result['itens_orcamentarios_fora_do_comum']['uncommon_items'],
-                    'missing_itens': result['itens_orcamentarios_fora_do_comum']['common_items_not_in_project']
+                    'missing_itens': result['itens_orcamentarios_fora_do_comum']['common_items_not_in_project'],
+                    'is_valid': result['itens_orcamentarios_fora_do_comum']['is_valid'],
                 },
                 {
                     'name': 'comprovantes_pagamento',
                     'value': result['comprovantes_pagamento']['total_receipts'],
                     'reason': 'any reason',
                     'outlier_check': result['comprovantes_pagamento']['outlier_check'],
-                    'maximum_expected_in_segment': result['comprovantes_pagamento']['maximum_expected_in_segment']
+                    'maximum_expected_in_segment': result['comprovantes_pagamento']['maximum_expected_in_segment'],
+                    'is_valid': result['comprovantes_pagamento']['is_valid'],
                 },
                 {
                     'name': 'precos_acima_media',
@@ -531,19 +552,22 @@ def fetch_user_data(request):
                     'outlier_check': result['precos_acima_media']['outlier_check'],
                     'items': result['precos_acima_media']['items'],
                     'total_items': result['precos_acima_media']['total_items'],
-                    'maximum_expected': result['precos_acima_media']['maximum_expected']
+                    'maximum_expected': result['precos_acima_media']['maximum_expected'],
+                    'is_valid': result['precos_acima_media']['is_valid'],
                 },
                 {
                     'name': 'valor_comprovado',
                     'value': result['valor_comprovado']['value'],
                     'reason': result['valor_comprovado']['maximum_expected_value'],
-                    'outlier_check': result['valor_comprovado']['outlier_check']
+                    'outlier_check': result['valor_comprovado']['outlier_check'],
+                    'is_valid': result['valor_comprovado']['is_valid'],
                 },
                 {
                     'name': 'valor_captado',
                     'value': result['valor_captado']['value'],
                     'reason': result['valor_captado']['maximum_expected_value'],
-                    'outlier_check': result['valor_captado']['outlier_check']
+                    'outlier_check': result['valor_captado']['outlier_check'],
+                    'is_valid': result['valor_captado']['is_valid'],
                 },
                 {
                     'name': 'mudancas_planilha_orcamentaria',
@@ -558,6 +582,7 @@ def fetch_user_data(request):
                     'reason': 'any reason',
                     'outlier_check': result['projetos_mesmo_proponente']['outlier_check'],
                     'proponent_projects': result['projetos_mesmo_proponente']['submitted_projects'],
+                    'is_valid': result['projetos_mesmo_proponente']['is_valid'],
                 },
                 {
                     'name': 'novos_fornecedores',
@@ -567,14 +592,16 @@ def fetch_user_data(request):
                     'new_providers_percentage': result['novos_fornecedores']['new_providers_percentage'],
                     'segment_average_percentage': result['novos_fornecedores']['segment_average_percentage'],
                     'outlier_check': result['novos_fornecedores']['outlier_check'],
-                    'all_projects_average_percentage': result['novos_fornecedores']['all_projects_average_percentage']
+                    'all_projects_average_percentage': result['novos_fornecedores']['all_projects_average_percentage'],
+                    'is_valid': result['novos_fornecedores']['is_valid'],
                 },
                 {
                     'name': 'valor_aprovado',
                     'value': result['valor_aprovado']['value'],
                     'reason': 'any reason',
                     'outlier_check': result['valor_aprovado']['outlier_check'],
-                    'maximum_expected_funds': result['valor_aprovado']['maximum_expected_funds']
+                    'maximum_expected_funds': result['valor_aprovado']['maximum_expected_funds'],
+                    'is_valid': result['valor_aprovado']['is_valid'],
                 }
             ]
         },
