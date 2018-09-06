@@ -118,6 +118,13 @@ def get_items_interval(mean, std):
 
     return result
 
+def get_outlier_float(metric_outlier):
+    print(metric_outlier)
+    if metric_outlier == 'Metric-bad':
+        return 1.0
+    else:
+        return 0.0
+
 def get_outlier_color(is_outlier):
     if is_outlier:
         return 'Metric-bad'
@@ -139,13 +146,14 @@ def register_project_indicator(pronac, name, value):
      
     return indicator
 
-def register_project_metric(name, value, reason, indicator_name, pronac):
+def register_project_metric(name, value, reason, indicator_name, pronac, outlier):
     entity = Entity.objects.get(pronac=pronac)
     indicator = Indicator.objects.get(name=indicator_name, entity=entity)
     metric = Metric.objects.get_or_create(name=name, indicator=indicator)
     metric = metric[0]
     metric.value = value
     metric.reason = reason
+    metric.outlier = outlier
     metric.save()
     
     return metric
@@ -243,7 +251,7 @@ def fetch_user_data(request):
 
     result['itens_orcamentarios'] = items
 
-    register_project_metric('itens_orcamentarios', items['total_items'], str(items), financial_complexity_indicator.name, int(pronac))
+    register_project_metric('itens_orcamentarios', items['total_items'], str(items), financial_complexity_indicator.name, int(pronac), get_outlier_float(items['outlier_check']))
 
     # valor_captado
     raised_funds = {
@@ -263,7 +271,7 @@ def fetch_user_data(request):
 
     result['valor_captado'] = raised_funds
 
-    register_project_metric('valor_captado', raised_funds['float_value'], str(raised_funds), financial_complexity_indicator.name, int(pronac))
+    register_project_metric('valor_captado', raised_funds['float_value'], str(raised_funds), financial_complexity_indicator.name, int(pronac), get_outlier_float(raised_funds['outlier_check']))
 
     # valor_comprovado
     verified_funds = {
@@ -283,7 +291,7 @@ def fetch_user_data(request):
 
     result['valor_comprovado'] = verified_funds
 
-    register_project_metric('valor_comprovado', verified_funds['float_value'], str(verified_funds), financial_complexity_indicator.name, int(pronac))
+    register_project_metric('valor_comprovado', verified_funds['float_value'], str(verified_funds), financial_complexity_indicator.name, int(pronac), get_outlier_float(verified_funds['outlier_check']))
 
     # valor_aprovado
     approved_funds = {
@@ -303,7 +311,7 @@ def fetch_user_data(request):
     
     result['valor_aprovado'] = approved_funds
 
-    register_project_metric('valor_aprovado', approved_funds['float_value'], str(approved_funds), financial_complexity_indicator.name, int(pronac))
+    register_project_metric('valor_aprovado', approved_funds['float_value'], str(approved_funds), financial_complexity_indicator.name, int(pronac), get_outlier_float(approved_funds['outlier_check']))
 
     # itens_orcamentarios_fora_do_comum
     
@@ -348,7 +356,7 @@ def fetch_user_data(request):
 
     result['itens_orcamentarios_fora_do_comum'] = common_items_ratio
 
-    register_project_metric('itens_orcamentarios_fora_do_comum', common_items_ratio['value'], "", financial_complexity_indicator.name, int(pronac))
+    register_project_metric('itens_orcamentarios_fora_do_comum', common_items_ratio['value'], "", financial_complexity_indicator.name, int(pronac), get_outlier_float(common_items_ratio['outlier_check']))
 
     # comprovantes_pagamento
     total_receipts = {
@@ -366,7 +374,7 @@ def fetch_user_data(request):
 
     result['comprovantes_pagamento'] = total_receipts
 
-    register_project_metric('comprovantes_pagamento', total_receipts['total_receipts'], str(total_receipts), financial_complexity_indicator.name, int(pronac))
+    register_project_metric('comprovantes_pagamento', total_receipts['total_receipts'], str(total_receipts), financial_complexity_indicator.name, int(pronac), get_outlier_float(total_receipts['outlier_check']))
 
     # novos_fornecedores
     new_providers = {
@@ -408,7 +416,7 @@ def fetch_user_data(request):
 
     result['novos_fornecedores'] = new_providers
 
-    register_project_metric('novos_fornecedores', new_providers['new_providers_quantity'], "", financial_complexity_indicator.name, int(pronac))
+    register_project_metric('novos_fornecedores', new_providers['new_providers_quantity'], "", financial_complexity_indicator.name, int(pronac), get_outlier_float(new_providers['outlier_check']))
 
     # projetos_mesmo_proponente
     proponent_projects = {
@@ -446,7 +454,7 @@ def fetch_user_data(request):
             'outlier_check': get_outlier_color(False)
         }
 
-    register_project_metric('projetos_mesmo_proponente', len(proponent_projects['submitted_projects']), "", financial_complexity_indicator.name, int(pronac))
+    register_project_metric('projetos_mesmo_proponente', len(proponent_projects['submitted_projects']), "", financial_complexity_indicator.name, int(pronac), get_outlier_float(proponent_projects['outlier_check']))
 
     result['projetos_mesmo_proponente'] = proponent_projects
 
@@ -477,7 +485,7 @@ def fetch_user_data(request):
             'maximum_expected': int(metrics['items_prices']['maximum_expected'])
         }
 
-    register_project_metric('precos_acima_media', items_prices['value'], "", financial_complexity_indicator.name, int(pronac))
+    register_project_metric('precos_acima_media', items_prices['value'], "", financial_complexity_indicator.name, int(pronac), get_outlier_float(items_prices['outlier_check']))
 
     result['precos_acima_media'] = items_prices
 

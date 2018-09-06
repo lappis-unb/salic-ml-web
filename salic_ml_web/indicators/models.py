@@ -30,6 +30,7 @@ class Metric(models.Model):
         on_delete=models.CASCADE,
         related_name='metrics')
     value = models.FloatField(default=0.0)
+    outlier = models.FloatField(default=0.0)
     name = models.CharField(max_length=200, default='Metric')
     reason = models.CharField(max_length=500, default='Any reason')
     created_at = models.DateTimeField(auto_now_add=True)
