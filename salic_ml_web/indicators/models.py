@@ -1,4 +1,5 @@
 from django.db import models
+from core.finance.financial_metrics import FinancialMetrics
 
 class Entity(models.Model):
     pronac = models.IntegerField(default=0)
@@ -12,7 +13,7 @@ class Entity(models.Model):
 
 class Indicator(models.Model):
     entity = models.ForeignKey(
-        Entity, 
+        Entity,
         on_delete=models.CASCADE,
         related_name='indicators')
     name = models.CharField(max_length=200)
@@ -26,7 +27,7 @@ class Indicator(models.Model):
 
 class Metric(models.Model):
     indicator = models.ForeignKey(
-        Indicator, 
+        Indicator,
         on_delete=models.CASCADE,
         related_name='metrics')
     value = models.FloatField(default=0.0)
@@ -42,7 +43,7 @@ class Metric(models.Model):
 
 class Evidence(models.Model):
     metric = models.ForeignKey(
-        Metric, 
+        Metric,
         on_delete=models.CASCADE,
         related_name='evidences')
     slug = models.TextField(max_length=280)
@@ -79,11 +80,11 @@ class MetricFeedback(models.Model):
 
     def __str__(self):
         return "{0} <{1}> {2}/{3} - {4} <{5}>".format(
-            self.metric.indicator.entity.name, 
-            self.metric.indicator.entity.pronac, 
-            self.metric.indicator.name, 
-            self.metric.name, 
-            self.user.name, 
+            self.metric.indicator.entity.name,
+            self.metric.indicator.entity.pronac,
+            self.metric.indicator.name,
+            self.metric.name,
+            self.user.name,
             self.user.email
             )
 
@@ -102,8 +103,21 @@ class ProjectFeedback(models.Model):
 
     def __str__(self):
         return "{0} <{1}> - {2} <{3}> ".format(
-            self.entity.name, 
-            self.entity.pronac, 
-            self.user.name, 
+            self.entity.name,
+            self.entity.pronac,
+            self.user.name,
             self.user.email
             )
+
+class FinancialMetricsLoader():
+
+    def __new__(cls, *args, **kwargs):
+        """
+        Creates a new instance of the class only if none already exists.
+        """
+        if '_inst' not in vars(cls):
+            cls._inst = object.__new__(cls)
+            return cls._inst
+
+    def __init__(self):
+        self.financial_metrics = FinancialMetrics()

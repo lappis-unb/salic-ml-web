@@ -2,16 +2,17 @@
 import random, json
 from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponse
-from .models import Entity, User, ProjectFeedback, MetricFeedback, Metric, Indicator
+from .models import Entity, User, ProjectFeedback, MetricFeedback, Metric, Indicator, FinancialMetricsLoader
 from salic_db.utils import test_connection, make_query_from_db
 from core.finance.financial_metrics import FinancialMetrics
 from core.utils.get_project_info_from_pronac import GetProjectInfoFromPronac
 
-# Instanciating FinancialMetrics global module
-financial_metrics = FinancialMetrics()
+# SALIC_URL = "localhost:80"
+SALIC_URL = "http://salic.cultura.gov.br"
+# SALIC_URL = "http://hmg.salic.cultura.gov.br"
 
-# Uncomment line below when deploying
-financial_metrics.save()
+# Instanciating FinancialMetrics global module
+financial_metrics = FinancialMetricsLoader().financial_metrics
 
 submitted_projects_info = GetProjectInfoFromPronac()
 def index(request, submit_success=False):
@@ -408,8 +409,8 @@ def fetch_user_data(request):
             for item_id in metrics['new_providers']['new_providers'][provider_cnpj_cpf]['items']:
                 items_by_provider.append({
                     'item_id': item_id,
-                    'item_name': metrics['new_providers']['new_providers'][provider_cnpj_cpf]['items'][item_id],
-                    'item_link': '#'
+                    'item_name': metrics['new_providers']['new_providers'][provider_cnpj_cpf]['items'][item_id]['name'],
+                    'item_link': SALIC_URL + metrics['new_providers']['new_providers'][provider_cnpj_cpf]['items'][item_id]['salic_url'],
                 })
 
             new_providers_list.append({
