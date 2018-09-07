@@ -217,7 +217,7 @@ def fetch_user_data(request):
 
     # return HttpResponse(str(result))
 
-    #complexidade_financeira
+    # complexidade_financeira
     financial_complexity_indicator = register_project_indicator(int(pronac), 'complexidade_financeira', 0)
 
     easiness = {
@@ -323,8 +323,6 @@ def fetch_user_data(request):
     register_project_metric('valor_aprovado', approved_funds['float_value'], str(approved_funds), financial_complexity_indicator.name, int(pronac), get_outlier_float(approved_funds['outlier_check']))
 
     # itens_orcamentarios_fora_do_comum
-
-
     common_items_ratio = {
         'outlier_check': get_outlier_color(False),
         'value': 0.0,
@@ -344,14 +342,14 @@ def fetch_user_data(request):
             common_items_not_in_project_list.append({
                 'id': item_id,
                 'name': metrics['common_items_ratio']['common_items_not_in_project'][item_id],
-                'link': '#'
+                'link': '#',
             })
 
         for item_id in metrics['common_items_ratio']['uncommon_items']:
             uncommon_items_list.append({
                 'id': item_id,
-                'name': metrics['common_items_ratio']['uncommon_items'][item_id],
-                'link': '#'
+                'name': metrics['common_items_ratio']['uncommon_items'][item_id]['name'],
+                'link': SALIC_URL + metrics['common_items_ratio']['uncommon_items'][item_id]['salic_url'],
             })
 
         common_items_ratio = {
