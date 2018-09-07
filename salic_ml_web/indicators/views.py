@@ -446,19 +446,19 @@ def fetch_user_data(request):
 
         all_pronacs = metrics['proponent_projects']['submitted_projects']['pronacs_of_this_proponent']
 
-        projects_information = submitted_projects_info.get_projects_name(all_pronacs)
+        projects_information = submitted_projects_info.get_projects_name_and_url(all_pronacs)
         for project_pronac in metrics['proponent_projects']['submitted_projects']['pronacs_of_this_proponent']:
             submitted_projects_list.append({
                 'pronac': project_pronac,
-                'name': projects_information[project_pronac],
-                'link': '#'
+                'name': projects_information[project_pronac]['NomeProjeto'],
+                'link': SALIC_URL + '/' + projects_information[project_pronac]['URL']
             })
 
         for project_pronac in metrics['proponent_projects']['analyzed_projects']['pronacs_of_this_proponent']:
             analyzed_projects_list.append({
                 'pronac': project_pronac,
-                'name': projects_information[project_pronac],
-                'link': '#'
+                'name': projects_information[project_pronac]['NomeProjeto'],
+                'link': SALIC_URL + '/' + projects_information[project_pronac]['URL']
             })
 
         proponent_projects = {
