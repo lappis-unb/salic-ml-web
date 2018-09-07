@@ -161,7 +161,7 @@
                             <div class="ui bulleted list">
                                 {% for itens in indicator.metrics.1.expected_itens %}
                                 <div class="item">
-                                    <a href="{{itens.link}}">{{itens.name}}</a>
+                                    <a target="_blank" href="{{itens.link}}">{{itens.name}}</a>
                                 </div>
                                 {% endfor %}
                             </div>
@@ -284,7 +284,7 @@
                 <div class="content active">
                     {% for item in indicator.metrics.3.items %}
                         <ul class="item">
-                            <li><a href="{{item.link}}">{{item.item_name}}</a></li>
+                            <li><a target="_blank" href="{{item.link}}">{{item.item_name}}</a></li>
                         </ul>
                     {% endfor %}
                     <p>
@@ -475,7 +475,7 @@
                     <div class="ui bulleted list">
                         {% for project in indicator.metrics.7.proponent_projects %}
                         <div class="item">
-                            <a href="{{project.link}}">{{project.name}}</a>
+                            <a target="_blank" href="{{project.link}}">{{project.name}}</a>
                         </div>
                         {% endfor %}
                     </div>
