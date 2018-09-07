@@ -638,17 +638,20 @@ def post_metrics_feedback(request):
         for metric in indicator.metrics.all():
             metric_feedback_text_tag = metric.name + '_text'
 
-            metric_feedback_rating = ratings.pop()
-            metric_feedback_text = request.POST[metric_feedback_text_tag]
+            try:
+                metric_feedback_text = request.POST[metric_feedback_text_tag]
+                metric_feedback_rating = ratings.pop()
 
-            saved_metric_feedback = MetricFeedback.objects.create(
-                user=user, metric=metric, grade=int(metric_feedback_rating), reason=metric_feedback_text)
+                saved_metric_feedback = MetricFeedback.objects.create(
+                    user=user, metric=metric, grade=int(metric_feedback_rating), reason=metric_feedback_text)
 
-            saved_data['metrics_feedback'].append({
-                'metric_name': saved_metric_feedback.metric.name,
-                'grade': saved_metric_feedback.grade,
-                'reason': saved_metric_feedback.reason
-            })
+                saved_data['metrics_feedback'].append({
+                    'metric_name': saved_metric_feedback.metric.name,
+                    'grade': saved_metric_feedback.grade,
+                    'reason': saved_metric_feedback.reason
+                })
+            except:
+                continue
 
     # return HttpResponse(status=201)
     try:
