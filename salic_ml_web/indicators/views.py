@@ -489,8 +489,8 @@ def fetch_user_data(request):
         for item_id in metrics['items_prices']['outlier_items']:
             items_list.append({
                 'item_id': item_id,
-                'item_name': metrics['items_prices']['outlier_items'][item_id],
-                'link': '#'
+                'item_name': metrics['items_prices']['outlier_items'][item_id]['name'],
+                'link': SALIC_URL + metrics['items_prices']['outlier_items'][item_id]['salic_url'],
             })
 
         items_prices = {
