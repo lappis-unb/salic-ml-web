@@ -69,7 +69,7 @@
                     <div class="ui ribbon label">
                         <i class="icon"></i>
                     </div>
-                    <span>Itens orçamentários: {{indicator.metrics.0.value}}</span>
+                    <span>Itens orçamentários: {% if not indicator.metrics.0.value %} - {% else %} {{ indicator.metrics.0.value }} {% endif %}</span>
                     <i class="dropdown icon"></i>
                     <div class="helper">
                         <i class="question circle outline icon"></i>
@@ -141,7 +141,7 @@
                 <div class="ui ribbon label">
                     <i class="icon"></i>
                 </div>
-                <span>Itens orçamentários inesperados: {{indicator.metrics.1.value}}%</span>
+                <span>Itens orçamentários inesperados: {% if not indicator.metrics.1.value %} - {% else %} {{ indicator.metrics.1.value }}% {% endif %}</span>
                 <i class="dropdown icon"></i>
                 <div class="helper">
                     <i class="question circle outline icon"></i>
@@ -212,7 +212,7 @@
                 <div class="ui ribbon label">
                     <i class="icon"></i>
                 </div>
-                Comprovantes de pagamento: {{indicator.metrics.2.value}}
+                Comprovantes de pagamento: {% if not indicator.metrics.2.value %} - {% else %} {{ indicator.metrics.2.value }} {% endif %}
                 <i class="dropdown icon"></i>
                 <div class="helper">
                     <i class="question circle outline icon"></i>
@@ -273,7 +273,7 @@
                 <div class="ui ribbon label">
                     <i class="icon"></i>
                 </div>
-                <span>Preços acima da média: {{indicator.metrics.3.value}}</span>
+                <span>Preços acima da média: {% if not indicator.metrics.3.value %} - {% else %} {{ indicator.metrics.3.value }} {% endif %}</span>
                 <i class="dropdown icon"></i>
                 <div class="helper">
                     <i class="question circle outline icon"></i>
@@ -334,7 +334,7 @@
                 <div class="ui ribbon label">
                     <i class="icon"></i>
                 </div>
-                <span>Valor comprovado: {{indicator.metrics.4.value}}</span>
+                <span>Valor comprovado: {% if indicator.metrics.4.value == "R$0,00" %} - {% else %} {{ indicator.metrics.4.value }} {% endif %}</span>
                 <i class="dropdown icon"></i>
                 <div class="helper">
                     <i class="question circle outline icon"></i>
@@ -383,7 +383,7 @@
                 <div class="ui ribbon label">
                     <i class="icon"></i>
                 </div>
-                <span>Valor captado: {{indicator.metrics.5.value}}</span>
+                <span>Valor captado: {% if indicator.metrics.5.value == "R$0,00" %} - {% else %} {{ indicator.metrics.5.value }} {% endif %}</span>
                 <i class="dropdown icon"></i>
                 <div class="helper">
                     <i class="question circle outline icon"></i>
@@ -469,7 +469,7 @@
                 <div class="ui ribbon label">
                     <i class="icon"></i>
                 </div>
-                <span>Projetos do mesmo proponente: {{indicator.metrics.7.value}}</span>
+                <span>Projetos do mesmo proponente: {% if not indicator.metrics.7.value %} - {% else %} {{ indicator.metrics.7.value }} {% endif %}</span>
                 <i class="dropdown icon"></i>
                 <div class="helper">
                     <i class="question circle outline icon"></i>
@@ -518,7 +518,7 @@
                 <div class="ui ribbon label">
                     <i class="icon"></i>
                 </div>
-                <span>Novos fornecedores: {{indicator.metrics.8.value}}</span>
+                <span>Novos fornecedores:  {% if not indicator.metrics.8.value %} - {% else %} {{ indicator.metrics.8.value }} {% endif %}</span>
                 <i class="dropdown icon"></i>
                 <div class="helper">
                     <i class="question circle outline icon"></i>
@@ -580,7 +580,7 @@
                 <div class="ui ribbon label">
                     <i class="icon"></i>
                 </div>
-                <span>Valor aprovado: {{indicator.metrics.9.value}}</span>
+                <span>Valor aprovado:  {% if indicator.metrics.9.value == "R$0,00" %} - {% else %} {{ indicator.metrics.9.value }} {% endif %}</span>
                 <i class="dropdown icon"></i>
                 <div class="helper">
                     <i class="question circle outline icon"></i>
