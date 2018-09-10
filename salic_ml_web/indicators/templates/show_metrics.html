@@ -65,11 +65,11 @@
 
             <!-- METRIC -->
             <!-- Total do número de itens -->
-                <div class="title active {{indicator.metrics.0.outlier_check}}">
+                <div class="title  {% if indicator.metrics.0.value %} active {% endif %}  {{indicator.metrics.0.outlier_check}}">
                     <div class="ui ribbon label">
                         <i class="icon"></i>
                     </div>
-                    <span>Itens orçamentários: {% if not indicator.metrics.0.value %} - {% else %} {{ indicator.metrics.0.value }} {% endif %}</span>
+                    <span>Itens orçamentários: {% if not indicator.metrics.0.value %} <i>Não disponível</i> {% else %} {{ indicator.metrics.0.value }} {% endif %}</span>
                     <i class="dropdown icon"></i>
                     <div class="helper">
                         <i class="question circle outline icon"></i>
@@ -124,24 +124,19 @@
                     </div>
                 </div>
             {% else %}
-                <div class="content active">
+                <div class="content">
                     <!-- <h3>(Barra de distribuição do valor do projeto em relação à média do segmento)</h3> -->
-                    <div>
-                        <p>
-                            <i>Não disponível</i>
-                        </p>
-                    </div>
                 </div>
             {% endif %}
 
 
             <!-- METRIC -->
             <!-- 1 Porcentagem de itens do projeto em relação a distribuição dos itens mais comuns para aquele segmento ou area -->
-            <div class="title active {{indicator.metrics.1.outlier_check}}">
+            <div class="title {% if indicator.metrics.1.value %} active {% endif %}  {{indicator.metrics.1.outlier_check}}">
                 <div class="ui ribbon label">
                     <i class="icon"></i>
                 </div>
-                <span>Itens orçamentários inesperados: {% if not indicator.metrics.1.value %} - {% else %} {{ indicator.metrics.1.value }}% {% endif %}</span>
+                <span>Itens orçamentários inesperados: {% if not indicator.metrics.1.value %} <i>Não disponível</i> {% else %} {{ indicator.metrics.1.value }}% {% endif %}</span>
                 <i class="dropdown icon"></i>
                 <div class="helper">
                     <i class="question circle outline icon"></i>
@@ -191,24 +186,19 @@
                     </div>
                 </div>
             {% else %}
-                <div class="content active">
+                <div class="content">
                     <!-- <h3>(Barra de distribuição do valor do projeto em relação à média do segmento)</h3> -->
-                    <div>
-                        <p>
-                            <i>Não disponível</i>
-                        </p>
-                    </div>
                 </div>
             {% endif %}
 
 
             <!-- METRIC -->
             <!-- Número de comprovantes do projeto-->
-            <div class="title active {{indicator.metrics.2.outlier_check}}">
+            <div class="title {% if indicator.metrics.2.value %} active {% endif %}  {{indicator.metrics.2.outlier_check}}">
                 <div class="ui ribbon label">
                     <i class="icon"></i>
                 </div>
-                Comprovantes de pagamento: {% if not indicator.metrics.2.value %} - {% else %} {{ indicator.metrics.2.value }} {% endif %}
+                Comprovantes de pagamento: {% if not indicator.metrics.2.value %} <i>Não disponível</i> {% else %} {{ indicator.metrics.2.value }} {% endif %}
                 <i class="dropdown icon"></i>
                 <div class="helper">
                     <i class="question circle outline icon"></i>
@@ -252,24 +242,19 @@
                     </div>
                 </div>
             {% else %}
-                <div class="content active">
+                <div class="content">
                     <!-- <h3>(Barra de distribuição do valor do projeto em relação à média do segmento)</h3> -->
-                    <div>
-                        <p>
-                            <i>Não disponível</i>
-                        </p>
-                    </div>
                 </div>
             {% endif %}
 
 
             <!-- METRIC -->
             <!-- 5 Porcentagem de itens acima da mediana histórica, média do desvio da mediana, ou o próprio vetor de diferença em relação a mediana -->
-            <div class="title active {{indicator.metrics.3.outlier_check}}">
+            <div class="title {% if indicator.metrics.3.value %} active {% endif %} {{indicator.metrics.3.outlier_check}}">
                 <div class="ui ribbon label">
                     <i class="icon"></i>
                 </div>
-                <span>Preços acima da média: {% if not indicator.metrics.3.value %} - {% else %} {{ indicator.metrics.3.value }} {% endif %}</span>
+                <span>Preços acima da média: {% if not indicator.metrics.3.value %} <i>Não disponível</i> {% else %} {{ indicator.metrics.3.value }} {% endif %}</span>
                 <i class="dropdown icon"></i>
                 <div class="helper">
                     <i class="question circle outline icon"></i>
@@ -309,24 +294,19 @@
                     </div>
                 </div>
             {% else %}
-                <div class="content active">
+                <div class="content">
                     <!-- <h3>(Barra de distribuição do valor do projeto em relação à média do segmento)</h3> -->
-                    <div>
-                        <p>
-                            <i>Não disponível</i>
-                        </p>
-                    </div>
                 </div>
             {% endif %}
 
 
             <!-- METRIC -->
             <!-- Total do valor comprovado do projeto -->
-            <div class="title active {{indicator.metrics.4.outlier_check}}">
+            <div class='title {% if indicator.metrics.4.value == "R$0,00" %} active {% endif %} {{indicator.metrics.4.outlier_check}}'>
                 <div class="ui ribbon label">
                     <i class="icon"></i>
                 </div>
-                <span>Valor comprovado: {% if indicator.metrics.4.value == "R$0,00" %} - {% else %} {{ indicator.metrics.4.value }} {% endif %}</span>
+                <span>Valor comprovado: {% if indicator.metrics.4.value == "R$0,00" %} <i>Não disponível</i> {% else %} {{ indicator.metrics.4.value }} {% endif %}</span>
                 <i class="dropdown icon"></i>
                 <div class="helper">
                     <i class="question circle outline icon"></i>
@@ -358,24 +338,19 @@
                     </div>
                 </div>
             {% else %}
-                <div class="content active">
+                <div class="content">
                     <!-- <h3>(Barra de distribuição do valor do projeto em relação à média do segmento)</h3> -->
-                    <div>
-                        <p>
-                            <i>Não disponível</i>
-                        </p>
-                    </div>
                 </div>
             {% endif %}
 
 
             <!-- METRIC -->
             <!-- Total do valor captado do projeto-->
-            <div class="title active {{indicator.metrics.5.outlier_check}}">
+            <div class="title {% if indicator.metrics.5.value  == 'R$0,00' %} active {% endif %} {{indicator.metrics.5.outlier_check}}">
                 <div class="ui ribbon label">
                     <i class="icon"></i>
                 </div>
-                <span>Valor captado: {% if indicator.metrics.5.value == "R$0,00" %} - {% else %} {{ indicator.metrics.5.value }} {% endif %}</span>
+                <span>Valor captado: {% if indicator.metrics.5.value == "R$0,00" %} <i>Não disponível</i> {% else %} {{ indicator.metrics.5.value }} {% endif %}</span>
                 <i class="dropdown icon"></i>
                 <div class="helper">
                     <i class="question circle outline icon"></i>
@@ -409,13 +384,8 @@
                     </div>
                 </div>
             {% else %}
-                <div class="content active">
+                <div class="content">
                     <!-- <h3>(Barra de distribuição do valor do projeto em relação à média do segmento)</h3> -->
-                    <div>
-                        <p>
-                            <i>Não disponível</i>
-                        </p>
-                    </div>
                 </div>
             {% endif %}
 
@@ -457,11 +427,11 @@
 
             <!-- METRIC -->
             <!-- 2 Número de projetos já enviados por aquele proponente ou outros "escritores" da proposta -->
-            <div class="title active {{indicator.metrics.7.outlier_check}}">
+            <div class="title {% if indicator.metrics.7.value %} active {% endif %}  {{indicator.metrics.7.outlier_check}}">
                 <div class="ui ribbon label">
                     <i class="icon"></i>
                 </div>
-                <span>Projetos do mesmo proponente: {% if not indicator.metrics.7.value %} - {% else %} {{ indicator.metrics.7.value }} {% endif %}</span>
+                <span>Projetos do mesmo proponente: {% if not indicator.metrics.7.value %} <i>Não disponível</i> {% else %} {{ indicator.metrics.7.value }} {% endif %}</span>
                 <i class="dropdown icon"></i>
                 <div class="helper">
                     <i class="question circle outline icon"></i>
@@ -493,24 +463,19 @@
                     </div>
                 </div>
             {% else %}
-                <div class="content active">
+                <div class="content">
                     <!-- <h3>(Barra de distribuição do valor do projeto em relação à média do segmento)</h3> -->
-                    <div>
-                        <p>
-                            <i>Não disponível</i>
-                        </p>
-                    </div>
                 </div>
             {% endif %}
 
 
             <!-- METRIC -->
             <!-- 4 Porcentagem ou distribuição dos fornecedores do projeto em relação a fornecedores já conhecidos -->
-            <div class="title active {{indicator.metrics.8.outlier_check}}">
+            <div class="title {% if indicator.metrics.8.value %} active {% endif %}  {{indicator.metrics.8.outlier_check}}">
                 <div class="ui ribbon label">
                     <i class="icon"></i>
                 </div>
-                <span>Novos fornecedores:  {% if not indicator.metrics.8.value %} - {% else %} {{ indicator.metrics.8.value }} {% endif %}</span>
+                <span>Novos fornecedores:  {% if not indicator.metrics.8.value %} <i>Não disponível</i> {% else %} {{ indicator.metrics.8.value }} {% endif %}</span>
                 <i class="dropdown icon"></i>
                 <div class="helper">
                     <i class="question circle outline icon"></i>
@@ -555,13 +520,8 @@
                     </div>
                 </div>
             {% else %}
-                <div class="content active">
+                <div class="content">
                     <!-- <h3>(Barra de distribuição do valor do projeto em relação à média do segmento)</h3> -->
-                    <div>
-                        <p>
-                            <i>Não disponível</i>
-                        </p>
-                    </div>
                 </div>
             {% endif %}
 
@@ -572,7 +532,7 @@
                 <div class="ui ribbon label">
                     <i class="icon"></i>
                 </div>
-                <span>Valor aprovado:  {% if indicator.metrics.9.value == "R$0,00" %} - {% else %} {{ indicator.metrics.9.value }} {% endif %}</span>
+                <span>Valor aprovado:  {% if indicator.metrics.9.value == "R$0,00" %} <i>Não disponível</i> {% else %} {{ indicator.metrics.9.value }} {% endif %}</span>
                 <i class="dropdown icon"></i>
                 <div class="helper">
                     <i class="question circle outline icon"></i>
@@ -607,11 +567,6 @@
             {% else %}
                 <div class="content active">
                     <!-- <h3>(Barra de distribuição do valor do projeto em relação à média do segmento)</h3> -->
-                    <div>
-                        <p>
-                            <i>Não disponível</i>
-                        </p>
-                    </div>
                 </div>
             {% endif %}
         </div>
