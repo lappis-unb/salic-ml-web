@@ -121,3 +121,4 @@ class FinancialMetricsLoader():
 
     def __init__(self):
         self.financial_metrics = FinancialMetrics()
+        self.financial_metrics.save()
