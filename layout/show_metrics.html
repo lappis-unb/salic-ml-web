@@ -10,6 +10,7 @@
 	<link rel="stylesheet" href="./static/css/style.css">
 	<link rel="stylesheet" href="./static/css/showmetrics.css">
 	<link rel="stylesheet" href="./static/css/circle.css">
+	<link rel="stylesheet" href="./static/css/progressbar.css">
 
 	<script src="https://code.jquery.com/jquery-3.3.1.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.3.1/semantic.min.js"></script>
@@ -94,7 +95,7 @@
 					</div>
 				</div>
 				
-				<div class="content active Metric-bad">
+				<div class="content active progressbar">
 					<!-- Barra de distribuição de itens nesse projeto em relação à média do segmento -->
 					<div class="ui pointing below label">
 						Este projeto
@@ -136,6 +137,7 @@
 						</div>
 					</div>
 				</div>
+				
 				<div class="content active">
 					<div class="ui grid">
 						<div class="eight wide column">
@@ -173,11 +175,19 @@
 							com a <strong>quantidade mais comum</strong> de comprovantes em projetos do mesmo segmento</p>	
 						</div>
 					</div>
-				</div>        
-				<div class="content active">
-					<h3>(Barra de distribuição de da quant de comprovantes nesse projeto em relação à média do segmento)</h3>
-				</div>
-
+				</div>    
+				
+				<div class="content active progressbar">
+					<div class="ui pointing below label">
+						Este projeto
+					</div>
+					<div class="ui progress" data-percent="12"  data-total="1000" id="MedianDisplay-TotalItems" >
+						<div class="bar">
+							<div class="progress">50 - 170</div>
+						</div>
+						<div class="label">Média de itens orçamentários para Jogos Eletrônicos</div>
+					</div>
+				</div>		
 
 				<!-- METRIC -->
 				<!-- 5 Porcentagem de itens acima da mediana histórica, média do desvio da mediana, ou o próprio vetor de diferença em relação a mediana -->
@@ -195,9 +205,17 @@
 						</div>
 					</div>
 				</div>        
-				<div class="content active">
-					<h3>(Barra de distribuição em relação à média)</h3>                  
-				</div>      
+				<div class="content active progressbar">
+					<div class="ui pointing below label">
+						Este projeto
+					</div>
+					<div class="ui progress" data-percent="12"  data-total="1000" id="MedianDisplay-TotalItems" >
+						<div class="bar">
+							<div class="progress">50 - 170</div>
+						</div>
+						<div class="label">Média de itens orçamentários para Jogos Eletrônicos</div>
+					</div>
+				</div>		     
 
 
 				<!-- METRIC -->
@@ -216,9 +234,17 @@
 						</div>
 					</div>
 				</div>
-				<div class="content active">
-					<h3>(Barra de distribuição do valor do projeto em relação à média do segmento)</h3>                  
-				</div>
+				<div class="content active progressbar">
+					<div class="ui pointing below label">
+						Este projeto
+					</div>
+					<div class="ui progress" data-percent="12"  data-total="1000" id="MedianDisplay-TotalItems" >
+						<div class="bar">
+							<div class="progress">50 - 170</div>
+						</div>
+						<div class="label">Média de itens orçamentários para Jogos Eletrônicos</div>
+					</div>
+				</div>		
 
 
 				<!-- METRIC -->
@@ -407,23 +433,42 @@
 </body>
 	
 <script>
-	$('#DiagnosticMetrics')
-		.accordion({
-			exclusive: false
-	})
-	;
-	$('#MedianDisplay-TotalItems')
-		.progress({
-			showActivity: false,
-			label: ''
-	})
-	;
+	// Set quality: bad, average or good
+	var progressBarStates = ['average', 'good', 'average', 'bad'];
+	
+	// Set offset percentage (w/o percentage symbol)
+	var progressBarOffsets = ['70', '15', '20', '100'];
+	
+	
+	
 	$('.ui.rating')
 		.rating({
 			initialRating: 3,
 			maxRating: 5
-	})
-	;
+	});
+	
+	$('#DiagnosticMetrics')
+		.accordion({
+			exclusive: false
+	});
+
+	
+	$( ".progressbar" ).each(function( index ) {
+		
+		//Gabiarra pra resolver posicionamento do balão
+		var offsetValue = progressBarOffsets[index] - 4;
+		var offsetLeft = offsetValue.toString() + '%';
+		
+		$(this).addClass('Metric-' + progressBarStates[index]);
+		$(this).children('.ui.progress')
+			.progress({
+			showActivity: false,
+			label: ''
+		});
+		$(this).children('.ui.pointing.below.label').css({'left': offsetLeft});
+		
+	});	
+
 </script>
 
 </html>
