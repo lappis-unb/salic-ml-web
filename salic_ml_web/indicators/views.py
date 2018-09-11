@@ -350,7 +350,11 @@ def fetch_user_data(request):
                 'id': item_id,
                 'name': metrics['common_items_ratio']['uncommon_items'][item_id]['name'],
                 'link': SALIC_URL + metrics['common_items_ratio']['uncommon_items'][item_id]['salic_url'],
+                'has_receipt': metrics['common_items_ratio']['uncommon_items'][item_id]['has_receipt'],
             })
+
+        common_items_not_in_project_list.sort(key=lambda item: item['name'])
+        uncommon_items_list.sort(key=lambda item: (item['has_receipt'] == False, item['name']))
 
         common_items_ratio = {
             'outlier_check': get_outlier_color(metrics['common_items_ratio']['is_outlier']),
@@ -490,8 +494,11 @@ def fetch_user_data(request):
             items_list.append({
                 'item_id': item_id,
                 'item_name': metrics['items_prices']['outlier_items'][item_id]['name'],
+                'has_receipt': metrics['items_prices']['outlier_items'][item_id]['has_receipt'],
                 'link': SALIC_URL + metrics['items_prices']['outlier_items'][item_id]['salic_url'],
             })
+
+        items_list.sort(key=lambda item: (item['has_receipt'] == False, item['item_name']))
 
         items_prices = {
             'value': metrics['items_prices']['number_items_outliers'],
