@@ -19,7 +19,7 @@ build:
         - docker push $WEB_IMAGE
         - docker push $CI_REGISTRY_IMAGE/web:latest
     only:
-        - /master|homolog/
+        - /master|homolog|develop/
     tags:
         - docker
 
