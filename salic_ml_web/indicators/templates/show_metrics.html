@@ -24,7 +24,7 @@
             <div class="header">
                 Preencha seus dados para avaliar este projeto (ou para continuar uma avaliação interrompida):
             </div>
-            <form action="/user_info" method="post">
+            <form action="{% url 'user_info' %}" method="post">
                 {% csrf_token %}
                 <div class="three fields">
                     <div class="six wide field">
