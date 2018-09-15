@@ -2,40 +2,31 @@
  ****** Progress Bar *******
  ***************************/
 .ui.pointing.below.label{
-	color: #FFF;
-	font-weight: normal;
-	max-width: 5em;
-	text-align: center;
+	color: #FFF!important;
+	font-weight: normal!important;
+	max-width: 5em!important;
+	text-align: center!important;
 }
 
 .Metric-bad .ui.pointing.below.label{
-	background-color: #db2828;
-	color: #FFF;
+	background-color: #db2828!important;
+	color: #FFF!important;
 }
 
 .Metric-average .ui.pointing.below.label{
-	background-color: #f2b01c;
-	color: #FFF;
-}
-
-.Metric-good .ui.pointing.below.label{
-	color: #000;
+	background-color: #f2b01c!important;
+	color: #FFF!important;
 }
 
 .ui.progress{
-	margin: 0 auto;
+	margin: 0 auto!important;
 } 
 
-.ui.progress .bar{
-	left: 5%;
-	width: 50%;
-}
-
 .ui.progress .bar > .progress{
-	color: #FFF;
-	left: 0;
-	right: 0;
-	text-align: center;
+	color: #FFF!important;
+	left: 0!important;
+	right: 0!important;
+	text-align: center!important;
 }
 
 .Metric-text-color {

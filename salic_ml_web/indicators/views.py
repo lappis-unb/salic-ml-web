@@ -166,10 +166,10 @@ def set_width_bar(min_interval, max_interval, value):
         max_value = 1
 
     return {
-        'max_value': max_value,
-        'min_interval': (min_interval/max_value)*100,
-        'project': ((value/max_value)*100),
-        'interval': (max_interval-min_interval)
+        'max_value': round(max_value),
+        'min_interval': round((min_interval/max_value)*100),
+        'project': round((value/max_value)*100),
+        'interval': round(max_interval-min_interval)
     }
 
 def fetch_user_data(request):
@@ -269,6 +269,7 @@ def fetch_user_data(request):
         raised_funds = {
             'value': float_to_money(metrics['raised_funds']['total_raised_funds']),
             'float_value': metrics['raised_funds']['total_raised_funds'],
+            'float_maximum_expected_value': metrics['raised_funds']['maximum_expected_funds'],
             'maximum_expected_value': float_to_money(metrics['raised_funds']['maximum_expected_funds']),
             'outlier_check': get_outlier_color(metrics['raised_funds']['is_outlier']),
             'is_valid': True,
@@ -313,6 +314,7 @@ def fetch_user_data(request):
         approved_funds = {
             'value': float_to_money(metrics['approved_funds']['total_approved_funds']),
             'float_value': metrics['approved_funds']['total_approved_funds'],
+            'float_maximum_expected_funds': metrics['approved_funds']['maximum_expected_funds'],
             'maximum_expected_funds': float_to_money(metrics['approved_funds']['maximum_expected_funds']),
             'outlier_check': get_outlier_color(metrics['approved_funds']['is_outlier']),
             'is_valid': True,
@@ -574,6 +576,8 @@ def fetch_user_data(request):
                     'reason': result['valor_captado']['maximum_expected_value'],
                     'outlier_check': result['valor_captado']['outlier_check'],
                     'is_valid': result['valor_captado']['is_valid'],
+                    'bar': set_width_bar(0, result['valor_captado']['float_maximum_expected_value'],
+                                         result['valor_captado']['float_value']),
                 },
                 {
                     'name': 'mudancas_planilha_orcamentaria',
@@ -604,10 +608,12 @@ def fetch_user_data(request):
                 {
                     'name': 'valor_aprovado',
                     'value': result['valor_aprovado']['value'],
-                    'reason': 'any reason',
+                    'reason': result['valor_aprovado']['maximum_expected_funds'],
                     'outlier_check': result['valor_aprovado']['outlier_check'],
-                    'maximum_expected_funds': result['valor_aprovado']['maximum_expected_funds'],
+                    
                     'is_valid': result['valor_aprovado']['is_valid'],
+                    'bar': set_width_bar(0, result['valor_aprovado']['float_maximum_expected_funds'],
+                                         result['valor_aprovado']['float_value']),
                 }
             ]
         },
