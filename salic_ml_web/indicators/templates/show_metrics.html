@@ -65,12 +65,12 @@
 
             <!-- METRIC -->
             <!-- Total do número de itens -->
-                <div class="title  {% if indicator.metrics.0.value %} active {% endif %}  {{indicator.metrics.0.outlier_check}}">
+                <div class="title {% if indicator.metrics.0.value %} active {% endif %} {{indicator.metrics.0.outlier_check}}">
                     <div class="ui ribbon label">
                         <i class="icon"></i>
                     </div>
                     <span>Itens orçamentários: {% if not indicator.metrics.0.value %} <i>Não disponível</i> {% else %} {{ indicator.metrics.0.value }} {% endif %}</span>
-                    <i class="dropdown icon"></i>
+                    {% if indicator.metrics.0.value %} <i class="dropdown icon"></i>  {% endif %}
                     <div class="helper">
                         <i class="question circle outline icon"></i>
                         <div class="ui floating message">
@@ -83,9 +83,9 @@
                 </div>
 
             {% if indicator.metrics.0.is_valid %}
-                <div class="content active {{indicator.metrics.0.outlier_check}}">
+                <div class="content active progressbar {{indicator.metrics.0.outlier_check}}">
                     <!-- Barra de distribuição de itens nesse projeto em relação à média do segmento -->
-                    <div class="ui pointing below label" id="MedianDisplay-Project">
+                    <div class="ui pointing below label Metric-text-color" id="MedianDisplay-Project">
                         Este projeto
                     </div>
                     <!-- {{indicator.metrics.0.max_interval}} -->
@@ -97,8 +97,8 @@
                     </div>
 
                     <div>
-                        <p>
-                            Esta quantidade de item orçamentários está {% if indicator.metrics.0.outlier_check != "Metric-good" %} fora {% else %} dentro
+                        <p class="Reason-text">
+                            Esta quantidade de itens orçamentários está {% if indicator.metrics.0.outlier_check != "Metric-good" %} fora {% else %} dentro
                             {% endif %} da margem considerada como normal sendo esta: {{indicator.metrics.0.interval_start}}
                             de {{indicator.metrics.0.interval_end}}.
                         </p>
@@ -124,20 +124,18 @@
                     </div>
                 </div>
             {% else %}
-                <div class="content">
-                    <!-- <h3>(Barra de distribuição do valor do projeto em relação à média do segmento)</h3> -->
-                </div>
+                <div class="content"></div>
             {% endif %}
 
 
             <!-- METRIC -->
             <!-- 1 Porcentagem de itens do projeto em relação a distribuição dos itens mais comuns para aquele segmento ou area -->
-            <div class="title {% if indicator.metrics.1.value %} active {% endif %}  {{indicator.metrics.1.outlier_check}}">
+            <div class="title progressbar {% if indicator.metrics.1.value %} active {% endif %}  {{indicator.metrics.1.outlier_check}}">
                 <div class="ui ribbon label">
                     <i class="icon"></i>
                 </div>
                 <span>Itens orçamentários inesperados: {% if not indicator.metrics.1.value %} <i>Não disponível</i> {% else %} {{ indicator.metrics.1.value }}% {% endif %}</span>
-                <i class="dropdown icon"></i>
+                {% if indicator.metrics.1.value %} <i class="dropdown icon"></i>  {% endif %}
                 <div class="helper">
                     <i class="question circle outline icon"></i>
                     <div class="ui floating message">
@@ -149,7 +147,7 @@
                 </div>
             </div>
             {% if indicator.metrics.1.is_valid %}
-                <div class="content active">
+                <div class="content active progressbar">
                     <div class="ui grid">
                         <div class="eight wide column">
                             <div class="list header">Itens inesperados</div>
@@ -190,9 +188,7 @@
                     </div>
                 </div>
             {% else %}
-                <div class="content">
-                    <!-- <h3>(Barra de distribuição do valor do projeto em relação à média do segmento)</h3> -->
-                </div>
+                <div class="content"></div>
             {% endif %}
 
 
@@ -203,7 +199,7 @@
                     <i class="icon"></i>
                 </div>
                 Comprovantes de pagamento: {% if not indicator.metrics.2.value %} <i>Não disponível</i> {% else %} {{ indicator.metrics.2.value }} {% endif %}
-                <i class="dropdown icon"></i>
+                {% if indicator.metrics.2.value %} <i class="dropdown icon"></i>  {% endif %}
                 <div class="helper">
                     <i class="question circle outline icon"></i>
                     <div class="ui floating message">
@@ -213,7 +209,7 @@
                 </div>
             </div>
             {% if indicator.metrics.2.is_valid %}
-                <div class="content active">
+                <div class="content active progressbar">
                     <!-- <div class="ui pointing below label" id="MedianDisplay-Project">
                         Este projeto
                     </div>
@@ -246,9 +242,7 @@
                     </div>
                 </div>
             {% else %}
-                <div class="content">
-                    <!-- <h3>(Barra de distribuição do valor do projeto em relação à média do segmento)</h3> -->
-                </div>
+                <div class="content"></div>
             {% endif %}
 
 
@@ -259,7 +253,7 @@
                     <i class="icon"></i>
                 </div>
                 <span>Preços acima da média: {% if not indicator.metrics.3.value %} <i>Não disponível</i> {% else %} {{ indicator.metrics.3.value }} {% endif %}</span>
-                <i class="dropdown icon"></i>
+                {% if indicator.metrics.3.value %} <i class="dropdown icon"></i>  {% endif %}
                 <div class="helper">
                     <i class="question circle outline icon"></i>
                     <div class="ui floating message">
@@ -269,8 +263,9 @@
                     </div>
                 </div>
             </div>
+            <!-- TODO - PQ ESTA PRECISANDO DO NOT -->
             {% if indicator.metrics.3.is_valid %}
-                <div class="content active">
+                <div class="content active progressbar">
                     {% for item in indicator.metrics.3.items %}
                         <ul class="item">
                             {% if item.has_receipt %}
@@ -303,7 +298,6 @@
                 </div>
             {% else %}
                 <div class="content">
-                    <!-- <h3>(Barra de distribuição do valor do projeto em relação à média do segmento)</h3> -->
                 </div>
             {% endif %}
 
@@ -315,7 +309,7 @@
                     <i class="icon"></i>
                 </div>
                 <span>Valor comprovado: {% if indicator.metrics.4.value == "R$0,00" %} <i>Não disponível</i> {% else %} {{ indicator.metrics.4.value }} {% endif %}</span>
-                <i class="dropdown icon"></i>
+                {% if indicator.metrics.4.value != "R$0,00" %} <i class="dropdown icon"></i>  {% endif %}
                 <div class="helper">
                     <i class="question circle outline icon"></i>
                     <div class="ui floating message">
@@ -325,7 +319,7 @@
                 </div>
             </div>
             {% if indicator.metrics.4.is_valid %}
-                <div class="content active">
+                <div class="content active progressbar">
                     <div>
                         <p>
                             Este valor comprovado {% if indicator.metrics.4.outlier_check != "Metric-good" %}está acima {% else %}não está acima{% endif %}
@@ -347,7 +341,6 @@
                 </div>
             {% else %}
                 <div class="content">
-                    <!-- <h3>(Barra de distribuição do valor do projeto em relação à média do segmento)</h3> -->
                 </div>
             {% endif %}
 
@@ -359,7 +352,7 @@
                     <i class="icon"></i>
                 </div>
                 <span>Valor captado: {% if indicator.metrics.5.value == "R$0,00" %} <i>Não disponível</i> {% else %} {{ indicator.metrics.5.value }} {% endif %}</span>
-                <i class="dropdown icon"></i>
+                {% if indicator.metrics.5.value != "R$0,00" %} <i class="dropdown icon"></i>  {% endif %}
                 <div class="helper">
                     <i class="question circle outline icon"></i>
                     <div class="ui floating message">
@@ -369,7 +362,7 @@
                 </div>
             </div>
             {% if indicator.metrics.5.is_valid %}
-                <div class="content active">
+                <div class="content active progressbar">
                     <!-- <h3>(Barra de distribuição do valor do projeto em relação à média do segmento)</h3> -->
                     <div>
                         <p>
@@ -393,7 +386,6 @@
                 </div>
             {% else %}
                 <div class="content">
-                    <!-- <h3>(Barra de distribuição do valor do projeto em relação à média do segmento)</h3> -->
                 </div>
             {% endif %}
 
@@ -440,7 +432,7 @@
                     <i class="icon"></i>
                 </div>
                 <span>Projetos do mesmo proponente: {% if not indicator.metrics.7.value %} <i>Não disponível</i> {% else %} {{ indicator.metrics.7.value }} {% endif %}</span>
-                <i class="dropdown icon"></i>
+                {% if indicator.metrics.7.value %} <i class="dropdown icon"></i> {% endif %}
                 <div class="helper">
                     <i class="question circle outline icon"></i>
                     <div class="ui floating message">
@@ -449,7 +441,7 @@
                 </div>
             </div>
             {% if indicator.metrics.7.is_valid %}
-                <div class="content active">
+                <div class="content active progressbar">
                     <div class="ui bulleted list">
                         {% for project in indicator.metrics.7.proponent_projects %}
                         <div class="item">
@@ -472,7 +464,6 @@
                 </div>
             {% else %}
                 <div class="content">
-                    <!-- <h3>(Barra de distribuição do valor do projeto em relação à média do segmento)</h3> -->
                 </div>
             {% endif %}
 
@@ -484,7 +475,7 @@
                     <i class="icon"></i>
                 </div>
                 <span>Novos fornecedores:  {% if not indicator.metrics.8.value %} <i>Não disponível</i> {% else %} {{ indicator.metrics.8.value }} {% endif %}</span>
-                <i class="dropdown icon"></i>
+                {% if indicator.metrics.8.value %} <i class="dropdown icon"></i>  {% endif %}
                 <div class="helper">
                     <i class="question circle outline icon"></i>
                     <div class="ui floating message">
@@ -496,7 +487,7 @@
                 </div>
             </div>
             {% if indicator.metrics.8.is_valid %}
-                <div class="content active">
+                <div class="content active progressbar">
                     <div class="accordion">
                         {% for provider in indicator.metrics.8.providers %}
                         <div class="title">
@@ -529,7 +520,6 @@
                 </div>
             {% else %}
                 <div class="content">
-                    <!-- <h3>(Barra de distribuição do valor do projeto em relação à média do segmento)</h3> -->
                 </div>
             {% endif %}
 
@@ -540,8 +530,8 @@
                 <div class="ui ribbon label">
                     <i class="icon"></i>
                 </div>
-                <span>Valor aprovado:  {% if indicator.metrics.9.value == "R$0,00" %} <i>Não disponível</i> {% else %} {{ indicator.metrics.9.value }} {% endif %}</span>
-                <i class="dropdown icon"></i>
+                <span>Valor aprovado: {% if indicator.metrics.9.value == "R$0,00" %} <i>Não disponível</i> {% else %} {{ indicator.metrics.9.value }} {% endif %}</span>
+                {% if indicator.metrics.9.value != "R$0,00" %} <i class="dropdown icon"></i>  {% endif %}
                 <div class="helper">
                     <i class="question circle outline icon"></i>
                     <div class="ui floating message">
@@ -551,7 +541,7 @@
                 </div>
             </div>
             {% if indicator.metrics.9.is_valid %}
-                <div class="content active">
+                <div class="content active progressbar">
                     <!-- <h3>(Barra de distribuição em relação à média)</h3> -->
                     <div>
                         <p>
@@ -573,8 +563,7 @@
                     </div>
                 </div>
             {% else %}
-                <div class="content active">
-                    <!-- <h3>(Barra de distribuição do valor do projeto em relação à média do segmento)</h3> -->
+                <div class="content">
                 </div>
             {% endif %}
         </div>
@@ -679,9 +668,9 @@
     mark_project.addEventListener("load", changeWidthBar(mark_project, document.getElementById("barra")));
 
     function changeWidthBar(x, y) {
-        y.style.left = "{{project_indicators.0.metrics.0.bar.min_interval}}" + "%";
-        var value = "{{project_indicators.0.metrics.0.bar.project}}";
-        x.style.left = (value-3) + "%";
+       y.style.left = "{{project_indicators.0.metrics.0.bar.min_interval}}" + "%";
+       var value = "{{project_indicators.0.metrics.0.bar.project}}";
+       x.style.left = (value-3) + "%";
     }
 
     var toTop = document.getElementById("confirmation-rating");
@@ -689,11 +678,8 @@
         scrollToTop(2000);
     });
 
-    $('#MedianDisplay-TotalItems')
-        .progress({
-            label: "oi",
-        })
-        ;
+    $('#MedianDisplay-TotalItems').progress({label: "oi"});
+
     function scrollToTop(scrollDuration) {
         var scrollStep = -window.scrollY / (scrollDuration / 15),
             scrollInterval = setInterval(function () {
@@ -708,5 +694,25 @@
     var comp = 100 - "{{project_indicators.0.value}}"
     radialObj.value(comp)
 
+	// // Set quality: bad, average or good
+	// var progressBarStates = ['average', 'good', 'average', 'bad'];
+	
+	// // Set offset percentage (w/o percentage symbol)
+	// var progressBarOffsets = ['70', '15', '20', '100'];
+	
+	// $(".progressbar").each(function( index ) {
+	// 	//Gabiarra pra resolver posicionamento do balão
+	// 	var offsetValue = progressBarOffsets[index] - 22;
+	// 	var offsetLeft = offsetValue.toString() + '%';
+		
+	// 	$(this).addClass('Metric-' + progressBarStates[index]);
+	// 	$(this).children('.ui.progress')
+	// 		.progress({
+	// 		showActivity: false,
+	// 		label: ''
+	// 	});
+    //     console.log("Este é o off: ", offsetLeft)
+	// 	$(this).children('.ui.pointing.below.label').css({'left': offsetLeft});
+	// });	
 
 </script> {% endblock %}
