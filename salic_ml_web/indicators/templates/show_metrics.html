@@ -210,15 +210,16 @@
             </div>
             {% if indicator.metrics.2.is_valid %}
                 <div class="content active">
-                    <div class="{{indicator.metrics.2.outlier_check}}"></div>
-                    <!-- <div class="ui pointing below label" id="MedianDisplay-Project">
-                        Este projeto
-                    </div>
-                    <div class="ui progress" data-value="15" data-total="{{indicator.metrics.2.interval.max_value}}" id="MedianDisplay-TotalItems">
-                        <div class="bar" id="barra">
-                            <div class="progress">{{indicator.metrics.2.interval_start}} de {{indicator.metrics.2.interval_end}} Média de itens</div>
+                    <div class="{{indicator.metrics.2.outlier_check}}">
+                        <div class="ui pointing below label Metric-text-color" id="MedianDisplay-Project-pagamento">
+                            Este projeto
                         </div>
-                    </div> -->
+                    </div>
+                    <div class="ui progress" data-value="{{indicator.metrics.2.bar.interval}}" data-total="{{indicator.metrics.2.bar.max_value}}" id="MedianDisplay-Pagamento">
+                        <div class="bar" id="pagamento-bar">
+                            <div class="progress">0 de {{indicator.metrics.2.reason}} Média de valor comprovantes</div>
+                        </div>
+                    </div>
                     <div>
                         <p class="Reason-text">
                             Esta quantidade de comprovantes de pagamento está {% if indicator.metrics.2.outlier_check != "Metric-good" %}
@@ -721,6 +722,13 @@
             left_bar: "{{project_indicators.0.metrics.4.bar.min_interval}}",
             project_position: "{{project_indicators.0.metrics.4.bar.project}}",
             id: "#MedianDisplay-Comprovado"
+        },
+        {
+            current_project: "MedianDisplay-Project-pagamento",
+            bar: "pagamento-bar",
+            left_bar: "{{project_indicators.0.metrics.2.bar.min_interval}}",
+            project_position: "{{project_indicators.0.metrics.2.bar.project}}",
+            id: "#MedianDisplay-Pagamento"
         },
     ]
 

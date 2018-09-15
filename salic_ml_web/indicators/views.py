@@ -552,10 +552,12 @@ def fetch_user_data(request):
                 {
                     'name': 'comprovantes_pagamento',
                     'value': result['comprovantes_pagamento']['total_receipts'],
-                    'reason': 'any reason',
+                    'reason': result['comprovantes_pagamento']['maximum_expected_in_segment'],
                     'outlier_check': result['comprovantes_pagamento']['outlier_check'],
-                    'maximum_expected_in_segment': result['comprovantes_pagamento']['maximum_expected_in_segment'],
                     'is_valid': result['comprovantes_pagamento']['is_valid'],
+                    'bar': set_width_bar(0,
+                                         result['comprovantes_pagamento']['maximum_expected_in_segment'],
+                                         result['comprovantes_pagamento']['total_receipts']),
                 },
                 {
                     'name': 'precos_acima_media',
