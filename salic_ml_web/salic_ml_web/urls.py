@@ -13,11 +13,27 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+import os
+
 from django.contrib import admin
 from django.urls import path, include
 
+from indicators import views as indicators_views
+
+
+SUBPATH = os.environ.get('SUBPATH', '')
+
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('', include('indicators.urls')),
-    path('indicators/', include('indicators.urls')),
+    # path('admin/', admin.site.urls),
+    # path('', include('indicators.urls')),
+    # path('indicators/', include('indicators.urls')),
+
+    path(os.path.join(SUBPATH, 'admin/'), admin.site.urls),
+    path(os.path.join(SUBPATH, ''), indicators_views.index, name='index'),
+    path(os.path.join(SUBPATH, SUBPATH + '/'), indicators_views.index, name='index'),
+    path(os.path.join(SUBPATH, 'indicators/'), include('indicators.urls')),
+
+    # path('salicml/admin/', admin.site.urls),
+    # path('salicml/', include('indicators.urls')),
+    # path('salicml/indicators/', include('indicators.urls')),
 ]
