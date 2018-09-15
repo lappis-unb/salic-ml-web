@@ -65,12 +65,12 @@
 
             <!-- METRIC -->
             <!-- Total do número de itens -->
-                <div class="title  {% if indicator.metrics.0.value %} active {% endif %}  {{indicator.metrics.0.outlier_check}}">
+                <div class="title {% if indicator.metrics.0.value %} active {% endif %} {{indicator.metrics.0.outlier_check}}">
                     <div class="ui ribbon label">
                         <i class="icon"></i>
                     </div>
                     <span>Itens orçamentários: {% if not indicator.metrics.0.value %} <i>Não disponível</i> {% else %} {{ indicator.metrics.0.value }} {% endif %}</span>
-                    <i class="dropdown icon"></i>
+                    {% if indicator.metrics.0.value %} <i class="dropdown icon"></i>  {% endif %}
                     <div class="helper">
                         <i class="question circle outline icon"></i>
                         <div class="ui floating message">
@@ -85,23 +85,23 @@
             {% if indicator.metrics.0.is_valid %}
                 <div class="content active {{indicator.metrics.0.outlier_check}}">
                     <!-- Barra de distribuição de itens nesse projeto em relação à média do segmento -->
-                    <div class="ui pointing below label" id="MedianDisplay-Project">
+                    <div class="ui pointing below label Metric-text-color" id="MedianDisplay-Project-itens-orc">
                         Este projeto
                     </div>
                     <!-- {{indicator.metrics.0.max_interval}} -->
                     <div class="ui progress" data-value="{{indicator.metrics.0.bar.interval}}" data-total="{{indicator.metrics.0.bar.max_value}}"
                         id="MedianDisplay-TotalItems">
-                        <div class="bar" id="barra">
-                            <div class="progress">{{indicator.metrics.0.interval_start}} de {{indicator.metrics.0.interval_end}} Média de itens</div>
+                        <div class="bar" id="itens-orc-bar">
+                            <div class="progress">{{indicator.metrics.0.interval_start}} de {{indicator.metrics.0.interval_end}}</div>
                         </div>
                     </div>
-
+                    <p style="text-align: center;">Média de itens no segmento</p>
                     <div>
-                        <p>
-                            Esta quantidade de item orçamentários está {% if indicator.metrics.0.outlier_check != "Metric-good" %} fora {% else %} dentro
+                        <!-- <p class="Reason-text" style="color: black;">
+                            Esta quantidade de itens orçamentários está {% if indicator.metrics.0.outlier_check != "Metric-good" %} fora {% else %} dentro
                             {% endif %} da margem considerada como normal sendo esta: {{indicator.metrics.0.interval_start}}
                             de {{indicator.metrics.0.interval_end}}.
-                        </p>
+                        </p> -->
                         <!-- <p>Valor da métrica: {{indicator.metrics.0.value}}</p>
                         <p>Explicação do resultado da métrica: {{indicator.metrics.0.reason}}</p>
                         <p>É um outlier: {{indicator.metrics.0.outlier_check}}</p>
@@ -124,9 +124,7 @@
                     </div>
                 </div>
             {% else %}
-                <div class="content">
-                    <!-- <h3>(Barra de distribuição do valor do projeto em relação à média do segmento)</h3> -->
-                </div>
+                <div class="content"></div>
             {% endif %}
 
 
@@ -137,7 +135,7 @@
                     <i class="icon"></i>
                 </div>
                 <span>Itens orçamentários inesperados: {% if not indicator.metrics.1.value %} <i>Não disponível</i> {% else %} {{ indicator.metrics.1.value }}% {% endif %}</span>
-                <i class="dropdown icon"></i>
+                {% if indicator.metrics.1.value %} <i class="dropdown icon"></i>  {% endif %}
                 <div class="helper">
                     <i class="question circle outline icon"></i>
                     <div class="ui floating message">
@@ -190,9 +188,7 @@
                     </div>
                 </div>
             {% else %}
-                <div class="content">
-                    <!-- <h3>(Barra de distribuição do valor do projeto em relação à média do segmento)</h3> -->
-                </div>
+                <div class="content"></div>
             {% endif %}
 
 
@@ -203,7 +199,7 @@
                     <i class="icon"></i>
                 </div>
                 Comprovantes de pagamento: {% if not indicator.metrics.2.value %} <i>Não disponível</i> {% else %} {{ indicator.metrics.2.value }} {% endif %}
-                <i class="dropdown icon"></i>
+                {% if indicator.metrics.2.value %} <i class="dropdown icon"></i>  {% endif %}
                 <div class="helper">
                     <i class="question circle outline icon"></i>
                     <div class="ui floating message">
@@ -214,23 +210,25 @@
             </div>
             {% if indicator.metrics.2.is_valid %}
                 <div class="content active">
-                    <!-- <div class="ui pointing below label" id="MedianDisplay-Project">
-                        Este projeto
-                    </div>
-                    <div class="ui progress" data-value="15" data-total="{{indicator.metrics.2.interval.max_value}}" id="MedianDisplay-TotalItems">
-                        <div class="bar" id="barra">
-                            <div class="progress">{{indicator.metrics.2.interval_start}} de {{indicator.metrics.2.interval_end}} Média de itens</div>
+                    <div class="{{indicator.metrics.2.outlier_check}}">
+                        <div class="ui pointing below label Metric-text-color" id="MedianDisplay-Project-pagamento">
+                            Este projeto
                         </div>
-                    </div> -->
+                    </div>
+                    <div class="ui progress" data-value="{{indicator.metrics.2.bar.interval}}" data-total="{{indicator.metrics.2.bar.max_value}}" id="MedianDisplay-Pagamento">
+                        <div class="bar" id="pagamento-bar">
+                            <div class="progress">0 de {{indicator.metrics.2.reason}} Média de valor comprovantes</div>
+                        </div>
+                    </div>
                     <div>
-                        <p>
+                        <!-- <p class="Reason-text">
                             Esta quantidade de comprovantes de pagamento está {% if indicator.metrics.2.outlier_check != "Metric-good" %}
                             acima
                             {% else %}
                             abaixo
                             {% endif %}
                             do limite esperado, sendo este: {{indicator.metrics.2.maximum_expected_in_segment}}.
-                        </p>
+                        </p> -->
                     </div>
                     <div class="ui fedback form">
                         <div class="ui divider"></div>
@@ -246,9 +244,7 @@
                     </div>
                 </div>
             {% else %}
-                <div class="content">
-                    <!-- <h3>(Barra de distribuição do valor do projeto em relação à média do segmento)</h3> -->
-                </div>
+                <div class="content"></div>
             {% endif %}
 
 
@@ -259,7 +255,7 @@
                     <i class="icon"></i>
                 </div>
                 <span>Preços acima da média: {% if not indicator.metrics.3.value %} <i>Não disponível</i> {% else %} {{ indicator.metrics.3.value }} {% endif %}</span>
-                <i class="dropdown icon"></i>
+                {% if indicator.metrics.3.value %} <i class="dropdown icon"></i>  {% endif %}
                 <div class="helper">
                     <i class="question circle outline icon"></i>
                     <div class="ui floating message">
@@ -269,6 +265,7 @@
                     </div>
                 </div>
             </div>
+            <!-- TODO - PQ ESTA PRECISANDO DO NOT -->
             {% if indicator.metrics.3.is_valid %}
                 <div class="content active">
                     {% for item in indicator.metrics.3.items %}
@@ -280,14 +277,14 @@
                             {% endif %}
                         </ul>
                     {% endfor %}
-                    <p>
-                            Esta quantidade de itens com valor acima da média está {% if indicator.metrics.3.outlier_check != "Metric-good" %}
-                            acima
-                            {% else %}
-                            abaixo
-                            {% endif %}
-                            do limite esperado, sendo este: {{indicator.metrics.3.maximum_expected}}.
-                        </p>
+                    <!-- <p class="Reason-text">
+                        Esta quantidade de itens com valor acima da média está {% if indicator.metrics.3.outlier_check != "Metric-good" %}
+                        acima
+                        {% else %}
+                        abaixo
+                        {% endif %}
+                        do limite esperado, sendo este: {{indicator.metrics.3.maximum_expected}}.
+                    </p> -->
                     <div class="ui fedback form">
                         <div class="ui divider"></div>
                         <div class="header">Quanto essa informação é útil para você?</div>
@@ -303,7 +300,6 @@
                 </div>
             {% else %}
                 <div class="content">
-                    <!-- <h3>(Barra de distribuição do valor do projeto em relação à média do segmento)</h3> -->
                 </div>
             {% endif %}
 
@@ -315,7 +311,7 @@
                     <i class="icon"></i>
                 </div>
                 <span>Valor comprovado: {% if indicator.metrics.4.value == "R$0,00" %} <i>Não disponível</i> {% else %} {{ indicator.metrics.4.value }} {% endif %}</span>
-                <i class="dropdown icon"></i>
+                {% if indicator.metrics.4.value != "R$0,00" %} <i class="dropdown icon"></i>  {% endif %}
                 <div class="helper">
                     <i class="question circle outline icon"></i>
                     <div class="ui floating message">
@@ -326,11 +322,22 @@
             </div>
             {% if indicator.metrics.4.is_valid %}
                 <div class="content active">
+                    <div class="{{indicator.metrics.4.outlier_check}}">
+                        <div class="ui pointing below label Metric-text-color" id="MedianDisplay-Project-comprovado">
+                            Este projeto
+                        </div>
+                    </div>
+                    <div class="ui progress" data-value="{{indicator.metrics.4.bar.interval}}" data-total="{{indicator.metrics.4.bar.max_value}}" id="MedianDisplay-Comprovado">
+                        <div class="bar" id="comprovado-bar">
+                            <div class="progress">até {{indicator.metrics.4.reason}}</div>
+                        </div>
+                    </div>
+                    <p style="text-align:center;">Média de valor comprovado no segmento</p>
                     <div>
-                        <p>
+                        <!-- <p class="Reason-text">
                             Este valor comprovado {% if indicator.metrics.4.outlier_check != "Metric-good" %}está acima {% else %}não está acima{% endif %}
                             do limite esperado, sendo este: {{indicator.metrics.4.reason}}.
-                        </p>
+                        </p> -->
                     </div>
                     <div class="ui fedback form">
                         <div class="ui divider"></div>
@@ -347,7 +354,6 @@
                 </div>
             {% else %}
                 <div class="content">
-                    <!-- <h3>(Barra de distribuição do valor do projeto em relação à média do segmento)</h3> -->
                 </div>
             {% endif %}
 
@@ -359,7 +365,7 @@
                     <i class="icon"></i>
                 </div>
                 <span>Valor captado: {% if indicator.metrics.5.value == "R$0,00" %} <i>Não disponível</i> {% else %} {{ indicator.metrics.5.value }} {% endif %}</span>
-                <i class="dropdown icon"></i>
+                {% if indicator.metrics.5.value != "R$0,00" %} <i class="dropdown icon"></i>  {% endif %}
                 <div class="helper">
                     <i class="question circle outline icon"></i>
                     <div class="ui floating message">
@@ -370,12 +376,22 @@
             </div>
             {% if indicator.metrics.5.is_valid %}
                 <div class="content active">
-                    <!-- <h3>(Barra de distribuição do valor do projeto em relação à média do segmento)</h3> -->
+                    <div class="{{indicator.metrics.5.outlier_check}}">
+                        <div class="ui pointing below label Metric-text-color" id="MedianDisplay-Project-captado">
+                            Este projeto
+                        </div>
+                    </div>
+                    <div class="ui progress" data-value="{{indicator.metrics.5.bar.interval}}" data-total="{{indicator.metrics.5.bar.max_value}}" id="MedianDisplay-Captado">
+                        <div class="bar" id="captado-bar">
+                            <div class="progress">até {{indicator.metrics.5.reason}}</div>
+                        </div>
+                    </div>
+                    <p style="text-align:center;">Média de valor captado no segmento</p>
                     <div>
-                        <p>
+                        <!-- <p class="Reason-text">
                             Esta valor captado {% if indicator.metrics.5.outlier_check != "Metric-good" %}está acima {% else %}não está acima{% endif %}
                              do limite esperado, sendo este: {{indicator.metrics.5.reason}}.
-                        </p>
+                        </p> -->
                     </div>
 
                     <div class="ui fedback form">
@@ -393,7 +409,6 @@
                 </div>
             {% else %}
                 <div class="content">
-                    <!-- <h3>(Barra de distribuição do valor do projeto em relação à média do segmento)</h3> -->
                 </div>
             {% endif %}
 
@@ -440,7 +455,7 @@
                     <i class="icon"></i>
                 </div>
                 <span>Projetos do mesmo proponente: {% if not indicator.metrics.7.value %} <i>Não disponível</i> {% else %} {{ indicator.metrics.7.value }} {% endif %}</span>
-                <i class="dropdown icon"></i>
+                {% if indicator.metrics.7.value %} <i class="dropdown icon"></i> {% endif %}
                 <div class="helper">
                     <i class="question circle outline icon"></i>
                     <div class="ui floating message">
@@ -472,7 +487,6 @@
                 </div>
             {% else %}
                 <div class="content">
-                    <!-- <h3>(Barra de distribuição do valor do projeto em relação à média do segmento)</h3> -->
                 </div>
             {% endif %}
 
@@ -484,7 +498,7 @@
                     <i class="icon"></i>
                 </div>
                 <span>Novos fornecedores:  {% if not indicator.metrics.8.value %} <i>Não disponível</i> {% else %} {{ indicator.metrics.8.value }} {% endif %}</span>
-                <i class="dropdown icon"></i>
+                {% if indicator.metrics.8.value %} <i class="dropdown icon"></i>  {% endif %}
                 <div class="helper">
                     <i class="question circle outline icon"></i>
                     <div class="ui floating message">
@@ -529,7 +543,6 @@
                 </div>
             {% else %}
                 <div class="content">
-                    <!-- <h3>(Barra de distribuição do valor do projeto em relação à média do segmento)</h3> -->
                 </div>
             {% endif %}
 
@@ -540,8 +553,8 @@
                 <div class="ui ribbon label">
                     <i class="icon"></i>
                 </div>
-                <span>Valor aprovado:  {% if indicator.metrics.9.value == "R$0,00" %} <i>Não disponível</i> {% else %} {{ indicator.metrics.9.value }} {% endif %}</span>
-                <i class="dropdown icon"></i>
+                <span>Valor aprovado: {% if indicator.metrics.9.value == "R$0,00" %} <i>Não disponível</i> {% else %} {{ indicator.metrics.9.value }} {% endif %}</span>
+                {% if indicator.metrics.9.value != "R$0,00" %} <i class="dropdown icon"></i>  {% endif %}
                 <div class="helper">
                     <i class="question circle outline icon"></i>
                     <div class="ui floating message">
@@ -552,13 +565,23 @@
             </div>
             {% if indicator.metrics.9.is_valid %}
                 <div class="content active">
-                    <!-- <h3>(Barra de distribuição em relação à média)</h3> -->
-                    <div>
-                        <p>
-                            Esta valor aprovado {% if indicator.metrics.9.outlier_check != "Metric-good" %}está acima {% else %}não está acima{% endif %}
-                            do limite esperado, sendo este: {{indicator.metrics.9.maximum_expected_funds}}.
-                        </p>
+                    <div class="{{indicator.metrics.9.outlier_check}}">
+                        <div class="ui pointing below label Metric-text-color" id="MedianDisplay-Project-aprovado">
+                            Este projeto
+                        </div>
                     </div>
+                    <div class="ui progress" data-value="{{indicator.metrics.9.bar.interval}}" data-total="{{indicator.metrics.9.bar.max_value}}" id="MedianDisplay-Aprovado">
+                        <div class="bar" id="aprovado-bar">
+                            <div class="progress">até {{indicator.metrics.9.reason}}</div>
+                        </div>
+                    </div>
+                    <p style="text-align:center;">Média de valor aprovado no segmento</p>
+                    <!-- <div>
+                        <p class="Reason-text">
+                            Esta valor aprovado {% if indicator.metrics.9.outlier_check != "Metric-good" %}está acima {% else %}não está acima{% endif %}
+                            do limite esperado, sendo este: {{indicator.metrics.9.reason}}.
+                        </p>
+                    </div> -->
                     <div class="ui fedback form">
                         <div class="ui divider"></div>
                         <div class="header">Quanto essa informação é útil para você?</div>
@@ -573,8 +596,7 @@
                     </div>
                 </div>
             {% else %}
-                <div class="content active">
-                    <!-- <h3>(Barra de distribuição do valor do projeto em relação à média do segmento)</h3> -->
+                <div class="content">
                 </div>
             {% endif %}
         </div>
@@ -675,13 +697,56 @@
         $('#modal-sucess').modal('show')
     }
 
-    var mark_project = document.getElementById("MedianDisplay-Project");
-    mark_project.addEventListener("load", changeWidthBar(mark_project, document.getElementById("barra")));
+    const metrics_bars = [
+        {
+            current_project: "MedianDisplay-Project-itens-orc",
+            bar: "itens-orc-bar",
+            left_bar: "{{project_indicators.0.metrics.0.bar.min_interval}}",
+            project_position: "{{project_indicators.0.metrics.0.bar.project}}",
+            id: "#MedianDisplay-TotalItems"
+        },
+        {
+            current_project: "MedianDisplay-Project-captado",
+            bar: "captado-bar",
+            left_bar: "{{project_indicators.0.metrics.5.bar.min_interval}}",
+            project_position: "{{project_indicators.0.metrics.5.bar.project}}",
+            id: "#MedianDisplay-Captado"
+        },
+        {
+            current_project: "MedianDisplay-Project-aprovado",
+            bar: "aprovado-bar",
+            left_bar: "{{project_indicators.0.metrics.9.bar.min_interval}}",
+            project_position: "{{project_indicators.0.metrics.9.bar.project}}",
+            id: "#MedianDisplay-Aprovado"
+        },
+        {
+            current_project: "MedianDisplay-Project-comprovado",
+            bar: "comprovado-bar",
+            left_bar: "{{project_indicators.0.metrics.4.bar.min_interval}}",
+            project_position: "{{project_indicators.0.metrics.4.bar.project}}",
+            id: "#MedianDisplay-Comprovado"
+        },
+        {
+            current_project: "MedianDisplay-Project-pagamento",
+            bar: "pagamento-bar",
+            left_bar: "{{project_indicators.0.metrics.2.bar.min_interval}}",
+            project_position: "{{project_indicators.0.metrics.2.bar.project}}",
+            id: "#MedianDisplay-Pagamento"
+        },
+    ]
 
-    function changeWidthBar(x, y) {
-        y.style.left = "{{project_indicators.0.metrics.0.bar.min_interval}}" + "%";
-        var value = "{{project_indicators.0.metrics.0.bar.project}}";
-        x.style.left = (value-3) + "%";
+    function changeWidthBar(x, y, bar) {
+        y.style.left = bar.left_bar + "%";
+        x.style.left = (bar.project_position-4) + "%";
+    }
+
+    for(var i = 0, size = metrics_bars.length; i < size; i++){
+        var mark_project = document.getElementById(metrics_bars[i].current_project);
+        $(metrics_bars[i].id).progress({label: "oi"});
+        if(mark_project){
+            mark_project.addEventListener("load", 
+                changeWidthBar(mark_project, document.getElementById(metrics_bars[i].bar), metrics_bars[i]));
+        }
     }
 
     var toTop = document.getElementById("confirmation-rating");
@@ -689,11 +754,6 @@
         scrollToTop(2000);
     });
 
-    $('#MedianDisplay-TotalItems')
-        .progress({
-            label: "oi",
-        })
-        ;
     function scrollToTop(scrollDuration) {
         var scrollStep = -window.scrollY / (scrollDuration / 15),
             scrollInterval = setInterval(function () {
@@ -708,5 +768,25 @@
     var comp = 100 - "{{project_indicators.0.value}}"
     radialObj.value(comp)
 
+	// // Set quality: bad, average or good
+	// varStates = ['average', 'good', 'average', 'bad'];
+	
+	// // Set offset percentage (w/o percentage symbol)
+	// varOffsets = ['70', '15', '20', '100'];
+	
+	// $(".progressbar").each(function( index ) {
+	// 	//Gabiarra pra resolver posicionamento do balão
+	// 	var offsetValue =Offsets[index] - 22;
+	// 	var offsetLeft = offsetValue.toString() + '%';
+		
+	// 	$(this).addClass('Metric-' +States[index]);
+	// 	$(this).children('.ui.progress')
+	// 		.progress({
+	// 		showActivity: false,
+	// 		label: ''
+	// 	});
+    //     console.log("Este é o off: ", offsetLeft)
+	// 	$(this).children('.ui.pointing.below.label').css({'left': offsetLeft});
+	// });	
 
 </script> {% endblock %}
