@@ -260,6 +260,7 @@ def fetch_user_data(request):
     raised_funds = {
         'value': float_to_money(0.0),
         'float_value': 0.0,
+        'float_maximum_expected_value': 1,
         'maximum_expected_value': float_to_money(0.0),
         'outlier_check': get_outlier_color(False),
         'is_valid': False,
@@ -283,6 +284,7 @@ def fetch_user_data(request):
     verified_funds = {
         'value': float_to_money(0.0),
         'float_value': 0.0,
+        'float_maximum_expected_value': 1,
         'maximum_expected_value': float_to_money(0.0),
         'outlier_check': get_outlier_color(False),
         'is_valid': False,
@@ -292,6 +294,7 @@ def fetch_user_data(request):
         verified_funds = {
             'value': float_to_money(metrics['verified_funds']['total_verified_funds']),
             'float_value': metrics['verified_funds']['total_verified_funds'],
+            'float_maximum_expected_value': metrics['verified_funds']['maximum_expected_funds'],
             'maximum_expected_value': float_to_money(metrics['verified_funds']['maximum_expected_funds']),
             'outlier_check': get_outlier_color(metrics['verified_funds']['is_outlier']),
             'is_valid': True,
@@ -305,6 +308,7 @@ def fetch_user_data(request):
     approved_funds = {
         'value': float_to_money(0),
         'float_value': 0.0,
+        'float_maximum_expected_funds': 1,
         'maximum_expected_funds': float_to_money(0.0),
         'outlier_check': get_outlier_color(False),
         'is_valid': False,
@@ -569,6 +573,8 @@ def fetch_user_data(request):
                     'reason': result['valor_comprovado']['maximum_expected_value'],
                     'outlier_check': result['valor_comprovado']['outlier_check'],
                     'is_valid': result['valor_comprovado']['is_valid'],
+                    'bar': set_width_bar(0, result['valor_comprovado']['float_maximum_expected_value'],
+                                         result['valor_comprovado']['float_value']),
                 },
                 {
                     'name': 'valor_captado',
@@ -610,7 +616,6 @@ def fetch_user_data(request):
                     'value': result['valor_aprovado']['value'],
                     'reason': result['valor_aprovado']['maximum_expected_funds'],
                     'outlier_check': result['valor_aprovado']['outlier_check'],
-                    
                     'is_valid': result['valor_aprovado']['is_valid'],
                     'bar': set_width_bar(0, result['valor_aprovado']['float_maximum_expected_funds'],
                                          result['valor_aprovado']['float_value']),

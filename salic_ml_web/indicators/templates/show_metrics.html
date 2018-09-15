@@ -321,6 +321,16 @@
             </div>
             {% if indicator.metrics.4.is_valid %}
                 <div class="content active">
+                    <div class="{{indicator.metrics.4.outlier_check}}">
+                        <div class="ui pointing below label Metric-text-color" id="MedianDisplay-Project-comprovado">
+                            Este projeto
+                        </div>
+                    </div>
+                    <div class="ui progress" data-value="{{indicator.metrics.4.bar.interval}}" data-total="{{indicator.metrics.4.bar.max_value}}" id="MedianDisplay-Comprovado">
+                        <div class="bar" id="comprovado-bar">
+                            <div class="progress">R$0 de {{indicator.metrics.4.reason}} Média de valor comprovado</div>
+                        </div>
+                    </div>
                     <div>
                         <p class="Reason-text">
                             Este valor comprovado {% if indicator.metrics.4.outlier_check != "Metric-good" %}está acima {% else %}não está acima{% endif %}
@@ -705,6 +715,13 @@
             project_position: "{{project_indicators.0.metrics.9.bar.project}}",
             id: "#MedianDisplay-Aprovado"
         },
+        {
+            current_project: "MedianDisplay-Project-comprovado",
+            bar: "comprovado-bar",
+            left_bar: "{{project_indicators.0.metrics.4.bar.min_interval}}",
+            project_position: "{{project_indicators.0.metrics.4.bar.project}}",
+            id: "#MedianDisplay-Comprovado"
+        },
     ]
 
     function changeWidthBar(x, y, bar) {
@@ -715,9 +732,10 @@
     for(var i = 0, size = metrics_bars.length; i < size; i++){
         var mark_project = document.getElementById(metrics_bars[i].current_project);
         $(metrics_bars[i].id).progress({label: "oi"});
-        console.log(metrics_bars[i])
-        mark_project.addEventListener("load", 
-            changeWidthBar(mark_project, document.getElementById(metrics_bars[i].bar), metrics_bars[i]));
+        if(mark_project){
+            mark_project.addEventListener("load", 
+                changeWidthBar(mark_project, document.getElementById(metrics_bars[i].bar), metrics_bars[i]));
+        }
     }
 
     var toTop = document.getElementById("confirmation-rating");
