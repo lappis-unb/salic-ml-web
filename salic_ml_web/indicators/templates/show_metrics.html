@@ -58,7 +58,7 @@
     </h1>
 </div>
 
-<form action="/metrics_feedback" method="post">
+<form action="{% url 'metrics_feedback_info' %}" method="post">
     {% csrf_token %}
     <div class="ui basic segment" id="DiagnosticArea">
         <div class="ui styled fluid accordion" id="DiagnosticMetrics">
