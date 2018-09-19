@@ -92,16 +92,16 @@
                     <div class="ui progress" data-value="{{indicator.metrics.0.bar.interval}}" data-total="{{indicator.metrics.0.bar.max_value}}"
                         id="MedianDisplay-TotalItems">
                         <div class="bar" id="itens-orc-bar">
-                            <div class="progress">{{indicator.metrics.0.interval_start}} de {{indicator.metrics.0.interval_end}} Média de itens</div>
+                            <div class="progress">{{indicator.metrics.0.interval_start}} de {{indicator.metrics.0.interval_end}}</div>
                         </div>
                     </div>
-
+                    <p style="text-align: center;">Média de itens no segmento</p>
                     <div>
-                        <p class="Reason-text" style="color: black;">
+                        <!-- <p class="Reason-text" style="color: black;">
                             Esta quantidade de itens orçamentários está {% if indicator.metrics.0.outlier_check != "Metric-good" %} fora {% else %} dentro
                             {% endif %} da margem considerada como normal sendo esta: {{indicator.metrics.0.interval_start}}
                             de {{indicator.metrics.0.interval_end}}.
-                        </p>
+                        </p> -->
                         <!-- <p>Valor da métrica: {{indicator.metrics.0.value}}</p>
                         <p>Explicação do resultado da métrica: {{indicator.metrics.0.reason}}</p>
                         <p>É um outlier: {{indicator.metrics.0.outlier_check}}</p>
@@ -221,14 +221,14 @@
                         </div>
                     </div>
                     <div>
-                        <p class="Reason-text">
+                        <!-- <p class="Reason-text">
                             Esta quantidade de comprovantes de pagamento está {% if indicator.metrics.2.outlier_check != "Metric-good" %}
                             acima
                             {% else %}
                             abaixo
                             {% endif %}
                             do limite esperado, sendo este: {{indicator.metrics.2.maximum_expected_in_segment}}.
-                        </p>
+                        </p> -->
                     </div>
                     <div class="ui fedback form">
                         <div class="ui divider"></div>
@@ -277,14 +277,14 @@
                             {% endif %}
                         </ul>
                     {% endfor %}
-                    <p class="Reason-text">
-                            Esta quantidade de itens com valor acima da média está {% if indicator.metrics.3.outlier_check != "Metric-good" %}
-                            acima
-                            {% else %}
-                            abaixo
-                            {% endif %}
-                            do limite esperado, sendo este: {{indicator.metrics.3.maximum_expected}}.
-                        </p>
+                    <!-- <p class="Reason-text">
+                        Esta quantidade de itens com valor acima da média está {% if indicator.metrics.3.outlier_check != "Metric-good" %}
+                        acima
+                        {% else %}
+                        abaixo
+                        {% endif %}
+                        do limite esperado, sendo este: {{indicator.metrics.3.maximum_expected}}.
+                    </p> -->
                     <div class="ui fedback form">
                         <div class="ui divider"></div>
                         <div class="header">Quanto essa informação é útil para você?</div>
@@ -329,14 +329,15 @@
                     </div>
                     <div class="ui progress" data-value="{{indicator.metrics.4.bar.interval}}" data-total="{{indicator.metrics.4.bar.max_value}}" id="MedianDisplay-Comprovado">
                         <div class="bar" id="comprovado-bar">
-                            <div class="progress">R$0 de {{indicator.metrics.4.reason}} Média de valor comprovado</div>
+                            <div class="progress">até {{indicator.metrics.4.reason}}</div>
                         </div>
                     </div>
+                    <p style="text-align:center;">Média de valor comprovado no segmento</p>
                     <div>
-                        <p class="Reason-text">
+                        <!-- <p class="Reason-text">
                             Este valor comprovado {% if indicator.metrics.4.outlier_check != "Metric-good" %}está acima {% else %}não está acima{% endif %}
                             do limite esperado, sendo este: {{indicator.metrics.4.reason}}.
-                        </p>
+                        </p> -->
                     </div>
                     <div class="ui fedback form">
                         <div class="ui divider"></div>
@@ -382,14 +383,15 @@
                     </div>
                     <div class="ui progress" data-value="{{indicator.metrics.5.bar.interval}}" data-total="{{indicator.metrics.5.bar.max_value}}" id="MedianDisplay-Captado">
                         <div class="bar" id="captado-bar">
-                            <div class="progress">R$0 de {{indicator.metrics.5.reason}} Média de valor captado</div>
+                            <div class="progress">até {{indicator.metrics.5.reason}}</div>
                         </div>
                     </div>
+                    <p style="text-align:center;">Média de valor captado no segmento</p>
                     <div>
-                        <p class="Reason-text">
+                        <!-- <p class="Reason-text">
                             Esta valor captado {% if indicator.metrics.5.outlier_check != "Metric-good" %}está acima {% else %}não está acima{% endif %}
                              do limite esperado, sendo este: {{indicator.metrics.5.reason}}.
-                        </p>
+                        </p> -->
                     </div>
 
                     <div class="ui fedback form">
@@ -570,15 +572,16 @@
                     </div>
                     <div class="ui progress" data-value="{{indicator.metrics.9.bar.interval}}" data-total="{{indicator.metrics.9.bar.max_value}}" id="MedianDisplay-Aprovado">
                         <div class="bar" id="aprovado-bar">
-                            <div class="progress">R$0 de {{indicator.metrics.9.reason}} Média de valor captado</div>
+                            <div class="progress">até {{indicator.metrics.9.reason}}</div>
                         </div>
                     </div>
-                    <div>
+                    <p style="text-align:center;">Média de valor aprovado no segmento</p>
+                    <!-- <div>
                         <p class="Reason-text">
                             Esta valor aprovado {% if indicator.metrics.9.outlier_check != "Metric-good" %}está acima {% else %}não está acima{% endif %}
                             do limite esperado, sendo este: {{indicator.metrics.9.reason}}.
                         </p>
-                    </div>
+                    </div> -->
                     <div class="ui fedback form">
                         <div class="ui divider"></div>
                         <div class="header">Quanto essa informação é útil para você?</div>
