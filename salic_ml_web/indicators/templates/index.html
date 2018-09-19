@@ -1,14 +1,5 @@
-{% extends 'base.html' %} {% block content %} {% if submit_success %}
-<div class="ui info message">
-    <i class="close icon"></i>
-    <div class="header">
-        Sucesso ao enviar o feedback
-    </div>
-    <ul class="list">
-        <li>Agradecemos pelo seu feedback!</li>
-    </ul>
-</div>
-{% endif %}
+{% extends 'base.html' %} {% block content %}
+
 <div class="ui fixed inverted menu" id="ProjectID">
     <h1>Projetos com Diagnóstico de complexidade</h1>
 </div>
@@ -32,7 +23,7 @@
         {% for project in projects %}
         <tr>
             <td>
-                <a class="ui positive button" href="{% url 'show_metrics' project.pronac %}">
+                <a class="ui positive button" target="_blank" href="{% url 'show_metrics' project.pronac %}">
                     {{ project.pronac }}
                 </a>
             </td>
