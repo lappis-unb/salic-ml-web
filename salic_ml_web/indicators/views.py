@@ -87,13 +87,21 @@ def projects_to_analyse(request):
         'L10', 'L11' \
     "
 
-    query = "SELECT CONCAT(AnoProjeto, Sequencial), NomeProjeto, Analista \
-             FROM SAC.dbo.Projetos WHERE DtFimExecucao < GETDATE() \
-             AND Situacao NOT IN ({})".format(end_situations)
+    # query = "SELECT CONCAT(AnoProjeto, Sequencial), NomeProjeto, Analista \
+    #          FROM SAC.dbo.Projetos WHERE DtFimExecucao < GETDATE() \
+    #          AND Situacao NOT IN ({})".format(end_situations)
 
     # query = "SELECT TOP 2000 CONCAT(AnoProjeto, Sequencial), NomeProjeto, Analista \
     #          FROM SAC.dbo.Projetos WHERE DtFimExecucao < GETDATE() \
     #          AND Situacao NOT IN ({}) ORDER BY DtFimExecucao DESC".format(end_situations)
+
+    query = "SELECT DISTINCT CONCAT(p.AnoProjeto, p.Sequencial), NomeProjeto, Analista \
+            FROM SAC.dbo.Projetos p \
+            INNER JOIN SAC.dbo.tbPlanilhaAprovacao a ON (a.IdPRONAC = p.IdPRONAC) \
+            INNER JOIN BDCorporativo.scSAC.tbComprovantePagamentoxPlanilhaAprovacao comprovantePag \
+                ON (comprovantePag.idPlanilhaAprovacao = a.idPlanilhaAprovacao) \
+            WHERE DtFimExecucao < GETDATE() \
+            AND Situacao NOT IN ({})".format(end_situations)
 
     query_result = make_query_from_db(query)
 
