@@ -3,11 +3,11 @@ from .models import Entity, Metric, Indicator
 
 def get_financial_complexity(metrics):
     try:
-        easiness = metrics['easiness']['easiness'] * 100
+        complexity = 100 - (metrics['easiness']['easiness'] * 100)
     except:
-        easiness = 1
+        complexity = 1
 
-    return easiness
+    return complexity
 
 
 def pre_fetch_financial_complexity():        
