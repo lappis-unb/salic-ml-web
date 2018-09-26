@@ -1,0 +1,3 @@
+from indicators.fetch_complexity import pre_fetch_financial_complexity
+
+pre_fetch_financial_complexity()
