@@ -36,7 +36,20 @@
                     {{ project.pronac }}
                 </a>
             </td>
-            <td>{{ project.complexity }}</td>
+            <td>
+<<<<<<< HEAD
+                {% if project.complexity >= 80 %}
+                    <strong style="color: #db2828; font-size: 30px;">{{ project.complexity }}</strong>
+                {% else %}
+                    <strong style="color: #1B5E20; font-size: 30px;">{{ project.complexity }}</strong>
+=======
+                {% if project.complexity > 50 %}
+                    <strong style="color: red; font-size: 30px;">{{ project.complexity }}</strong>
+                {% else %}
+                    <strong style="color: green; font-size: 30px;">{{ project.complexity }}</strong>
+>>>>>>> df118cc... Add complexity columns in project tables
+                {% endif %}
+            </td>
             <td>{{ project.project_name }}</td>
             <td>{{ project.analist }}</td>
         </tr>
