@@ -218,7 +218,6 @@ def fetch_user_data(request):
     # return HttpResponse(str(result))
 
     # complexidade_financeira
-    financial_complexity_indicator = register_project_indicator(int(pronac), 'complexidade_financeira', 0)
 
     easiness = {
         'value': 1,
@@ -232,6 +231,8 @@ def fetch_user_data(request):
         }
 
     result['easiness'] = easiness
+
+    financial_complexity_indicator = register_project_indicator(int(pronac), 'complexidade_financeira', easiness['value'])
 
     # itens_orcamentarios
     items = {
