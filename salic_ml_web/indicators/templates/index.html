@@ -36,7 +36,13 @@
                     {{ project.pronac }}
                 </a>
             </td>
-            <td>{{ project.complexity }}</td>
+            <td>
+                {% if project.complexity >= 80 %}
+                    <strong style="color: #db2828; font-size: 30px;">{{ project.complexity }}</strong>
+                {% else %}
+                    <strong style="color: #1B5E20; font-size: 30px;">{{ project.complexity }}</strong>
+                {% endif %}
+            </td>
             <td>{{ project.project_name }}</td>
             <td>{{ project.analist }}</td>
         </tr>
