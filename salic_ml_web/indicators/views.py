@@ -116,7 +116,7 @@ def projects_to_analyse(request):
     indicators = Indicator.objects.all()
 
     filtered_data = [{'pronac': each[0],
-                      'complexity': fetch_project_complexity(int(each[0]), indicators),
+                      'complexity': int(fetch_project_complexity(int(each[0]), indicators)),
                       'project_name': each[1],
                       'analist': each[2]}
                       for each in query_result]
