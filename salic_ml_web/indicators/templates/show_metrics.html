@@ -751,7 +751,7 @@
 
     function changeWidthBar(x, y, bar) {
         y.style.left = bar.left_bar + "%";
-        (bar.project_position<100) ? x.style.left = (bar.project_position-5) + "%" :  x.style.left = 95 + "%";
+        (bar.project_position>=100) ? x.style.left = 95 + "%" : x.style.left = (bar.project_position-5) + "%";
     }
 
     for(var i = 0, size = metrics_bars.length; i < size; i++){
@@ -779,7 +779,8 @@
     }
 
     $('.ui.accordion').accordion({ exclusive: false });
-    var comp = 100 - "{{project_indicators.0.value}}"
+    // var comp = 100 - "{{project_indicators.0.value}}"
+    var comp = 100
     radialObj.value(comp)
 
 	// // Set quality: bad, average or good
