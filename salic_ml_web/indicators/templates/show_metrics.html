@@ -751,7 +751,7 @@
 
     function changeWidthBar(x, y, bar) {
         y.style.left = bar.left_bar + "%";
-        x.style.left = (bar.project_position-4) + "%";
+        (bar.project_position<100) ? x.style.left = (bar.project_position-5) + "%" :  x.style.left = 95 + "%";
     }
 
     for(var i = 0, size = metrics_bars.length; i < size; i++){

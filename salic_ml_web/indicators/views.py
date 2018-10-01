@@ -15,6 +15,15 @@ SALIC_URL = "http://salic.cultura.gov.br"
 financial_metrics = FinancialMetricsLoader().financial_metrics
 
 submitted_projects_info = GetProjectInfoFromPronac()
+
+pre_fetched_indicators = {}
+
+for project in Entity.objects.all():
+    try:
+        pre_fetched_indicators["{0}".format(project.pronac)] = project.indicators.get(name='complexidade_financeira').value
+    except:
+        continue
+
 def index(request, submit_success=False):
     try:
         projects = projects_to_analyse(request)
@@ -77,6 +86,13 @@ def db_connection_test(request):
     connection_result = test_connection()
     return HttpResponse(connection_result)
 
+def fetch_project_complexity(pronac, indicators):
+    try:
+        indicator_value = pre_fetched_indicators["{0}".format(pronac)]
+    except:
+        indicator_value = 1
+
+    return indicator_value
 
 def projects_to_analyse(request):
     end_situations = " \
@@ -105,8 +121,10 @@ def projects_to_analyse(request):
 
     query_result = make_query_from_db(query)
 
+    indicators = Indicator.objects.all()
+
     filtered_data = [{'pronac': each[0],
-                      'complexity': random.randint(0, 100),
+                      'complexity': int(fetch_project_complexity(int(each[0]), indicators)),
                       'project_name': each[1],
                       'analist': each[2]}
                       for each in query_result]
@@ -226,7 +244,6 @@ def fetch_user_data(request):
     # return HttpResponse(str(result))
 
     # complexidade_financeira
-    financial_complexity_indicator = register_project_indicator(int(pronac), 'complexidade_financeira', 0)
 
     easiness = {
         'value': 1,
@@ -240,6 +257,8 @@ def fetch_user_data(request):
         }
 
     result['easiness'] = easiness
+
+    financial_complexity_indicator = register_project_indicator(int(pronac), 'complexidade_financeira', easiness['value'])
 
     # itens_orcamentarios
     items = {
