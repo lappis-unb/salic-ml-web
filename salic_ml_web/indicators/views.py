@@ -106,13 +106,21 @@ def projects_to_analyse(request):
         'L10', 'L11' \
     "
 
-    query = "SELECT CONCAT(AnoProjeto, Sequencial), NomeProjeto, Analista \
-             FROM SAC.dbo.Projetos WHERE DtFimExecucao < GETDATE() \
-             AND Situacao NOT IN ({})".format(end_situations)
+    # query = "SELECT CONCAT(AnoProjeto, Sequencial), NomeProjeto, Analista \
+    #          FROM SAC.dbo.Projetos WHERE DtFimExecucao < GETDATE() \
+    #          AND Situacao NOT IN ({})".format(end_situations)
 
     # query = "SELECT TOP 2000 CONCAT(AnoProjeto, Sequencial), NomeProjeto, Analista \
     #          FROM SAC.dbo.Projetos WHERE DtFimExecucao < GETDATE() \
     #          AND Situacao NOT IN ({}) ORDER BY DtFimExecucao DESC".format(end_situations)
+
+    query = "SELECT DISTINCT CONCAT(p.AnoProjeto, p.Sequencial), NomeProjeto, Analista \
+            FROM SAC.dbo.Projetos p \
+            INNER JOIN SAC.dbo.tbPlanilhaAprovacao a ON (a.IdPRONAC = p.IdPRONAC) \
+            INNER JOIN BDCorporativo.scSAC.tbComprovantePagamentoxPlanilhaAprovacao comprovantePag \
+                ON (comprovantePag.idPlanilhaAprovacao = a.idPlanilhaAprovacao) \
+            WHERE DtFimExecucao < GETDATE() \
+            AND Situacao NOT IN ({})".format(end_situations)
 
     query_result = make_query_from_db(query)
 
@@ -695,25 +703,5 @@ def post_metrics_feedback(request):
             except:
                 continue
 
-    # return HttpResponse(status=201)
-    try:
-        projects = projects_to_analyse(request)
-    except:
-        projects = [
-        {"pronac": "90021", "complexity": 25,
-            "project_name": "Indie 2009 - Mostra de Cinema Mundial", "analist": "Florentina"},
-        {"pronac": "153833", "complexity": 75,
-            "project_name": "TRES SOMBREROS DE COPA", "analist": "Chimbinha"},
-        {"pronac": "160443", "complexity": 95,
-            "project_name": "SERGIO REIS – CORAÇÃO ESTRADEIRO", "analist": "Cláudia Leitte"},
-        {"pronac": "118593", "complexity": 15,
-            "project_name": "ÁGUIA  CARNAVAL 2012: TROPICÁLIA! O MOVIMENTO QUE NÃO TERMINOU", "analist": "Ferdinando"},
-        {"pronac": "161533", "complexity": 5,
-            "project_name": "“Livro sobre Serafim Derenzi” (título provisório)", "analist": "Modelo"},
-        {"pronac": "171372", "complexity": 5,
-            "project_name": "“Paisagismo Brasileiro, Roberto Burle Marx e Haruyoshi Ono – 60 anos de história”.", "analist": "Modelo"},
-        {"pronac": "92739", "complexity": 5,
-            "project_name": "Circulação de oficinas e shows - Claudia Cimbleris", "analist": "Modelo"},
-    ]
-    # return redirect(index, submit_success = True)
-    return render(request, 'index.html', {'submit_success': True, 'projects': projects})
+    # return render(request, 'index.html', {'submit_success': True, 'projects': projects})
+    return render(request, 'show_metrics.html', {'submit_success': True, 'user': None, 'project': entity})

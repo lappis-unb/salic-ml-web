@@ -4,10 +4,12 @@
     <a class="ui icon inverted button" id="btBack" href="{% url 'index' %}">
         <i class="left arrow icon"></i>
     </a>
+    {% if string_pronac %}
     <div class="ui tiny inverted statistic">
         <div class="label">PRONAC</div>
         <div class="value">{{ string_pronac }}</div>
     </div>
+    {% endif %}
     <h1>{{project.name}}</h1>
     {% if user %}
     <div class="ui basic segment" id="LoggedUser">
@@ -16,6 +18,18 @@
     </div>
     {% endif %}
 </div>
+
+{% if submit_success %}
+<div class="ui info message">
+    <i class="close icon"></i>
+    <div class="header">
+        Sucesso ao enviar o feedback
+    </div>
+    <ul class="list">
+        <li>Agradecemos pelo seu feedback!</li>
+    </ul>
+</div>
+{% endif %}
 
 {% if not user %}
 <div class="ui ten column centered grid" style="margin-top:50px;">
@@ -657,7 +671,8 @@
         barColor: {
             0: '#1B5E20',
             30: '#F2B01C',
-            80: '#DB2828'
+            80: '#DB2828',
+            100: '#DB2828'
         },
         maxValue: 100,
         barWidth: 10,
@@ -737,7 +752,7 @@
 
     function changeWidthBar(x, y, bar) {
         y.style.left = bar.left_bar + "%";
-        x.style.left = (bar.project_position-4) + "%";
+        (bar.project_position>=100) ? x.style.left = 95 + "%" : x.style.left = (bar.project_position-5) + "%";
     }
 
     for(var i = 0, size = metrics_bars.length; i < size; i++){
