@@ -1,2 +1,3 @@
 #!/usr/bin/env bash
-python3 manage.py shell < preload_data.py
+echo "Attempting to cron"
+python3 /salic_ml_web/manage.py shell < /salic_ml_web/preload_data.py
