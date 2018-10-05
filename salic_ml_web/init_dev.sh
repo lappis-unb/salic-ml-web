@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 
+cron
 python3 manage.py makemigrations
 python3 manage.py migrate
 echo "** Attempting to start service **"

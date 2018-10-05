@@ -18,11 +18,14 @@ submitted_projects_info = GetProjectInfoFromPronac()
 
 pre_fetched_indicators = {}
 
-for project in Entity.objects.all():
-    try:
-        pre_fetched_indicators["{0}".format(project.pronac)] = project.indicators.get(name='complexidade_financeira').value
-    except:
-        continue
+def load_fetched_indicators():
+    for project in Entity.objects.all():
+        try:
+            pre_fetched_indicators["{0}".format(project.pronac)] = project.indicators.get(name='complexidade_financeira').value
+        except:
+            continue
+
+load_fetched_indicators()
 
 def index(request, submit_success=False):
     try:
