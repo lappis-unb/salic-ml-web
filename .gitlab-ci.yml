@@ -1,5 +1,6 @@
 stages:
     - build
+    - deploy_dev
     - deploy_homolog
 
 
@@ -37,3 +38,16 @@ deploy_homolog_minc:
         - sshpass -p $SSH_PASSWORD ssh $SSH_USER@$SSH_IP "sshpass -p $SSH_VPN_PASSWORD ssh $SSH_VPN_USER@$SSH_VPN_IP 'cd salic-ml-web/; echo $SSH_VPN_PASSWORD | sudo -S docker-compose pull; echo $SSH_VPN_PASSWORD | sudo -S docker-compose up -d'"
     only:
         - /homolog/
+
+deploy_dev_lappis:
+    image: cdrx/rancher-gitlab-deploy
+    stage: deploy_dev
+    services:
+        - docker:dind
+    script:
+        - upgrade --environment Production --stack SALIC-ML-WEB --service web --new-image $WEB_IMAGE --no-finish-upgrade --debug
+    only:
+        - /develop/
+    environment: production
+    tags:
+        - docker

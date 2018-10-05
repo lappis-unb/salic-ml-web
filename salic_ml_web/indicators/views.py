@@ -15,6 +15,18 @@ SALIC_URL = "http://salic.cultura.gov.br"
 financial_metrics = FinancialMetricsLoader().financial_metrics
 
 submitted_projects_info = GetProjectInfoFromPronac()
+
+pre_fetched_indicators = {}
+
+def load_fetched_indicators():
+    for project in Entity.objects.all():
+        try:
+            pre_fetched_indicators["{0}".format(project.pronac)] = project.indicators.get(name='complexidade_financeira').value
+        except:
+            continue
+
+load_fetched_indicators()
+
 def index(request, submit_success=False):
     try:
         projects = projects_to_analyse(request)
@@ -77,6 +89,13 @@ def db_connection_test(request):
     connection_result = test_connection()
     return HttpResponse(connection_result)
 
+def fetch_project_complexity(pronac, indicators):
+    try:
+        indicator_value = pre_fetched_indicators["{0}".format(pronac)]
+    except:
+        indicator_value = 1
+
+    return indicator_value
 
 def projects_to_analyse(request):
     end_situations = " \
@@ -87,18 +106,28 @@ def projects_to_analyse(request):
         'L10', 'L11' \
     "
 
-    query = "SELECT CONCAT(AnoProjeto, Sequencial), NomeProjeto, Analista \
-             FROM SAC.dbo.Projetos WHERE DtFimExecucao < GETDATE() \
-             AND Situacao NOT IN ({})".format(end_situations)
+    # query = "SELECT CONCAT(AnoProjeto, Sequencial), NomeProjeto, Analista \
+    #          FROM SAC.dbo.Projetos WHERE DtFimExecucao < GETDATE() \
+    #          AND Situacao NOT IN ({})".format(end_situations)
 
     # query = "SELECT TOP 2000 CONCAT(AnoProjeto, Sequencial), NomeProjeto, Analista \
     #          FROM SAC.dbo.Projetos WHERE DtFimExecucao < GETDATE() \
     #          AND Situacao NOT IN ({}) ORDER BY DtFimExecucao DESC".format(end_situations)
 
+    query = "SELECT DISTINCT CONCAT(p.AnoProjeto, p.Sequencial), NomeProjeto, Analista \
+            FROM SAC.dbo.Projetos p \
+            INNER JOIN SAC.dbo.tbPlanilhaAprovacao a ON (a.IdPRONAC = p.IdPRONAC) \
+            INNER JOIN BDCorporativo.scSAC.tbComprovantePagamentoxPlanilhaAprovacao comprovantePag \
+                ON (comprovantePag.idPlanilhaAprovacao = a.idPlanilhaAprovacao) \
+            WHERE DtFimExecucao < GETDATE() \
+            AND Situacao NOT IN ({})".format(end_situations)
+
     query_result = make_query_from_db(query)
 
+    indicators = Indicator.objects.all()
+
     filtered_data = [{'pronac': each[0],
-                      'complexity': random.randint(0, 100),
+                      'complexity': int(fetch_project_complexity(int(each[0]), indicators)),
                       'project_name': each[1],
                       'analist': each[2]}
                       for each in query_result]
@@ -166,10 +195,10 @@ def set_width_bar(min_interval, max_interval, value):
         max_value = 1
 
     return {
-        'max_value': max_value,
-        'min_interval': (min_interval/max_value)*100,
-        'project': ((value/max_value)*100),
-        'interval': (max_interval-min_interval)
+        'max_value': round(max_value),
+        'min_interval': round((min_interval/max_value)*100),
+        'project': round((value/max_value)*100),
+        'interval': round(max_interval-min_interval)
     }
 
 def fetch_user_data(request):
@@ -218,7 +247,6 @@ def fetch_user_data(request):
     # return HttpResponse(str(result))
 
     # complexidade_financeira
-    financial_complexity_indicator = register_project_indicator(int(pronac), 'complexidade_financeira', 0)
 
     easiness = {
         'value': 1,
@@ -232,6 +260,8 @@ def fetch_user_data(request):
         }
 
     result['easiness'] = easiness
+
+    financial_complexity_indicator = register_project_indicator(int(pronac), 'complexidade_financeira', easiness['value'])
 
     # itens_orcamentarios
     items = {
@@ -260,6 +290,7 @@ def fetch_user_data(request):
     raised_funds = {
         'value': float_to_money(0.0),
         'float_value': 0.0,
+        'float_maximum_expected_value': 1,
         'maximum_expected_value': float_to_money(0.0),
         'outlier_check': get_outlier_color(False),
         'is_valid': False,
@@ -269,6 +300,7 @@ def fetch_user_data(request):
         raised_funds = {
             'value': float_to_money(metrics['raised_funds']['total_raised_funds']),
             'float_value': metrics['raised_funds']['total_raised_funds'],
+            'float_maximum_expected_value': metrics['raised_funds']['maximum_expected_funds'],
             'maximum_expected_value': float_to_money(metrics['raised_funds']['maximum_expected_funds']),
             'outlier_check': get_outlier_color(metrics['raised_funds']['is_outlier']),
             'is_valid': True,
@@ -282,6 +314,7 @@ def fetch_user_data(request):
     verified_funds = {
         'value': float_to_money(0.0),
         'float_value': 0.0,
+        'float_maximum_expected_value': 1,
         'maximum_expected_value': float_to_money(0.0),
         'outlier_check': get_outlier_color(False),
         'is_valid': False,
@@ -291,6 +324,7 @@ def fetch_user_data(request):
         verified_funds = {
             'value': float_to_money(metrics['verified_funds']['total_verified_funds']),
             'float_value': metrics['verified_funds']['total_verified_funds'],
+            'float_maximum_expected_value': metrics['verified_funds']['maximum_expected_funds'],
             'maximum_expected_value': float_to_money(metrics['verified_funds']['maximum_expected_funds']),
             'outlier_check': get_outlier_color(metrics['verified_funds']['is_outlier']),
             'is_valid': True,
@@ -304,6 +338,7 @@ def fetch_user_data(request):
     approved_funds = {
         'value': float_to_money(0),
         'float_value': 0.0,
+        'float_maximum_expected_funds': 1,
         'maximum_expected_funds': float_to_money(0.0),
         'outlier_check': get_outlier_color(False),
         'is_valid': False,
@@ -313,6 +348,7 @@ def fetch_user_data(request):
         approved_funds = {
             'value': float_to_money(metrics['approved_funds']['total_approved_funds']),
             'float_value': metrics['approved_funds']['total_approved_funds'],
+            'float_maximum_expected_funds': metrics['approved_funds']['maximum_expected_funds'],
             'maximum_expected_funds': float_to_money(metrics['approved_funds']['maximum_expected_funds']),
             'outlier_check': get_outlier_color(metrics['approved_funds']['is_outlier']),
             'is_valid': True,
@@ -546,10 +582,12 @@ def fetch_user_data(request):
                 {
                     'name': 'comprovantes_pagamento',
                     'value': result['comprovantes_pagamento']['total_receipts'],
-                    'reason': 'any reason',
+                    'reason': result['comprovantes_pagamento']['maximum_expected_in_segment'],
                     'outlier_check': result['comprovantes_pagamento']['outlier_check'],
-                    'maximum_expected_in_segment': result['comprovantes_pagamento']['maximum_expected_in_segment'],
                     'is_valid': result['comprovantes_pagamento']['is_valid'],
+                    'bar': set_width_bar(0,
+                                         result['comprovantes_pagamento']['maximum_expected_in_segment'],
+                                         result['comprovantes_pagamento']['total_receipts']),
                 },
                 {
                     'name': 'precos_acima_media',
@@ -567,6 +605,8 @@ def fetch_user_data(request):
                     'reason': result['valor_comprovado']['maximum_expected_value'],
                     'outlier_check': result['valor_comprovado']['outlier_check'],
                     'is_valid': result['valor_comprovado']['is_valid'],
+                    'bar': set_width_bar(0, result['valor_comprovado']['float_maximum_expected_value'],
+                                         result['valor_comprovado']['float_value']),
                 },
                 {
                     'name': 'valor_captado',
@@ -574,6 +614,8 @@ def fetch_user_data(request):
                     'reason': result['valor_captado']['maximum_expected_value'],
                     'outlier_check': result['valor_captado']['outlier_check'],
                     'is_valid': result['valor_captado']['is_valid'],
+                    'bar': set_width_bar(0, result['valor_captado']['float_maximum_expected_value'],
+                                         result['valor_captado']['float_value']),
                 },
                 {
                     'name': 'mudancas_planilha_orcamentaria',
@@ -604,10 +646,11 @@ def fetch_user_data(request):
                 {
                     'name': 'valor_aprovado',
                     'value': result['valor_aprovado']['value'],
-                    'reason': 'any reason',
+                    'reason': result['valor_aprovado']['maximum_expected_funds'],
                     'outlier_check': result['valor_aprovado']['outlier_check'],
-                    'maximum_expected_funds': result['valor_aprovado']['maximum_expected_funds'],
                     'is_valid': result['valor_aprovado']['is_valid'],
+                    'bar': set_width_bar(0, result['valor_aprovado']['float_maximum_expected_funds'],
+                                         result['valor_aprovado']['float_value']),
                 }
             ]
         },
@@ -660,25 +703,5 @@ def post_metrics_feedback(request):
             except:
                 continue
 
-    # return HttpResponse(status=201)
-    try:
-        projects = projects_to_analyse(request)
-    except:
-        projects = [
-        {"pronac": "90021", "complexity": 25,
-            "project_name": "Indie 2009 - Mostra de Cinema Mundial", "analist": "Florentina"},
-        {"pronac": "153833", "complexity": 75,
-            "project_name": "TRES SOMBREROS DE COPA", "analist": "Chimbinha"},
-        {"pronac": "160443", "complexity": 95,
-            "project_name": "SERGIO REIS – CORAÇÃO ESTRADEIRO", "analist": "Cláudia Leitte"},
-        {"pronac": "118593", "complexity": 15,
-            "project_name": "ÁGUIA  CARNAVAL 2012: TROPICÁLIA! O MOVIMENTO QUE NÃO TERMINOU", "analist": "Ferdinando"},
-        {"pronac": "161533", "complexity": 5,
-            "project_name": "“Livro sobre Serafim Derenzi” (título provisório)", "analist": "Modelo"},
-        {"pronac": "171372", "complexity": 5,
-            "project_name": "“Paisagismo Brasileiro, Roberto Burle Marx e Haruyoshi Ono – 60 anos de história”.", "analist": "Modelo"},
-        {"pronac": "92739", "complexity": 5,
-            "project_name": "Circulação de oficinas e shows - Claudia Cimbleris", "analist": "Modelo"},
-    ]
-    # return redirect(index, submit_success = True)
-    return render(request, 'index.html', {'submit_success': True, 'projects': projects})
+    # return render(request, 'index.html', {'submit_success': True, 'projects': projects})
+    return render(request, 'show_metrics.html', {'submit_success': True, 'user': None, 'project': entity})

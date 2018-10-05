@@ -1,14 +1,5 @@
-{% extends 'base.html' %} {% block content %} {% if submit_success %}
-<div class="ui info message">
-    <i class="close icon"></i>
-    <div class="header">
-        Sucesso ao enviar o feedback
-    </div>
-    <ul class="list">
-        <li>Agradecemos pelo seu feedback!</li>
-    </ul>
-</div>
-{% endif %}
+{% extends 'base.html' %} {% block content %}
+
 <div class="ui fixed inverted menu" id="ProjectID">
     <h1>Projetos com Diagnóstico de complexidade</h1>
 </div>
@@ -23,7 +14,7 @@
     <thead>
         <tr>
             <th>Pronac</th>
-            <!-- <th>Complexidade</th> -->
+            <th>Complexidade</th>
             <th>Título</th>
             <th>Responsável</th>
         </tr>
@@ -32,11 +23,19 @@
         {% for project in projects %}
         <tr>
             <td>
-                <a class="ui positive button" href="{% url 'show_metrics' project.pronac %}">
+                <a class="ui positive button" target="_blank" href="{% url 'show_metrics' project.pronac %}">
                     {{ project.pronac }}
                 </a>
             </td>
-            <!-- <td>{{ project.complexity }}</td> -->
+            <td>
+                {% if project.complexity >= 80 %}
+                    <strong style="color: #DB2828; font-size: 25px;">{{ project.complexity }}%</strong>
+                {% elif project.complexity >= 30  %}
+                    <strong style="color: #F2B01C; font-size: 25px;">{{ project.complexity }}%</strong>
+                {% else  %}
+                    <strong style="color: #1B5E20; font-size: 25px;">{{ project.complexity }}%</strong>
+                {% endif %}
+            </td>
             <td>{{ project.project_name }}</td>
             <td>{{ project.analist }}</td>
         </tr>
@@ -45,7 +44,7 @@
     <tfoot>
         <tr>
             <th>Pronac</th>
-            <!-- <th>Complexidade</th> -->
+            <th>Complexidade</th>
             <th>Título</th>
             <th>Responsável</th>
         </tr>
