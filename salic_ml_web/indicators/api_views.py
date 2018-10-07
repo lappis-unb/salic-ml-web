@@ -99,8 +99,8 @@ def set_width_bar(min_interval, max_interval, value):
 
     return {
         'max_value': max_value, 
-        'min_interval': (min_interval/max_value)*100, 
-        'project': ((value/max_value)*100),
+        'interval_start': min_interval, 
+        'interval_end': max_interval,
         'interval': (max_interval-min_interval)
     }
 
