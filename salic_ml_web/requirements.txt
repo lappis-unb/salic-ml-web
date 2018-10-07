@@ -4,5 +4,5 @@ markdown
 django-filter
 psycopg2
 pyodbc
-salic-ml-dev==0.0.11
+salic-ml==0.0.4
 django-cors-headers
