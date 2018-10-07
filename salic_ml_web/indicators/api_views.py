@@ -13,6 +13,7 @@ from indicators.financial_metrics_instance import financial_metrics, submitted_p
 from core.utils.get_project_info_from_pronac import GetProjectInfoFromPronac
 from indicators.models import Entity, Indicator, Metric, User, MetricFeedback, ProjectFeedback
 from django.shortcuts import get_object_or_404
+from indicators.indicators_requests import http_financial_metrics_instance
 
 def fetch_entity(pronac):
     string_pronac = "{:06}".format(pronac)
@@ -401,6 +402,8 @@ class ProjectInfoView(APIView):
 
         metrics = {}
 
+        # total_metrics = 
+
         total_metrics = financial_metrics.get_metrics("{:06}".format(int(pronac)))
 
         for metric_name in metrics_list:
@@ -411,6 +414,8 @@ class ProjectInfoView(APIView):
                     metrics[metric_name] = total_metrics[metric_name]
                 else:
                     metrics[metric_name] = None
+
+        metrics['items'] = http_financial_metrics_instance.number_of_items(pronac="090105")
 
         result = {
             'pronac': pronac,
@@ -448,12 +453,12 @@ class ProjectInfoView(APIView):
         }
 
         if metrics['items'] is not None:
-            items_interval = get_items_interval(metrics['items']['mean'], metrics['items']['std'])
+            # items_interval = get_items_interval(metrics['items']['mean'], metrics['items']['std'])
             items = {
-                'total_items': int(metrics['items']['value']),
-                'interval_start': int(items_interval['start']),
-                'interval_end': int(items_interval['end']),
-                'reason': reason_text_formatter(int(metrics['items']['value']), int(items_interval['end']), descriptor=" item(ns)"),
+                'total_items': int(metrics['items']['number_of_items']),
+                'interval_start': int(metrics['items']['minimum_expected']),
+                'interval_end': int(metrics['items']['maximum_expected']),
+                'reason': reason_text_formatter(int(metrics['items']['number_of_items']), int(metrics['items']['maximum_expected']), descriptor=" item(ns)"),
                 'outlier_check': get_outlier_color(metrics['items']['is_outlier'])
             }
 
