@@ -24,7 +24,7 @@ router.register(r'users', views.UserViewSet, 'users')
 router.register(r'groups', views.GroupViewSet, 'groups')
 
 urlpatterns = [
-    url(r'', include(router.urls)),
-    url(r'^indicators/', include('indicators.urls')),
+    #url(r'', include(router.urls)),
+    url(r'', include('indicators.urls')),
     path('admin/', admin.site.urls),
 ]

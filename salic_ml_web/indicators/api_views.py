@@ -335,7 +335,7 @@ class SearchProjectView(APIView):
         
         # content = {'projects': projects_list, 'last_page': len(paginated_list)}
 
-        next_page_index = int(page) + 1
+        """next_page_index = int(page) + 1
 
         if next_page_index > len(paginated_list):
             next_page = None
@@ -348,14 +348,14 @@ class SearchProjectView(APIView):
             prev_page = None
         else:
             prev_page = '/indicators/projects/search/any/{0}'.format(prev_page_index)
-
+        """
         content = {
             'total': len(projects),
             'per_page': 10,
             'current_page': int(page),
             'last_page': len(paginated_list),
-            'next_page_url': next_page,
-            'prev_page_url': prev_page,
+            #'next_page_url': next_page,
+            #'prev_page_url': prev_page,
             'from': 1,
             'to': len(paginated_list),
             'data': projects_list
