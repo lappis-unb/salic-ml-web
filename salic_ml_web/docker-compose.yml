@@ -23,6 +23,7 @@ services:
       - SALIC_DB_PORT=1435
       - SALIC_DB_USER=
       - SALIC_DB_PASSWORD=
+      - PYTHONUNBUFFERED=1
 
   salic_db:
     image: edsonma/openconnect-globalprotect

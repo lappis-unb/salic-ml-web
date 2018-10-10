@@ -113,6 +113,7 @@ def calculate_search_cutoff(keyword_len):
     return cutoff
 
 def paginate_by_10(full_list):
+    print(full_list.sort(key=lambda x : x["complexity_value"], reverse=True))
     paginated_list = [full_list[i:i+10] for i in range(0, len(full_list), 10)]
     
     return paginated_list
@@ -175,33 +176,33 @@ class ProjectsView(APIView):
             projects = projects_to_analyse(request)
         except:
             projects = [
-            {"pronac": "90021", "complexity": 25,
+            {"pronac": "90021", "complexity_value": 25,
                 "project_name": "Indie 2009 - Mostra de Cinema Mundial", "analist": "Florentina"},
-            {"pronac": "153833", "complexity": 75,
+            {"pronac": "153833", "complexity_value": 75,
                 "project_name": "TRES SOMBREROS DE COPA", "analist": "Chimbinha"},
-            {"pronac": "160443", "complexity": 95,
+            {"pronac": "160443", "complexity_value": 95,
                 "project_name": "SERGIO REIS – CORAÇÃO ESTRADEIRO", "analist": "Cláudia Leitte"},
-            {"pronac": "118593", "complexity": 15,
+            {"pronac": "118593", "complexity_value": 15,
                 "project_name": "ÁGUIA  CARNAVAL 2012: TROPICÁLIA! O MOVIMENTO QUE NÃO TERMINOU", "analist": "Ferdinando"},
-            {"pronac": "161533", "complexity": 5,
+            {"pronac": "161533", "complexity_value": 5,
                 "project_name": "“Livro sobre Serafim Derenzi” (título provisório)", "analist": "Modelo"},
-            {"pronac": "171372", "complexity": 5,
+            {"pronac": "171372", "complexity_value": 5,
                 "project_name": "“Paisagismo Brasileiro, Roberto Burle Marx e Haruyoshi Ono – 60 anos de história”.", "analist": "Modelo"},
-            {"pronac": "92739", "complexity": 5,
+            {"pronac": "92739", "complexity_value": 5,
                 "project_name": "Circulação de oficinas e shows - Claudia Cimbleris", "analist": "Modelo"},
-            {"pronac": "90021", "complexity": 25,
+            {"pronac": "90021", "complexity_value": 25,
                 "project_name": "Indie 2009 - Mostra de Cinema Mundial", "analist": "Florentina"},
-            {"pronac": "153833", "complexity": 75,
+            {"pronac": "153833", "complexity_value": 75,
                 "project_name": "TRES SOMBREROS DE COPA", "analist": "Chimbinha"},
-            {"pronac": "160443", "complexity": 95,
+            {"pronac": "160443", "complexity_value": 95,
                 "project_name": "SERGIO REIS – CORAÇÃO ESTRADEIRO", "analist": "Cláudia Leitte"},
-            {"pronac": "118593", "complexity": 15,
+            {"pronac": "118593", "complexity_value": 15,
                 "project_name": "ÁGUIA  CARNAVAL 2012: TROPICÁLIA! O MOVIMENTO QUE NÃO TERMINOU", "analist": "Ferdinando"},
-            {"pronac": "161533", "complexity": 5,
+            {"pronac": "161533", "complexity_value": 5,
                 "project_name": "“Livro sobre Serafim Derenzi” (título provisório)", "analist": "Modelo"},
-            {"pronac": "171372", "complexity": 5,
+            {"pronac": "171372", "complexity_value": 5,
                 "project_name": "“Paisagismo Brasileiro, Roberto Burle Marx e Haruyoshi Ono – 60 anos de história”.", "analist": "Modelo"},
-            {"pronac": "92739", "complexity": 5,
+            {"pronac": "92739", "complexity_value": 5,
                 "project_name": "Circulação de oficinas e shows - Claudia Cimbleris", "analist": "Modelo"},
             ]
 
@@ -258,33 +259,33 @@ class SearchProjectView(APIView):
             projects = projects_to_analyse(request)
         except:
             projects = [
-            {"pronac": "90021", "complexity": 25,
+            {"pronac": "90021", "complexity_value": 25,
                 "project_name": "Indie 2009 - Mostra de Cinema Mundial", "analist": ""},
-            {"pronac": "153833", "complexity": 75,
+            {"pronac": "153833", "complexity_value": 75,
                 "project_name": "TRES SOMBREROS DE COPA", "analist": ""},
-            {"pronac": "160443", "complexity": 95,
+            {"pronac": "160443", "complexity_value": 95,
                 "project_name": "SERGIO REIS – CORAÇÃO ESTRADEIRO", "analist": ""},
-            {"pronac": "118593", "complexity": 15,
+            {"pronac": "118593", "complexity_value": 15,
                 "project_name": "ÁGUIA  CARNAVAL 2012: TROPICÁLIA! O MOVIMENTO QUE NÃO TERMINOU", "analist": ""},
-            {"pronac": "161533", "complexity": 5,
+            {"pronac": "161533", "complexity_value": 5,
                 "project_name": "“Livro sobre Serafim Derenzi” (título provisório)", "analist": ""},
-            {"pronac": "171372", "complexity": 5,
+            {"pronac": "171372", "complexity_value": 5,
                 "project_name": "“Paisagismo Brasileiro, Roberto Burle Marx e Haruyoshi Ono – 60 anos de história”.", "analist": ""},
-            {"pronac": "92739", "complexity": 5,
+            {"pronac": "92739", "complexity_value": 5,
                 "project_name": "Circulação de oficinas e shows - Claudia Cimbleris", "analist": ""},
-            {"pronac": "90021", "complexity": 25,
+            {"pronac": "90021", "complexity_value": 25,
                 "project_name": "Indie 2009 - Mostra de Cinema Mundial", "analist": ""},
-            {"pronac": "153833", "complexity": 75,
+            {"pronac": "153833", "complexity_value": 75,
                 "project_name": "TRES SOMBREROS DE COPA", "analist": ""},
-            {"pronac": "160443", "complexity": 95,
+            {"pronac": "160443", "complexity_value": 95,
                 "project_name": "SERGIO REIS – CORAÇÃO ESTRADEIRO", "analist": ""},
-            {"pronac": "118593", "complexity": 15,
+            {"pronac": "118593", "complexity_value": 15,
                 "project_name": "ÁGUIA  CARNAVAL 2012: TROPICÁLIA! O MOVIMENTO QUE NÃO TERMINOU", "analist": ""},
-            {"pronac": "161533", "complexity": 5,
+            {"pronac": "161533", "complexity_value": 5,
                 "project_name": "“Livro sobre Serafim Derenzi” (título provisório)", "analist": ""},
-            {"pronac": "171372", "complexity": 5,
+            {"pronac": "171372", "complexity_value": 5,
                 "project_name": "“Paisagismo Brasileiro, Roberto Burle Marx e Haruyoshi Ono – 60 anos de história”.", "analist": ""},
-            {"pronac": "92739", "complexity": 5,
+            {"pronac": "92739", "complexity_value": 5,
                 "project_name": "Circulação de oficinas e shows - Claudia Cimbleris", "analist": ""},
             ]
 
@@ -295,7 +296,7 @@ class SearchProjectView(APIView):
 
         projects_processed = [{
             "pronac": project['pronac'], 
-            "complexity": project['complexity'],
+            "complexity_value": project['complexity_value'],
             "project_name": project['project_name'],
             "project_name_lowered": project['project_name'].lower(), 
             "analist": project['analist']
@@ -324,6 +325,7 @@ class SearchProjectView(APIView):
         else:
             result_list = projects
 
+
         paginated_list = paginate_by_10(result_list)
 
         page = request.GET.get('page')
@@ -349,15 +351,16 @@ class SearchProjectView(APIView):
         else:
             prev_page = '/indicators/projects/search/any/{0}'.format(prev_page_index)
         """
+
         content = {
             'total': len(projects),
             'per_page': 10,
             'current_page': int(page),
-            'last_page': len(paginated_list),
+            #'last_page': len(paginated_list),
             #'next_page_url': next_page,
             #'prev_page_url': prev_page,
-            'from': 1,
-            'to': len(paginated_list),
+            'begin_page': 1,
+            'end_page': len(paginated_list),
             'data': projects_list
         }
         
@@ -398,7 +401,7 @@ class ProjectInfoView(APIView):
             'proponent_projects',
             'easiness',
             'items_prices'
-            ]
+        ]
 
         metrics = {}
 
@@ -750,6 +753,12 @@ class ProjectInfoView(APIView):
 
         result['precos_acima_media'] = items_prices
 
+        indicators = [
+            {
+                'name': 'complexidade_financeira',
+                'complexity_value': result['easiness']['value'],
+            }
+        ]
         project_indicators = [
             {
                 'name': 'complexidade_financeira',
@@ -878,23 +887,13 @@ class ProjectInfoView(APIView):
                 ]
             },
         ]
-        project_feedback_possibilities = ['Muito simples',
-                                'Simples', 'Normal', 'Complexo', 'Muito complexo']
 
         string_pronac = "{:06}".format(int(pronac))
 
         project_information = {
-            'project': {
-                'name': project.name,
-                'pronac': string_pronac
-            },
-            # 'user': {
-            #     'user_id': user.id,
-            #     'name': user.name,
-            #     'email': user.email
-            # },
-            'project_indicators': project_indicators,
-            'project_feedback_possibilities': project_feedback_possibilities,
+            'name': project.name,
+            'pronac': string_pronac,
+            'indicators': indicators,
         }
 
         return JsonResponse(project_information)
