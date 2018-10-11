@@ -112,9 +112,10 @@ def calculate_search_cutoff(keyword_len):
     
     return cutoff
 
-def paginate_by_10(full_list):
-    print(full_list.sort(key=lambda x : x["complexity_value"], reverse=True))
-    paginated_list = [full_list[i:i+10] for i in range(0, len(full_list), 10)]
+def paginate_projects(full_list, projects_per_page):
+
+    full_list.sort(key=lambda x : x["complexity_value"], reverse=True)
+    paginated_list = [full_list[i:i+projects_per_page] for i in range(0, len(full_list), projects_per_page)]
     
     return paginated_list
 
@@ -211,7 +212,7 @@ class ProjectsView(APIView):
         for i in range(100):
             projects = projects + projects_bk
 
-        paginated_list = paginate_by_10(projects)
+        paginated_list = paginate_projects(projects, request.GET.get('per_page'))
 
         page = request.GET.get('page')
         
@@ -324,9 +325,13 @@ class SearchProjectView(APIView):
             result_list = [project for project in projects_processed if project['pronac'] in pronac_matches_list or project['project_name_lowered'] in name_matches_list]
         else:
             result_list = projects
+        projects_per_page = request.GET.get('per_page')
+        if projects_per_page is None:
+            projects_per_page = 15
+        else: 
+            projects_per_page = int(projects_per_page)
 
-
-        paginated_list = paginate_by_10(result_list)
+        paginated_list = paginate_projects(result_list, projects_per_page)
 
         page = request.GET.get('page')
 
@@ -354,7 +359,7 @@ class SearchProjectView(APIView):
 
         content = {
             'total': len(projects),
-            'per_page': 10,
+            'per_page': projects_per_page,
             'current_page': int(page),
             #'last_page': len(paginated_list),
             #'next_page_url': next_page,
