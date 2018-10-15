@@ -6,7 +6,7 @@ from .models import Entity, User, ProjectFeedback, MetricFeedback, Metric, Indic
 from salic_db.utils import test_connection, make_query_from_db
 from core.utils.get_project_info_from_pronac import GetProjectInfoFromPronac
 from rest_framework import viewsets
-from indicators.financial_metrics_instance import financial_metrics
+from indicators.financial_metrics_instance import financial_metrics, fetch_project_complexity
 from indicators.serializers import CustomUserSerializer, EntitySerializer, IndicatorSerializer, MetricSerializer, MetricFeedbackSerializer, ProjectFeedbackSerializer
 
 class CustomUserViewSet(viewsets.ModelViewSet):
@@ -136,7 +136,7 @@ def projects_to_analyse(request):
     query_result = make_query_from_db(query)
 
     filtered_data = [{'pronac': each[0],
-                      'complexity': random.randint(0, 100),
+                      'complexity': int(fetch_project_complexity(each[0])),
                       'project_name': each[1],
                       'analist': each[2]}
                       for each in query_result]
