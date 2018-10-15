@@ -14,7 +14,7 @@ indicators_router.register(r'metric_feedbacks', views.MetricFeedbackViewSet)
 indicators_router.register(r'project_feedbacks', views.ProjectFeedbackViewSet)
 
 urlpatterns = [
-    url(r'^project/(?P<pronac>[0-9]+)', csrf_exempt(api_views.ProjectInfoView.as_view()), name='project_info_view'),
+    path('project/<pronac>', csrf_exempt(api_views.ProjectInfoView.as_view()), name='project_info_view'),
     url(r'^projects', csrf_exempt(api_views.SearchProjectView.as_view()), name='search_project_view'),
     # path('', views.index, name='index'),
     # url(r'^oi/', include(indicators_router.urls)),
