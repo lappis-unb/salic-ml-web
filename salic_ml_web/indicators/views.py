@@ -136,7 +136,7 @@ def projects_to_analyse(request):
     query_result = make_query_from_db(query)
 
     filtered_data = [{'pronac': each[0],
-                      'complexity': int(fetch_project_complexity(each[0])),
+                      'complexity_value': int(fetch_project_complexity(each[0])),
                       'project_name': each[1],
                       'analist': each[2]}
                       for each in query_result]
