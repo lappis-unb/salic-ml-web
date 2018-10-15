@@ -18,6 +18,7 @@ from django.urls import path, include
 from . import views
 from rest_framework import routers
 from django.conf.urls import url, include
+from rest_framework_swagger.views import get_swagger_view
 
 router = routers.DefaultRouter()
 router.register(r'users', views.UserViewSet, 'users')
@@ -25,6 +26,7 @@ router.register(r'groups', views.GroupViewSet, 'groups')
 
 urlpatterns = [
     # url(r'', include(router.urls)),
-    url(r'', include('indicators.urls')),
     # path('admin', admin.site.urls),
+    url(r'', include('indicators.urls')),
+    url(r'^docs', get_swagger_view(title='SalicML API')),
 ]
