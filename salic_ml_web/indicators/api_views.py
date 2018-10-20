@@ -17,6 +17,7 @@ from indicators.indicators_requests import http_financial_metrics_instance
 
 def fetch_entity(pronac):
     string_pronac = "{:06}".format(pronac)
+    # project = get_object_or_404(Entity, pronac=pronac)
     try:
         project = Entity.objects.get(pronac=pronac)
     except:
@@ -27,11 +28,11 @@ def fetch_entity(pronac):
         #         'pronac': project_raw_data[0][0],
         #         'project_name': project_raw_data[0][1]
         # }
-
-        # project_data = {
-        #     'pronac': pronac,
-        #     'project_name': 'Mock'
-        # }
+        """
+        project_data = {
+            'pronac': pronac,
+            'project_name': 'Mock'
+        }
 
         info = submitted_projects_info.get_projects_name([string_pronac])
 
@@ -39,8 +40,9 @@ def fetch_entity(pronac):
             'pronac': pronac,
             'project_name': info[string_pronac]
         }
-
-        project = Entity.objects.create(pronac=int(project_data['pronac']), name=project_data['project_name'])
+        """
+        #project = Entity.objects.create(pronac=int(project_data['pronac']), name=project_data['project_name'])
+        project = None
 
     return project
 
@@ -250,7 +252,13 @@ class ProjectsView(APIView):
 
 class SearchProjectView(APIView):
     """
-    A view that returns a list containing projects that match the given keyword
+    Busca todos os projetos. Como retorno tem se como resultado uma lista paginada com todos os projetos ordenados de forma decrescente à complexidade do projeto.
+
+    Abaixo acompanha respectivamente um exemplo de como obter uma lista de projetos contida em uma determinada página e como limitar a quantidade de projetos por página.
+    ```
+        https://url/projetos?page=3
+        http://url/projetos?per_page=2
+    ```
     """
     renderer_classes = (JSONRenderer, )
     @csrf_exempt
@@ -290,11 +298,6 @@ class SearchProjectView(APIView):
                 "project_name": "Circulação de oficinas e shows - Claudia Cimbleris", "analist": ""},
             ]
 
-            projects_bk = projects
-        
-            for i in range(100):
-                projects = projects + projects_bk
-
         projects_processed = [{
             "pronac": project['pronac'], 
             "complexity_value": project['complexity_value'],
@@ -325,7 +328,9 @@ class SearchProjectView(APIView):
             result_list = [project for project in projects_processed if project['pronac'] in pronac_matches_list or project['project_name_lowered'] in name_matches_list]
         else:
             result_list = projects
+
         projects_per_page = request.GET.get('per_page')
+        
         if projects_per_page is None:
             projects_per_page = 15
         else: 
@@ -373,7 +378,7 @@ class SearchProjectView(APIView):
 
 class ProjectInfoView(APIView):
     """
-    A view that creates or sets an user and returns a single project information (indicators, metrics, feedbacks...)
+    Busca informações de determinado projeto por meio do seu PRONAC
     """
     renderer_classes = (JSONRenderer, )
     @method_decorator(csrf_exempt)
@@ -394,7 +399,6 @@ class ProjectInfoView(APIView):
 
         pronac = kwargs['pronac']
         project = fetch_entity(int(pronac))
-
         metrics_list = [
             'items',
             'raised_funds',
@@ -423,7 +427,7 @@ class ProjectInfoView(APIView):
                 else:
                     metrics[metric_name] = None
 
-        metrics['items'] = http_financial_metrics_instance.number_of_items(pronac="090105")
+        # metrics['items'] = http_financial_metrics_instance.number_of_items(pronac="090105")
 
         result = {
             'pronac': pronac,
@@ -431,9 +435,8 @@ class ProjectInfoView(APIView):
         }
 
         # return HttpResponse(str(result))
-
         #complexidade_financeira
-        financial_complexity_indicator = register_project_indicator(int(pronac), 'complexidade_financeira', 0)
+        # financial_complexity_indicator = register_project_indicator(int(pronac), 'complexidade_financeira', 0)
 
         easiness = {
             'value': 1,
@@ -450,7 +453,9 @@ class ProjectInfoView(APIView):
             }
 
         result['easiness'] = easiness
+        # return HttpResponse(str(result))
 
+        """
         # itens_orcamentarios
         items = {
                 'total_items': 0,
@@ -757,13 +762,8 @@ class ProjectInfoView(APIView):
         items_prices['metric_id'] = precos_acima_media.id
 
         result['precos_acima_media'] = items_prices
-
-        indicators = [
-            {
-                'name': 'complexidade_financeira',
-                'complexity_value': result['easiness']['value'],
-            }
-        ]
+        """
+        """
         project_indicators = [
             {
                 'name': 'complexidade_financeira',
@@ -892,14 +892,24 @@ class ProjectInfoView(APIView):
                 ]
             },
         ]
+       """ 
+
+        indicators = [
+            {
+                'name': 'complexidade_financeira',
+                'complexity_value': result['easiness']['value'],
+            }
+        ]
 
         string_pronac = "{:06}".format(int(pronac))
 
-        project_information = {
-            'name': project.name,
-            'pronac': string_pronac,
-            'indicators': indicators,
-        }
+        if(project is not None):
+            project_information = {
+                'name': project.name,
+                'pronac': string_pronac,
+                'indicators': indicators,
+            }
+        else: project_information = {} 
 
         return JsonResponse(project_information)
 
