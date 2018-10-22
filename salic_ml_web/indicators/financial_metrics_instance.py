@@ -21,7 +21,10 @@ def load_fetched_indicators():
         except:
             continue
 
-load_fetched_indicators()
+try:
+    load_fetched_indicators()
+except:
+    pass
 
 def fetch_project_complexity(pronac):
     try:
