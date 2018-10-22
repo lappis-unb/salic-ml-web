@@ -26,22 +26,22 @@ def fetch_entity(pronac):
         # project_raw_data = make_query_from_db(project_query)
         # project_data = {
         #         'pronac': project_raw_data[0][0],
-        #         'project_name': project_raw_data[0][1]
+        #         'name': project_raw_data[0][1]
         # }
         """
         project_data = {
             'pronac': pronac,
-            'project_name': 'Mock'
+            'name': 'Mock'
         }
 
         info = submitted_projects_info.get_projects_name([string_pronac])
 
         project_data = {
             'pronac': pronac,
-            'project_name': info[string_pronac]
+            'name': info[string_pronac]
         }
         """
-        #project = Entity.objects.create(pronac=int(project_data['pronac']), name=project_data['project_name'])
+        #project = Entity.objects.create(pronac=int(project_data['pronac']), name=project_data['name'])
         project = None
 
     return project
@@ -180,33 +180,33 @@ class ProjectsView(APIView):
         except:
             projects = [
             {"pronac": "90021", "complexity_value": 25,
-                "project_name": "Indie 2009 - Mostra de Cinema Mundial", "analist": "Florentina"},
+                "name": "Indie 2009 - Mostra de Cinema Mundial", "analist": "Florentina"},
             {"pronac": "153833", "complexity_value": 75,
-                "project_name": "TRES SOMBREROS DE COPA", "analist": "Chimbinha"},
+                "name": "TRES SOMBREROS DE COPA", "analist": "Chimbinha"},
             {"pronac": "160443", "complexity_value": 95,
-                "project_name": "SERGIO REIS – CORAÇÃO ESTRADEIRO", "analist": "Cláudia Leitte"},
+                "name": "SERGIO REIS – CORAÇÃO ESTRADEIRO", "analist": "Cláudia Leitte"},
             {"pronac": "118593", "complexity_value": 15,
-                "project_name": "ÁGUIA  CARNAVAL 2012: TROPICÁLIA! O MOVIMENTO QUE NÃO TERMINOU", "analist": "Ferdinando"},
+                "name": "ÁGUIA  CARNAVAL 2012: TROPICÁLIA! O MOVIMENTO QUE NÃO TERMINOU", "analist": "Ferdinando"},
             {"pronac": "161533", "complexity_value": 5,
-                "project_name": "“Livro sobre Serafim Derenzi” (título provisório)", "analist": "Modelo"},
+                "name": "“Livro sobre Serafim Derenzi” (título provisório)", "analist": "Modelo"},
             {"pronac": "171372", "complexity_value": 5,
-                "project_name": "“Paisagismo Brasileiro, Roberto Burle Marx e Haruyoshi Ono – 60 anos de história”.", "analist": "Modelo"},
+                "name": "“Paisagismo Brasileiro, Roberto Burle Marx e Haruyoshi Ono – 60 anos de história”.", "analist": "Modelo"},
             {"pronac": "92739", "complexity_value": 5,
-                "project_name": "Circulação de oficinas e shows - Claudia Cimbleris", "analist": "Modelo"},
+                "name": "Circulação de oficinas e shows - Claudia Cimbleris", "analist": "Modelo"},
             {"pronac": "90021", "complexity_value": 25,
-                "project_name": "Indie 2009 - Mostra de Cinema Mundial", "analist": "Florentina"},
+                "name": "Indie 2009 - Mostra de Cinema Mundial", "analist": "Florentina"},
             {"pronac": "153833", "complexity_value": 75,
-                "project_name": "TRES SOMBREROS DE COPA", "analist": "Chimbinha"},
+                "name": "TRES SOMBREROS DE COPA", "analist": "Chimbinha"},
             {"pronac": "160443", "complexity_value": 95,
-                "project_name": "SERGIO REIS – CORAÇÃO ESTRADEIRO", "analist": "Cláudia Leitte"},
+                "name": "SERGIO REIS – CORAÇÃO ESTRADEIRO", "analist": "Cláudia Leitte"},
             {"pronac": "118593", "complexity_value": 15,
-                "project_name": "ÁGUIA  CARNAVAL 2012: TROPICÁLIA! O MOVIMENTO QUE NÃO TERMINOU", "analist": "Ferdinando"},
+                "name": "ÁGUIA  CARNAVAL 2012: TROPICÁLIA! O MOVIMENTO QUE NÃO TERMINOU", "analist": "Ferdinando"},
             {"pronac": "161533", "complexity_value": 5,
-                "project_name": "“Livro sobre Serafim Derenzi” (título provisório)", "analist": "Modelo"},
+                "name": "“Livro sobre Serafim Derenzi” (título provisório)", "analist": "Modelo"},
             {"pronac": "171372", "complexity_value": 5,
-                "project_name": "“Paisagismo Brasileiro, Roberto Burle Marx e Haruyoshi Ono – 60 anos de história”.", "analist": "Modelo"},
+                "name": "“Paisagismo Brasileiro, Roberto Burle Marx e Haruyoshi Ono – 60 anos de história”.", "analist": "Modelo"},
             {"pronac": "92739", "complexity_value": 5,
-                "project_name": "Circulação de oficinas e shows - Claudia Cimbleris", "analist": "Modelo"},
+                "name": "Circulação de oficinas e shows - Claudia Cimbleris", "analist": "Modelo"},
             ]
 
         projects_bk = projects
@@ -269,40 +269,40 @@ class SearchProjectView(APIView):
         except:
             projects = [
             {"pronac": "90021", "complexity_value": 25,
-                "project_name": "Indie 2009 - Mostra de Cinema Mundial", "analist": ""},
+                "name": "Indie 2009 - Mostra de Cinema Mundial", "analist": ""},
             {"pronac": "153833", "complexity_value": 75,
-                "project_name": "TRES SOMBREROS DE COPA", "analist": ""},
+                "name": "TRES SOMBREROS DE COPA", "analist": ""},
             {"pronac": "160443", "complexity_value": 95,
-                "project_name": "SERGIO REIS – CORAÇÃO ESTRADEIRO", "analist": ""},
+                "name": "SERGIO REIS – CORAÇÃO ESTRADEIRO", "analist": ""},
             {"pronac": "118593", "complexity_value": 15,
-                "project_name": "ÁGUIA  CARNAVAL 2012: TROPICÁLIA! O MOVIMENTO QUE NÃO TERMINOU", "analist": ""},
+                "name": "ÁGUIA  CARNAVAL 2012: TROPICÁLIA! O MOVIMENTO QUE NÃO TERMINOU", "analist": ""},
             {"pronac": "161533", "complexity_value": 5,
-                "project_name": "“Livro sobre Serafim Derenzi” (título provisório)", "analist": ""},
+                "name": "“Livro sobre Serafim Derenzi” (título provisório)", "analist": ""},
             {"pronac": "171372", "complexity_value": 5,
-                "project_name": "“Paisagismo Brasileiro, Roberto Burle Marx e Haruyoshi Ono – 60 anos de história”.", "analist": ""},
+                "name": "“Paisagismo Brasileiro, Roberto Burle Marx e Haruyoshi Ono – 60 anos de história”.", "analist": ""},
             {"pronac": "92739", "complexity_value": 5,
-                "project_name": "Circulação de oficinas e shows - Claudia Cimbleris", "analist": ""},
+                "name": "Circulação de oficinas e shows - Claudia Cimbleris", "analist": ""},
             {"pronac": "90021", "complexity_value": 25,
-                "project_name": "Indie 2009 - Mostra de Cinema Mundial", "analist": ""},
+                "name": "Indie 2009 - Mostra de Cinema Mundial", "analist": ""},
             {"pronac": "153833", "complexity_value": 75,
-                "project_name": "TRES SOMBREROS DE COPA", "analist": ""},
+                "name": "TRES SOMBREROS DE COPA", "analist": ""},
             {"pronac": "160443", "complexity_value": 95,
-                "project_name": "SERGIO REIS – CORAÇÃO ESTRADEIRO", "analist": ""},
+                "name": "SERGIO REIS – CORAÇÃO ESTRADEIRO", "analist": ""},
             {"pronac": "118593", "complexity_value": 15,
-                "project_name": "ÁGUIA  CARNAVAL 2012: TROPICÁLIA! O MOVIMENTO QUE NÃO TERMINOU", "analist": ""},
+                "name": "ÁGUIA  CARNAVAL 2012: TROPICÁLIA! O MOVIMENTO QUE NÃO TERMINOU", "analist": ""},
             {"pronac": "161533", "complexity_value": 5,
-                "project_name": "“Livro sobre Serafim Derenzi” (título provisório)", "analist": ""},
+                "name": "“Livro sobre Serafim Derenzi” (título provisório)", "analist": ""},
             {"pronac": "171372", "complexity_value": 5,
-                "project_name": "“Paisagismo Brasileiro, Roberto Burle Marx e Haruyoshi Ono – 60 anos de história”.", "analist": ""},
+                "name": "“Paisagismo Brasileiro, Roberto Burle Marx e Haruyoshi Ono – 60 anos de história”.", "analist": ""},
             {"pronac": "92739", "complexity_value": 5,
-                "project_name": "Circulação de oficinas e shows - Claudia Cimbleris", "analist": ""},
+                "name": "Circulação de oficinas e shows - Claudia Cimbleris", "analist": ""},
             ]
 
         projects_processed = [{
             "pronac": project['pronac'], 
             "complexity_value": project['complexity_value'],
-            "project_name": project['project_name'],
-            "project_name_lowered": project['project_name'].lower(), 
+            "name": project['name'],
+            "name_lowered": project['name'].lower(), 
             "analist": project['analist']
         } for project in projects]
 
@@ -313,7 +313,7 @@ class SearchProjectView(APIView):
 
             name_matches_list = difflib.get_close_matches(
                 keyword.lower(), 
-                [project['project_name_lowered'] for project in projects_processed], 
+                [project['name_lowered'] for project in projects_processed], 
                 n=len(projects), 
                 cutoff=NAME_CUTOFF
             )
@@ -325,7 +325,7 @@ class SearchProjectView(APIView):
                 cutoff=0.2
             )
 
-            result_list = [project for project in projects_processed if project['pronac'] in pronac_matches_list or project['project_name_lowered'] in name_matches_list]
+            result_list = [project for project in projects_processed if project['pronac'] in pronac_matches_list or project['name_lowered'] in name_matches_list]
         else:
             result_list = projects
 
