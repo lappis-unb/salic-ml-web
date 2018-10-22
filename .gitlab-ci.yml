@@ -23,6 +23,23 @@ build:
     tags:
         - docker
 
+build-api:
+    image: docker:latest
+    stage: build
+    services:
+        - docker:dind
+    script:
+        - cd salic_ml_web/
+        - docker login -u "gitlab-ci-token" -p "$CI_JOB_TOKEN" $CI_REGISTRY
+        - docker build -f ./Dockerfile -t $WEB_IMAGE .
+        - docker tag $WEB_IMAGE $CI_REGISTRY_IMAGE/web:api_latest
+        - docker push $WEB_IMAGE
+        - docker push $CI_REGISTRY_IMAGE/web:api_latest
+    only:
+        - /djangorest/
+    tags:
+        - docker
+
 deploy_homolog_minc:
     image: debian:buster-slim
     stage: deploy_homolog
