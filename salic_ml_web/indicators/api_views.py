@@ -116,7 +116,7 @@ def calculate_search_cutoff(keyword_len):
 
 def paginate_projects(full_list, projects_per_page):
 
-    full_list.sort(key=lambda x : x["complexity_value"], reverse=True)
+    full_list.sort(key=lambda x : x["complexity"], reverse=True)
     paginated_list = [full_list[i:i+projects_per_page] for i in range(0, len(full_list), projects_per_page)]
     
     return paginated_list
@@ -179,33 +179,33 @@ class ProjectsView(APIView):
             projects = projects_to_analyse(request)
         except:
             projects = [
-            {"pronac": "90021", "complexity_value": 25,
+            {"pronac": "90021", "complexity": 25,
                 "name": "Indie 2009 - Mostra de Cinema Mundial", "analist": "Florentina"},
-            {"pronac": "153833", "complexity_value": 75,
+            {"pronac": "153833", "complexity": 75,
                 "name": "TRES SOMBREROS DE COPA", "analist": "Chimbinha"},
-            {"pronac": "160443", "complexity_value": 95,
+            {"pronac": "160443", "complexity": 95,
                 "name": "SERGIO REIS – CORAÇÃO ESTRADEIRO", "analist": "Cláudia Leitte"},
-            {"pronac": "118593", "complexity_value": 15,
+            {"pronac": "118593", "complexity": 15,
                 "name": "ÁGUIA  CARNAVAL 2012: TROPICÁLIA! O MOVIMENTO QUE NÃO TERMINOU", "analist": "Ferdinando"},
-            {"pronac": "161533", "complexity_value": 5,
+            {"pronac": "161533", "complexity": 5,
                 "name": "“Livro sobre Serafim Derenzi” (título provisório)", "analist": "Modelo"},
-            {"pronac": "171372", "complexity_value": 5,
+            {"pronac": "171372", "complexity": 5,
                 "name": "“Paisagismo Brasileiro, Roberto Burle Marx e Haruyoshi Ono – 60 anos de história”.", "analist": "Modelo"},
-            {"pronac": "92739", "complexity_value": 5,
+            {"pronac": "92739", "complexity": 5,
                 "name": "Circulação de oficinas e shows - Claudia Cimbleris", "analist": "Modelo"},
-            {"pronac": "90021", "complexity_value": 25,
+            {"pronac": "90021", "complexity": 25,
                 "name": "Indie 2009 - Mostra de Cinema Mundial", "analist": "Florentina"},
-            {"pronac": "153833", "complexity_value": 75,
+            {"pronac": "153833", "complexity": 75,
                 "name": "TRES SOMBREROS DE COPA", "analist": "Chimbinha"},
-            {"pronac": "160443", "complexity_value": 95,
+            {"pronac": "160443", "complexity": 95,
                 "name": "SERGIO REIS – CORAÇÃO ESTRADEIRO", "analist": "Cláudia Leitte"},
-            {"pronac": "118593", "complexity_value": 15,
+            {"pronac": "118593", "complexity": 15,
                 "name": "ÁGUIA  CARNAVAL 2012: TROPICÁLIA! O MOVIMENTO QUE NÃO TERMINOU", "analist": "Ferdinando"},
-            {"pronac": "161533", "complexity_value": 5,
+            {"pronac": "161533", "complexity": 5,
                 "name": "“Livro sobre Serafim Derenzi” (título provisório)", "analist": "Modelo"},
-            {"pronac": "171372", "complexity_value": 5,
+            {"pronac": "171372", "complexity": 5,
                 "name": "“Paisagismo Brasileiro, Roberto Burle Marx e Haruyoshi Ono – 60 anos de história”.", "analist": "Modelo"},
-            {"pronac": "92739", "complexity_value": 5,
+            {"pronac": "92739", "complexity": 5,
                 "name": "Circulação de oficinas e shows - Claudia Cimbleris", "analist": "Modelo"},
             ]
 
@@ -268,39 +268,39 @@ class SearchProjectView(APIView):
             projects = projects_to_analyse(request)
         except:
             projects = [
-            {"pronac": "90021", "complexity_value": 25,
+            {"pronac": "90021", "complexity": 25,
                 "name": "Indie 2009 - Mostra de Cinema Mundial", "analist": ""},
-            {"pronac": "153833", "complexity_value": 75,
+            {"pronac": "153833", "complexity": 75,
                 "name": "TRES SOMBREROS DE COPA", "analist": ""},
-            {"pronac": "160443", "complexity_value": 95,
+            {"pronac": "160443", "complexity": 95,
                 "name": "SERGIO REIS – CORAÇÃO ESTRADEIRO", "analist": ""},
-            {"pronac": "118593", "complexity_value": 15,
+            {"pronac": "118593", "complexity": 15,
                 "name": "ÁGUIA  CARNAVAL 2012: TROPICÁLIA! O MOVIMENTO QUE NÃO TERMINOU", "analist": ""},
-            {"pronac": "161533", "complexity_value": 5,
+            {"pronac": "161533", "complexity": 5,
                 "name": "“Livro sobre Serafim Derenzi” (título provisório)", "analist": ""},
-            {"pronac": "171372", "complexity_value": 5,
+            {"pronac": "171372", "complexity": 5,
                 "name": "“Paisagismo Brasileiro, Roberto Burle Marx e Haruyoshi Ono – 60 anos de história”.", "analist": ""},
-            {"pronac": "92739", "complexity_value": 5,
+            {"pronac": "92739", "complexity": 5,
                 "name": "Circulação de oficinas e shows - Claudia Cimbleris", "analist": ""},
-            {"pronac": "90021", "complexity_value": 25,
+            {"pronac": "90021", "complexity": 25,
                 "name": "Indie 2009 - Mostra de Cinema Mundial", "analist": ""},
-            {"pronac": "153833", "complexity_value": 75,
+            {"pronac": "153833", "complexity": 75,
                 "name": "TRES SOMBREROS DE COPA", "analist": ""},
-            {"pronac": "160443", "complexity_value": 95,
+            {"pronac": "160443", "complexity": 95,
                 "name": "SERGIO REIS – CORAÇÃO ESTRADEIRO", "analist": ""},
-            {"pronac": "118593", "complexity_value": 15,
+            {"pronac": "118593", "complexity": 15,
                 "name": "ÁGUIA  CARNAVAL 2012: TROPICÁLIA! O MOVIMENTO QUE NÃO TERMINOU", "analist": ""},
-            {"pronac": "161533", "complexity_value": 5,
+            {"pronac": "161533", "complexity": 5,
                 "name": "“Livro sobre Serafim Derenzi” (título provisório)", "analist": ""},
-            {"pronac": "171372", "complexity_value": 5,
+            {"pronac": "171372", "complexity": 5,
                 "name": "“Paisagismo Brasileiro, Roberto Burle Marx e Haruyoshi Ono – 60 anos de história”.", "analist": ""},
-            {"pronac": "92739", "complexity_value": 5,
+            {"pronac": "92739", "complexity": 5,
                 "name": "Circulação de oficinas e shows - Claudia Cimbleris", "analist": ""},
             ]
 
         projects_processed = [{
             "pronac": project['pronac'], 
-            "complexity_value": project['complexity_value'],
+            "complexity": project['complexity'],
             "name": project['name'],
             "name_lowered": project['name'].lower(), 
             "analist": project['analist']
@@ -897,7 +897,7 @@ class ProjectInfoView(APIView):
         indicators = [
             {
                 'name': 'complexidade_financeira',
-                'complexity_value': result['easiness']['value'],
+                'complexity': result['easiness']['value'],
             }
         ]
 
