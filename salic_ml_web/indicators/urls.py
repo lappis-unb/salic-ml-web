@@ -16,7 +16,7 @@ indicators_router.register(r'metric_feedbacks', views.MetricFeedbackViewSet)
 indicators_router.register(r'project_feedbacks', views.ProjectFeedbackViewSet)
 
 urlpatterns = [
-    path('projetos/<pronac>', csrf_exempt(api_views.ProjectInfoView.as_view()), name='project_info_view'),
+    # path('projetos/<pronac>', csrf_exempt(api_views.ProjectInfoView.as_view()), name='project_info_view'),
     url(r'^projetos', csrf_exempt(api_views.SearchProjectView.as_view()), name='search_project_view'),
     url(r'^docs', get_swagger_view(title='SalicML API'), name='swagger_index'),
     url(r'^', RedirectView.as_view(pattern_name='swagger_index', permanent=False)),

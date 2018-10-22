@@ -254,10 +254,12 @@ class SearchProjectView(APIView):
     """
     Busca todos os projetos. Como retorno tem se como resultado uma lista paginada com todos os projetos ordenados de forma decrescente à complexidade do projeto.
 
-    Abaixo acompanha respectivamente um exemplo de como obter uma lista de projetos contida em uma determinada página e como limitar a quantidade de projetos por página.
+    Abaixo acompanha respectivamente um exemplo de como obter uma lista de projetos contida em uma determinada página, como limitar a quantidade de projetos por página e como filtrar a lista de projetos pelo PRONAC.
     ```
-        https://url/projetos?page=3
-        http://url/projetos?per_page=2
+        https://salicml.lappis.rocks/projetos?page=3
+        https://salicml.lappis.rocks/projetos?per_page=2
+        https://salicml.lappis.rocks/projetos?filter=000001
+
     ```
     """
     renderer_classes = (JSONRenderer, )
@@ -302,30 +304,29 @@ class SearchProjectView(APIView):
             "pronac": project['pronac'], 
             "complexity": project['complexity'],
             "name": project['name'],
-            "name_lowered": project['name'].lower(), 
             "analist": project['analist']
         } for project in projects]
 
         keyword = request.GET.get('filter')
 
         if keyword is not None:
-            NAME_CUTOFF = calculate_search_cutoff(len(keyword))
+            # NAME_CUTOFF = calculate_search_cutoff(len(keyword))
 
-            name_matches_list = difflib.get_close_matches(
-                keyword.lower(), 
-                [project['name_lowered'] for project in projects_processed], 
-                n=len(projects), 
-                cutoff=NAME_CUTOFF
-            )
+            # name_matches_list = difflib.get_close_matches(
+            #     keyword.lower(), 
+            #     [project['name_lowered'] for project in projects_processed], 
+            #     n=len(projects), 
+            #     cutoff=NAME_CUTOFF
+            # )
 
             pronac_matches_list = difflib.get_close_matches(
                 keyword, 
                 [project['pronac'] for project in projects], 
                 n=len(projects), 
-                cutoff=0.2
+                cutoff=1
             )
 
-            result_list = [project for project in projects_processed if project['pronac'] in pronac_matches_list or project['name_lowered'] in name_matches_list]
+            result_list = [project for project in projects_processed if project['pronac'] in pronac_matches_list]
         else:
             result_list = projects
 
