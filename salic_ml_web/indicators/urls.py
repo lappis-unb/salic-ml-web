@@ -4,6 +4,7 @@ from rest_framework import routers
 from django.conf.urls import url, include
 from django.contrib import admin
 from django.views.decorators.csrf import csrf_exempt
+from rest_framework_swagger.views import get_swagger_view
 
 indicators_router = routers.DefaultRouter()
 indicators_router.register(r'custom_users', views.CustomUserViewSet)
@@ -14,8 +15,9 @@ indicators_router.register(r'metric_feedbacks', views.MetricFeedbackViewSet)
 indicators_router.register(r'project_feedbacks', views.ProjectFeedbackViewSet)
 
 urlpatterns = [
-    url(r'^projects/(?P<pronac>[0-9]+)', csrf_exempt(api_views.ProjectInfoView.as_view()), name='project_info_view'),
-    url(r'^projects', csrf_exempt(api_views.SearchProjectView.as_view()), name='search_project_view'),
+    path('projetos/<pronac>', csrf_exempt(api_views.ProjectInfoView.as_view()), name='project_info_view'),
+    url(r'^projetos', csrf_exempt(api_views.SearchProjectView.as_view()), name='search_project_view'),
+    url(r'^docs', get_swagger_view(title='SalicML API')),
     # path('', views.index, name='index'),
     # url(r'^oi/', include(indicators_router.urls)),
     # url(r'^project/(?P<page>[0-9]+)', csrf_exempt(api_views.ProjectsView.as_view()), name='index'),

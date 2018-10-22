@@ -40,8 +40,10 @@ INSTALLED_APPS = [
     'indicators.apps.IndicatorsConfig',
     'salic_db.apps.SalicDbConfig',
     'rest_framework',
+    'rest_framework_swagger',
     'corsheaders',
 ]
+
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -75,6 +77,7 @@ TEMPLATES = [
         },
     },
 ]
+
 
 WSGI_APPLICATION = 'salic_ml_web.wsgi.application'
 
