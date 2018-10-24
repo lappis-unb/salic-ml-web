@@ -244,9 +244,9 @@ class SearchProjectView(APIView):
 
         projects_processed = [{
             "pronac": project['pronac'],
-            "complexity": project['complexidade'],
-            "name": project['nome'],
-            "analist": project['responsavel']
+            "complexidade": project['complexidade'],
+            "nome": project['nome'],
+            "analista": project['responsavel']
         } for project in projects]
 
         keyword = request.GET.get('filter')
