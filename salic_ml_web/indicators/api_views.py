@@ -227,9 +227,9 @@ class SearchProjectView(APIView):
 
     Abaixo acompanha respectivamente um exemplo de como obter uma lista de projetos contida em uma determinada página, como limitar a quantidade de projetos por página e como filtrar a lista de projetos pelo PRONAC.
     ```
-        https://salicml.lappis.rocks/projetos?pagina=3
-        https://salicml.lappis.rocks/projetos?por_pagina=2
-        https://salicml.lappis.rocks/projetos?filtro=000001
+        https://salicml.lappis.rocks/projetos?page=3
+        https://salicml.lappis.rocks/projetos?per_page=2
+        https://salicml.lappis.rocks/projetos?filter=000001
 
     ```
     """
@@ -249,7 +249,7 @@ class SearchProjectView(APIView):
             "analist": project['responsavel']
         } for project in projects]
 
-        keyword = request.GET.get('filtro')
+        keyword = request.GET.get('filter')
 
         if keyword is not None:
             # NAME_CUTOFF = calculate_search_cutoff(len(keyword))
@@ -272,7 +272,7 @@ class SearchProjectView(APIView):
         else:
             result_list = projects
 
-        projects_per_page = request.GET.get('por_pagina')
+        projects_per_page = request.GET.get('per_page')
 
         if projects_per_page is None:
             projects_per_page = 15
@@ -281,7 +281,7 @@ class SearchProjectView(APIView):
 
         paginated_list = paginate_projects(result_list, projects_per_page)
 
-        page = request.GET.get('pagina')
+        page = request.GET.get('page')
 
         if page is None:
             page = "1"
