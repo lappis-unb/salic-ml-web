@@ -116,7 +116,7 @@ def calculate_search_cutoff(keyword_len):
 
 def paginate_projects(full_list, projects_per_page):
 
-    full_list.sort(key=lambda x : x["complexity"], reverse=True)
+    full_list.sort(key=lambda x : x["complexidade"], reverse=True)
     paginated_list = [full_list[i:i+projects_per_page] for i in range(0, len(full_list), projects_per_page)]
 
     return paginated_list
