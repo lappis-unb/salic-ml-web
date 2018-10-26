@@ -61,17 +61,17 @@ def get_items_interval(mean, std):
 
     return result
 
-def get_outlier_color(is_outlier):
-    if is_outlier:
-        return 'Metric-bad'
-    else:
-        return 'Metric-good'
-
 def float_to_money(value):
     us_value = '{:,.2f}'.format(value)
     v_value = us_value.replace(',','v')
     c_value = v_value.replace('.',',')
     return 'R$' + c_value.replace('v','.')
+
+def get_outlier_color(is_outlier):
+    if is_outlier:
+        return 'Metric-bad'
+    else:
+        return 'Metric-good'
 
 def register_project_indicator(pronac, name, value):
     entity = Entity.objects.get(pronac=pronac)
@@ -414,8 +414,6 @@ class ProjectInfoView(APIView):
 
         metrics = {}
 
-        # total_metrics = 
-
         total_metrics = financial_metrics.get_metrics("{:06}".format(int(pronac)))
 
         for metric_name in metrics_list:
@@ -427,7 +425,7 @@ class ProjectInfoView(APIView):
                 else:
                     metrics[metric_name] = None
 
-        # metrics['items'] = http_financial_metrics_instance.number_of_items(pronac="090105")
+        metrics['items'] = http_financial_metrics_instance.number_of_items(pronac="090105")
 
         result = {
             'pronac': pronac,
@@ -436,7 +434,7 @@ class ProjectInfoView(APIView):
 
         # return HttpResponse(str(result))
         #complexidade_financeira
-        # financial_complexity_indicator = register_project_indicator(int(pronac), 'complexidade_financeira', 0)
+        financial_complexity_indicator = register_project_indicator(int(pronac), 'complexidade_financeira', 0)
 
         easiness = {
             'value': 1,
@@ -455,24 +453,20 @@ class ProjectInfoView(APIView):
         result['easiness'] = easiness
         # return HttpResponse(str(result))
 
-        """
         # itens_orcamentarios
         items = {
                 'total_items': 0,
-                'interval_start': 0,
-                'interval_end': 0,
-                'reason': "Não há registros desta métrica para este projeto",
-                'outlier_check': get_outlier_color(False)
+                'minimum_expected': 0,
+                'maximum_expected': 0,
+                'is_outlier': False
         }
 
         if metrics['items'] is not None:
-            # items_interval = get_items_interval(metrics['items']['mean'], metrics['items']['std'])
             items = {
                 'total_items': int(metrics['items']['number_of_items']),
-                'interval_start': int(metrics['items']['minimum_expected']),
-                'interval_end': int(metrics['items']['maximum_expected']),
-                'reason': reason_text_formatter(int(metrics['items']['number_of_items']), int(metrics['items']['maximum_expected']), descriptor=" item(ns)"),
-                'outlier_check': get_outlier_color(metrics['items']['is_outlier'])
+                'minimum_expected': int(metrics['items']['minimum_expected']),
+                'maximum_expected': int(metrics['items']['maximum_expected']),
+                'is_outlier': metrics['items']['is_outlier']
             }
 
         itens_orcamentarios = register_project_metric('itens_orcamentarios', items['total_items'], str(items), financial_complexity_indicator.name, int(pronac))
@@ -762,28 +756,18 @@ class ProjectInfoView(APIView):
         items_prices['metric_id'] = precos_acima_media.id
 
         result['precos_acima_media'] = items_prices
-        """
-        """
+
         project_indicators = [
             {
                 'name': 'complexidade_financeira',
                 'value': result['easiness']['value'],
                 'metrics': [
                     {
-                        'name': 'itens_orcamentarios',
-                        'name_title': 'Itens orçamentários',
-                        'type': 'bar',
-                        'helper_text':'Compara a quantidade de itens deste projeto com a quantidade mais comum de itens em projetos do mesmo segmento',
                         'metric_id': result['itens_orcamentarios']['metric_id'],
                         'value': result['itens_orcamentarios']['total_items'],
-                        'reason': result['itens_orcamentarios']['reason'],
-                        'outlier_check': result['itens_orcamentarios']['outlier_check'],
-                        'interval_start': result['itens_orcamentarios']['interval_start'],
-                        'interval_end': result['itens_orcamentarios']['interval_end'],
-                        'bar': set_width_bar(result['itens_orcamentarios']['interval_start'],
-                                            result['itens_orcamentarios']['interval_end'],
-                                            result['itens_orcamentarios']['total_items'])
-
+                        'is_outlier': result['itens_orcamentarios']['is_outlier'],
+                        'minimum_expected': result['itens_orcamentarios']['minimum_expected'],
+                        'maximum_expected': result['itens_orcamentarios']['maximum_expected'],
                     },
                     {
                         'name': 'itens_orcamentarios_fora_do_comum',
@@ -892,7 +876,6 @@ class ProjectInfoView(APIView):
                 ]
             },
         ]
-       """ 
 
         indicators = [
             {
@@ -907,7 +890,7 @@ class ProjectInfoView(APIView):
             project_information = {
                 'name': project.name,
                 'pronac': string_pronac,
-                'indicators': indicators,
+                'indicators': project_indicators,
             }
         else: project_information = {} 
 
