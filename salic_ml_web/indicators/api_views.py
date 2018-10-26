@@ -385,6 +385,33 @@ class ProjectInfoView(APIView):
     def dispatch(self, request, *args, **kwargs):
         return generic.View.dispatch(self, request, *args, **kwargs)
 
+    def create_metric_template(self):
+        template = {
+            'total_items': 0,
+            'minimum_expected': 0,
+            'maximum_expected': 0,
+            'is_outlier': False
+        }
+        return template
+
+
+    def get_itens_orcamentarios(self, metrics, pronac, financial_complexity_indicator_name):
+        items = self.create_metric_template()
+
+        if metrics['items'] is not None:
+            items = {
+                'total_items': int(metrics['items']['number_of_items']),
+                'minimum_expected': int(metrics['items']['minimum_expected']),
+                'maximum_expected': int(metrics['items']['maximum_expected']),
+                'is_outlier': metrics['items']['is_outlier']
+            }
+
+        itens_orcamentarios = register_project_metric('itens_orcamentarios', items['total_items'], str(items), financial_complexity_indicator_name, pronac)
+        items['metric_id'] = itens_orcamentarios.id
+
+        return items
+
+
     # def post(self, request, format=None, **kwargs):
     def get(self, request, format=None, **kwargs):
         # user_data = json.loads(request.body)
@@ -432,7 +459,6 @@ class ProjectInfoView(APIView):
             'received_metrics': metrics
         }
 
-        # return HttpResponse(str(result))
         #complexidade_financeira
         financial_complexity_indicator = register_project_indicator(int(pronac), 'complexidade_financeira', 0)
 
@@ -452,28 +478,6 @@ class ProjectInfoView(APIView):
 
         result['easiness'] = easiness
         # return HttpResponse(str(result))
-
-        # itens_orcamentarios
-        items = {
-                'total_items': 0,
-                'minimum_expected': 0,
-                'maximum_expected': 0,
-                'is_outlier': False
-        }
-
-        if metrics['items'] is not None:
-            items = {
-                'total_items': int(metrics['items']['number_of_items']),
-                'minimum_expected': int(metrics['items']['minimum_expected']),
-                'maximum_expected': int(metrics['items']['maximum_expected']),
-                'is_outlier': metrics['items']['is_outlier']
-            }
-
-        itens_orcamentarios = register_project_metric('itens_orcamentarios', items['total_items'], str(items), financial_complexity_indicator.name, int(pronac))
-        items['metric_id'] = itens_orcamentarios.id
-
-        result['itens_orcamentarios'] = items
-
         # valor_captado
         raised_funds = {
             'value': float_to_money(0.0),
@@ -756,6 +760,8 @@ class ProjectInfoView(APIView):
         items_prices['metric_id'] = precos_acima_media.id
 
         result['precos_acima_media'] = items_prices
+
+        result['itens_orcamentarios'] = self.get_itens_orcamentarios(metrics, int(pronac), financial_complexity_indicator.name) 
 
         project_indicators = [
             {
