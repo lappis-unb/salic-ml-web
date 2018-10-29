@@ -70,9 +70,9 @@ def float_to_money(value):
 
 def get_outlier_color(is_outlier):
     if is_outlier:
-        return 'Metric-bad'
+        return False
     else:
-        return 'Metric-good'
+        return True
 
 def register_project_indicator(pronac, name, value):
     entity = Entity.objects.get(pronac=pronac)
@@ -94,19 +94,6 @@ def register_project_metric(name, value, reason, indicator_name, pronac):
 
     return metric
 
-def set_width_bar(min_interval, max_interval, value):
-    max_value = max_interval*2
-
-    if max_value is 0:
-        max_value = 1
-
-    return {
-        'max_value': max_value,
-        'interval_start': min_interval,
-        'interval_end': max_interval,
-        'interval': (max_interval-min_interval)
-    }
-
 def calculate_search_cutoff(keyword_len):
     if keyword_len >= 6:
         cutoff = 0.3
@@ -116,7 +103,6 @@ def calculate_search_cutoff(keyword_len):
     return cutoff
 
 def paginate_projects(full_list, projects_per_page):
-
     full_list.sort(key=lambda x : x["complexidade"], reverse=True)
     paginated_list = [full_list[i:i+projects_per_page] for i in range(0, len(full_list), projects_per_page)]
 
@@ -130,43 +116,6 @@ def get_page(paginated_list, page):
 
     return required_list
 
-def reason_text_formatter(value, expected_max_value, prefix="", descriptor="", to_show_value=None, to_show_expected_max_value=None):
-    # "O valor de {0}{1}{2} está abaixo/acima do valor médio de {3}{4} {5}"
-    if to_show_value is None:
-        to_show_value = value
-
-    if to_show_expected_max_value is None:
-        to_show_expected_max_value = expected_max_value
-
-    if value > expected_max_value:
-        reason_text = "O valor de {0}{1}{2} está acima do valor máximo esperado de {3}{4}{5}".format(
-            prefix,
-            to_show_value,
-            descriptor,
-            prefix,
-            to_show_expected_max_value,
-            descriptor
-            )
-    elif value < expected_max_value:
-        reason_text = "O valor de {0}{1}{2} está abaixo do valor máximo esperado de {3}{4}{5}".format(
-            prefix,
-            to_show_value,
-            descriptor,
-            prefix,
-            to_show_expected_max_value,
-            descriptor
-            )
-    else:
-        reason_text = "O valor de {0}{1}{2} está correspondente ao valor máximo esperado de {3}{4}{5}".format(
-            prefix,
-            to_show_value,
-            descriptor,
-            prefix,
-            to_show_expected_max_value,
-            descriptor
-            )
-
-    return reason_text
 
 class ProjectsView(APIView):
     """
@@ -410,7 +359,7 @@ class ProjectInfoView(APIView):
                 'new_providers_list': new_providers_list,
             }
 
-        novos_fornecedores = register_project_metric('novos_fornecedores', new_providers['new_providers_quantity'], "", financial_complexity_indicator_name, pronac)
+        novos_fornecedores = register_project_metric('novos_fornecedores', new_providers['value'], "", financial_complexity_indicator_name, pronac)
         new_providers['metric_id'] = novos_fornecedores.id
 
         return new_providers
@@ -458,6 +407,35 @@ class ProjectInfoView(APIView):
         proponent_projects['metric_id'] = projetos_mesmo_proponente.id
 
         return proponent_projects
+
+
+    def get_precos_acima_media(self, metrics, pronac, financial_complexity_indicator_name):
+        name = 'items_prices'
+        items_prices = {
+            'value': 0,
+            'is_outlier': get_outlier_color(False),
+            'items': [],
+            'total_items': 0,
+            'maximum_expected': 0,
+        }
+
+        if metrics[name] is not None:
+            items_list = []
+            items_list = self.create_list_items(metrics, 'items_prices', 'outlier_items')
+
+            items_prices = {
+                'value': int(metrics[name]['number_items_outliers']),
+                'is_outlier': get_outlier_color(metrics[name]['is_outlier']),
+                'items': items_list,
+                'total_items': int(metrics[name]['total_items']),
+                'maximum_expected': int(metrics[name]['maximum_expected']),
+            }
+
+        precos_acima_media = register_project_metric('precos_acima_media', items_prices['value'], "", financial_complexity_indicator_name, pronac)
+        items_prices['metric_id'] = precos_acima_media.id
+
+        return items_prices
+
 
     def create_metric(self, metric_attributes, metrics, pronac, financial_complexity_indicator_name):
         metric = self.create_metric_template()
@@ -529,40 +507,6 @@ class ProjectInfoView(APIView):
             }
 
         result['easiness'] = easiness
-        # return HttpResponse(str(result))
-        # precos_acima_media
-        items_prices = {
-            'value': 0,
-            'outlier_check': get_outlier_color(False),
-            'items': [],
-            'total_items': 0,
-            'maximum_expected': 0,
-            'reason': "Não há registros desta métrica para este projeto"
-        }
-
-        if metrics['items_prices'] is not None:
-            items_list = []
-
-            for item_id in metrics['items_prices']['outlier_items']:
-                items_list.append({
-                    'item_id': item_id,
-                    'item_name': metrics['items_prices']['outlier_items'][item_id],
-                    'link': '#'
-                })
-
-            items_prices = {
-                'value': int(metrics['items_prices']['number_items_outliers']),
-                'outlier_check': get_outlier_color(metrics['items_prices']['is_outlier']),
-                'items': items_list,
-                'total_items': int(metrics['items_prices']['total_items']),
-                'maximum_expected': int(metrics['items_prices']['maximum_expected']),
-                'reason': reason_text_formatter(int(metrics['items_prices']['number_items_outliers']), int(metrics['items_prices']['maximum_expected']), descriptor=" item(ns)")
-            }
-
-        precos_acima_media = register_project_metric('precos_acima_media', items_prices['value'], "", financial_complexity_indicator.name, int(pronac))
-        items_prices['metric_id'] = precos_acima_media.id
-
-        result['precos_acima_media'] = items_prices
 
         metric_attributes = [
             {
@@ -596,33 +540,21 @@ class ProjectInfoView(APIView):
                 'maximum_expected': 'maximum_expected_funds'
             }
         ]
+
         project_indicators = [
             {
                 'name': 'complexidade_financeira',
                 'value': result['easiness']['value'],
                 'metrics': [
-                    # self.create_metric(metric_attributes[0], metrics, int(pronac), financial_complexity_indicator.name),
-                    # self.create_metric(metric_attributes[1], metrics, int(pronac), financial_complexity_indicator.name),
-                    # self.create_metric(metric_attributes[2], metrics, int(pronac), financial_complexity_indicator.name),
-                    # self.create_metric(metric_attributes[3], metrics, int(pronac), financial_complexity_indicator.name),
-                    # self.create_metric(metric_attributes[4], metrics, int(pronac), financial_complexity_indicator.name),
-                    # self.get_itens_orcamentarios_fora_do_comum(metrics, int(pronac), financial_complexity_indicator.name),
-                    # self.get_novos_fornecedores(metrics, int(pronac), financial_complexity_indicator.name),
+                    self.create_metric(metric_attributes[0], metrics, int(pronac), financial_complexity_indicator.name),
+                    self.create_metric(metric_attributes[1], metrics, int(pronac), financial_complexity_indicator.name),
+                    self.create_metric(metric_attributes[2], metrics, int(pronac), financial_complexity_indicator.name),
+                    self.create_metric(metric_attributes[3], metrics, int(pronac), financial_complexity_indicator.name),
+                    self.create_metric(metric_attributes[4], metrics, int(pronac), financial_complexity_indicator.name),
+                    self.get_itens_orcamentarios_fora_do_comum(metrics, int(pronac), financial_complexity_indicator.name),
+                    self.get_novos_fornecedores(metrics, int(pronac), financial_complexity_indicator.name),
                     self.get_projetos_mesmo_proponente(metrics, int(pronac), financial_complexity_indicator.name),
-                    {
-                        'name': 'precos_acima_media',
-                        'name_title': 'Preços acima da média',
-                        'type': 'bar',
-                        'helper_text':'Verifica a porcentagem de itens com valor acima da mediana histórica neste projeto \
-                        e compara com a porcentagem mais frequente de itens acima da mediana em projetos do mesmo segmento',
-                        'metric_id': result['precos_acima_media']['metric_id'],
-                        'reason': result['precos_acima_media']['reason'],
-                        'value': result['precos_acima_media']['value'],
-                        'outlier_check': result['precos_acima_media']['outlier_check'],
-                        'items': result['precos_acima_media']['items'],
-                        'total_items': result['precos_acima_media']['total_items'],
-                        'maximum_expected': result['precos_acima_media']['maximum_expected']
-                    },
+                    self.get_precos_acima_media(metrics, int(pronac), financial_complexity_indicator.name),
                 ]
             },
         ]
