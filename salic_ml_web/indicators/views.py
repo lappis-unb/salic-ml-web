@@ -74,7 +74,7 @@ def index(request, submit_success=False):
             "name": "Circulação de oficinas e shows - Claudia Cimbleris", "analist": "Modelo"},
     ]
     json_dict = projects
-    
+
     return render(request, 'index.html', {'projects': projects, 'projects_json': json.dumps(json_dict)})
 
 
@@ -136,9 +136,9 @@ def projects_to_analyse(request):
     query_result = make_query_from_db(query)
 
     filtered_data = [{'pronac': each[0],
-                      'complexity': random.randint(0, 100),
-                      'name': each[1],
-                      'analist': each[2]}
+                      'complexidade': int(fetch_project_complexity(int(each[0]))),
+                      'nome': each[1],
+                      'responsavel': each[2]}
                       for each in query_result]
 
     return filtered_data
@@ -175,7 +175,7 @@ def register_project_indicator(pronac, name, value):
     indicator = indicator[0]
     indicator.value = value
     indicator.save()
-     
+
     return indicator
 
 def register_project_metric(name, value, reason, indicator_name, pronac):
@@ -186,7 +186,7 @@ def register_project_metric(name, value, reason, indicator_name, pronac):
     metric.value = value
     metric.reason = reason
     metric.save()
-    
+
     return metric
 
 def set_width_bar(min_interval, max_interval, value):
@@ -196,8 +196,8 @@ def set_width_bar(min_interval, max_interval, value):
         max_value = 1
 
     return {
-        'max_value': max_value, 
-        'min_interval': (min_interval/max_value)*100, 
+        'max_value': max_value,
+        'min_interval': (min_interval/max_value)*100,
         'project': ((value/max_value)*100),
         'interval': (max_interval-min_interval)
     }
@@ -337,11 +337,11 @@ def fetch_user_data(request):
             'maximum_expected_funds': float_to_money(metrics['approved_funds']['maximum_expected_funds']),
             'outlier_check': get_outlier_color(metrics['approved_funds']['is_outlier'])
         }
-    
+
     result['valor_aprovado'] = approved_funds
 
     # itens_orcamentarios_fora_do_comum
-    
+
 
     common_items_ratio = {
         'outlier_check': get_outlier_color(False),

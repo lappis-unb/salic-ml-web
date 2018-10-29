@@ -79,7 +79,7 @@ def register_project_indicator(pronac, name, value):
     indicator = indicator[0]
     indicator.value = value
     indicator.save()
-     
+
     return indicator
 
 def register_project_metric(name, value, reason, indicator_name, pronac):
@@ -90,7 +90,7 @@ def register_project_metric(name, value, reason, indicator_name, pronac):
     metric.value = value
     metric.reason = reason
     metric.save()
-    
+
     return metric
 
 def set_width_bar(min_interval, max_interval, value):
@@ -100,8 +100,8 @@ def set_width_bar(min_interval, max_interval, value):
         max_value = 1
 
     return {
-        'max_value': max_value, 
-        'interval_start': min_interval, 
+        'max_value': max_value,
+        'interval_start': min_interval,
         'interval_end': max_interval,
         'interval': (max_interval-min_interval)
     }
@@ -111,14 +111,14 @@ def calculate_search_cutoff(keyword_len):
         cutoff = 0.3
     else:
         cutoff = keyword_len * 0.05
-    
+
     return cutoff
 
 def paginate_projects(full_list, projects_per_page):
 
-    full_list.sort(key=lambda x : x["complexity"], reverse=True)
+    full_list.sort(key=lambda x : x["complexidade"], reverse=True)
     paginated_list = [full_list[i:i+projects_per_page] for i in range(0, len(full_list), projects_per_page)]
-    
+
     return paginated_list
 
 def get_page(paginated_list, page):
@@ -133,35 +133,35 @@ def reason_text_formatter(value, expected_max_value, prefix="", descriptor="", t
     # "O valor de {0}{1}{2} está abaixo/acima do valor médio de {3}{4} {5}"
     if to_show_value is None:
         to_show_value = value
-    
+
     if to_show_expected_max_value is None:
         to_show_expected_max_value = expected_max_value
 
     if value > expected_max_value:
         reason_text = "O valor de {0}{1}{2} está acima do valor máximo esperado de {3}{4}{5}".format(
-            prefix, 
-            to_show_value, 
-            descriptor, 
-            prefix, 
-            to_show_expected_max_value, 
+            prefix,
+            to_show_value,
+            descriptor,
+            prefix,
+            to_show_expected_max_value,
             descriptor
             )
     elif value < expected_max_value:
         reason_text = "O valor de {0}{1}{2} está abaixo do valor máximo esperado de {3}{4}{5}".format(
-            prefix, 
-            to_show_value, 
-            descriptor, 
-            prefix, 
-            to_show_expected_max_value, 
+            prefix,
+            to_show_value,
+            descriptor,
+            prefix,
+            to_show_expected_max_value,
             descriptor
             )
     else:
         reason_text = "O valor de {0}{1}{2} está correspondente ao valor máximo esperado de {3}{4}{5}".format(
-            prefix, 
-            to_show_value, 
-            descriptor, 
-            prefix, 
-            to_show_expected_max_value, 
+            prefix,
+            to_show_value,
+            descriptor,
+            prefix,
+            to_show_expected_max_value,
             descriptor
             )
 
@@ -174,54 +174,25 @@ class ProjectsView(APIView):
     renderer_classes = (JSONRenderer, )
     @csrf_exempt
     def get(self, request, format=None, **kwargs):
-        
+
         try:
             projects = projects_to_analyse(request)
         except:
-            projects = [
-            {"pronac": "90021", "complexity": 25,
-                "name": "Indie 2009 - Mostra de Cinema Mundial", "analist": "Florentina"},
-            {"pronac": "153833", "complexity": 75,
-                "name": "TRES SOMBREROS DE COPA", "analist": "Chimbinha"},
-            {"pronac": "160443", "complexity": 95,
-                "name": "SERGIO REIS – CORAÇÃO ESTRADEIRO", "analist": "Cláudia Leitte"},
-            {"pronac": "118593", "complexity": 15,
-                "name": "ÁGUIA  CARNAVAL 2012: TROPICÁLIA! O MOVIMENTO QUE NÃO TERMINOU", "analist": "Ferdinando"},
-            {"pronac": "161533", "complexity": 5,
-                "name": "“Livro sobre Serafim Derenzi” (título provisório)", "analist": "Modelo"},
-            {"pronac": "171372", "complexity": 5,
-                "name": "“Paisagismo Brasileiro, Roberto Burle Marx e Haruyoshi Ono – 60 anos de história”.", "analist": "Modelo"},
-            {"pronac": "92739", "complexity": 5,
-                "name": "Circulação de oficinas e shows - Claudia Cimbleris", "analist": "Modelo"},
-            {"pronac": "90021", "complexity": 25,
-                "name": "Indie 2009 - Mostra de Cinema Mundial", "analist": "Florentina"},
-            {"pronac": "153833", "complexity": 75,
-                "name": "TRES SOMBREROS DE COPA", "analist": "Chimbinha"},
-            {"pronac": "160443", "complexity": 95,
-                "name": "SERGIO REIS – CORAÇÃO ESTRADEIRO", "analist": "Cláudia Leitte"},
-            {"pronac": "118593", "complexity": 15,
-                "name": "ÁGUIA  CARNAVAL 2012: TROPICÁLIA! O MOVIMENTO QUE NÃO TERMINOU", "analist": "Ferdinando"},
-            {"pronac": "161533", "complexity": 5,
-                "name": "“Livro sobre Serafim Derenzi” (título provisório)", "analist": "Modelo"},
-            {"pronac": "171372", "complexity": 5,
-                "name": "“Paisagismo Brasileiro, Roberto Burle Marx e Haruyoshi Ono – 60 anos de história”.", "analist": "Modelo"},
-            {"pronac": "92739", "complexity": 5,
-                "name": "Circulação de oficinas e shows - Claudia Cimbleris", "analist": "Modelo"},
-            ]
+            projects = [ ]
 
         projects_bk = projects
-        
+
         for i in range(100):
             projects = projects + projects_bk
 
         paginated_list = paginate_projects(projects, request.GET.get('per_page'))
 
         page = request.GET.get('page')
-        
+
         projects_list = get_page(paginated_list, int(page))
 
         # content = {'projects': projects_list, 'last_page':len(paginated_list)}
-        
+
         next_page_index = int(page) + 1
 
         if next_page_index > len(paginated_list):
@@ -265,46 +236,17 @@ class SearchProjectView(APIView):
     renderer_classes = (JSONRenderer, )
     @csrf_exempt
     def get(self, request, format=None, **kwargs):
-        
+
         try:
             projects = projects_to_analyse(request)
         except:
-            projects = [
-            {"pronac": "90021", "complexity": 25,
-                "name": "Indie 2009 - Mostra de Cinema Mundial", "analist": ""},
-            {"pronac": "153833", "complexity": 75,
-                "name": "TRES SOMBREROS DE COPA", "analist": ""},
-            {"pronac": "160443", "complexity": 95,
-                "name": "SERGIO REIS – CORAÇÃO ESTRADEIRO", "analist": ""},
-            {"pronac": "118593", "complexity": 15,
-                "name": "ÁGUIA  CARNAVAL 2012: TROPICÁLIA! O MOVIMENTO QUE NÃO TERMINOU", "analist": ""},
-            {"pronac": "161533", "complexity": 5,
-                "name": "“Livro sobre Serafim Derenzi” (título provisório)", "analist": ""},
-            {"pronac": "171372", "complexity": 5,
-                "name": "“Paisagismo Brasileiro, Roberto Burle Marx e Haruyoshi Ono – 60 anos de história”.", "analist": ""},
-            {"pronac": "92739", "complexity": 5,
-                "name": "Circulação de oficinas e shows - Claudia Cimbleris", "analist": ""},
-            {"pronac": "90021", "complexity": 25,
-                "name": "Indie 2009 - Mostra de Cinema Mundial", "analist": ""},
-            {"pronac": "153833", "complexity": 75,
-                "name": "TRES SOMBREROS DE COPA", "analist": ""},
-            {"pronac": "160443", "complexity": 95,
-                "name": "SERGIO REIS – CORAÇÃO ESTRADEIRO", "analist": ""},
-            {"pronac": "118593", "complexity": 15,
-                "name": "ÁGUIA  CARNAVAL 2012: TROPICÁLIA! O MOVIMENTO QUE NÃO TERMINOU", "analist": ""},
-            {"pronac": "161533", "complexity": 5,
-                "name": "“Livro sobre Serafim Derenzi” (título provisório)", "analist": ""},
-            {"pronac": "171372", "complexity": 5,
-                "name": "“Paisagismo Brasileiro, Roberto Burle Marx e Haruyoshi Ono – 60 anos de história”.", "analist": ""},
-            {"pronac": "92739", "complexity": 5,
-                "name": "Circulação de oficinas e shows - Claudia Cimbleris", "analist": ""},
-            ]
+            projects = []
 
         projects_processed = [{
-            "pronac": project['pronac'], 
-            "complexity": project['complexity'],
-            "name": project['name'],
-            "analist": project['analist']
+            "pronac": project['pronac'],
+            "complexidade": project['complexidade'],
+            "nome": project['nome'],
+            "analista": project['responsavel']
         } for project in projects]
 
         keyword = request.GET.get('filter')
@@ -313,16 +255,16 @@ class SearchProjectView(APIView):
             # NAME_CUTOFF = calculate_search_cutoff(len(keyword))
 
             # name_matches_list = difflib.get_close_matches(
-            #     keyword.lower(), 
-            #     [project['name_lowered'] for project in projects_processed], 
-            #     n=len(projects), 
+            #     keyword.lower(),
+            #     [project['name_lowered'] for project in projects_processed],
+            #     n=len(projects),
             #     cutoff=NAME_CUTOFF
             # )
 
             pronac_matches_list = difflib.get_close_matches(
-                keyword, 
-                [project['pronac'] for project in projects], 
-                n=len(projects), 
+                keyword,
+                [project['pronac'] for project in projects],
+                n=len(projects),
                 cutoff=1
             )
 
@@ -331,10 +273,10 @@ class SearchProjectView(APIView):
             result_list = projects
 
         projects_per_page = request.GET.get('per_page')
-        
+
         if projects_per_page is None:
             projects_per_page = 15
-        else: 
+        else:
             projects_per_page = int(projects_per_page)
 
         paginated_list = paginate_projects(result_list, projects_per_page)
@@ -345,7 +287,7 @@ class SearchProjectView(APIView):
             page = "1"
 
         projects_list = get_page(paginated_list, int(page))
-        
+
         # content = {'projects': projects_list, 'last_page': len(paginated_list)}
 
         next_page_index = int(page) + 1
@@ -373,7 +315,7 @@ class SearchProjectView(APIView):
             'end_page': len(paginated_list),
             'data': projects_list
         }
-        
+
         return JsonResponse(content)
 
 class ProjectInfoView(APIView):
@@ -387,29 +329,45 @@ class ProjectInfoView(APIView):
 
     def create_metric_template(self):
         template = {
-            'total_items': 0,
+            'value': 0,
+            'is_outlier': False,
             'minimum_expected': 0,
-            'maximum_expected': 0,
-            'is_outlier': False
+            'maximum_expected': 0
         }
         return template
 
-
     def get_itens_orcamentarios(self, metrics, pronac, financial_complexity_indicator_name):
-        items = self.create_metric_template()
+        metric = self.create_metric_template()
+        name = 'items'
 
-        if metrics['items'] is not None:
-            items = {
-                'total_items': int(metrics['items']['number_of_items']),
-                'minimum_expected': int(metrics['items']['minimum_expected']),
-                'maximum_expected': int(metrics['items']['maximum_expected']),
-                'is_outlier': metrics['items']['is_outlier']
+        if metrics[name] is not None:
+            metric = {
+                'value': int(metrics[name]['number_of_items']),
+                'is_outlier': metrics[name]['is_outlier'],
+                'minimum_expected': int(metrics[name]['minimum_expected']),
+                'maximum_expected': int(metrics[name]['maximum_expected'])
             }
 
-        itens_orcamentarios = register_project_metric('itens_orcamentarios', items['total_items'], str(items), financial_complexity_indicator_name, pronac)
-        items['metric_id'] = itens_orcamentarios.id
+        itens_orcamentarios = register_project_metric('itens_orcamentarios', metric['value'], str(metric), financial_complexity_indicator_name, pronac)
+        metric['metric_id'] = itens_orcamentarios.id
 
-        return items
+        return metric
+
+    def get_comprovantes_pagamento(self, metrics, pronac, financial_complexity_indicator_name):
+        total_receipts = self.create_metric_template() 
+        name = 'total_receipts'
+
+        if metrics[name] is not None:
+            total_receipts = {
+                'value': int(metrics[name]['total_receipts']),
+                'is_outlier': get_outlier_color(metrics[name]['is_outlier']),
+                'maximum_expected': int(metrics[name]['maximum_expected_in_segment'])
+            }
+
+        comprovantes_pagamento = register_project_metric('comprovantes_pagamento', total_receipts['value'], str(total_receipts), financial_complexity_indicator_name, pronac)
+        total_receipts['metric_id'] = comprovantes_pagamento.id
+
+        return total_receipts
 
 
     # def post(self, request, format=None, **kwargs):
@@ -468,7 +426,7 @@ class ProjectInfoView(APIView):
 
         if metrics['easiness'] is not None:
             complexity = int((1 - metrics['easiness']['easiness']) * 100) # Converts easiness to complexity
-            
+
             if complexity is 0:
                 complexity = 1
 
@@ -492,8 +450,8 @@ class ProjectInfoView(APIView):
                 'value': float_to_money(metrics['raised_funds']['total_raised_funds']),
                 'float_value': metrics['raised_funds']['total_raised_funds'],
                 'reason': reason_text_formatter(
-                    metrics['raised_funds']['total_raised_funds'], 
-                    metrics['raised_funds']['maximum_expected_funds'], 
+                    metrics['raised_funds']['total_raised_funds'],
+                    metrics['raised_funds']['maximum_expected_funds'],
                     to_show_value=float_to_money(metrics['raised_funds']['total_raised_funds']),
                     to_show_expected_max_value=float_to_money(metrics['raised_funds']['maximum_expected_funds'])
                     ),
@@ -501,7 +459,7 @@ class ProjectInfoView(APIView):
                 'outlier_check': get_outlier_color(metrics['raised_funds']['is_outlier'])
             }
 
-        valor_captado = register_project_metric('valor_captado', raised_funds['float_value'], str(raised_funds), financial_complexity_indicator.name, int(pronac))        
+        valor_captado = register_project_metric('valor_captado', raised_funds['float_value'], str(raised_funds), financial_complexity_indicator.name, int(pronac))
         raised_funds['metric_id'] = valor_captado.id
 
         result['valor_captado'] = raised_funds
@@ -522,8 +480,8 @@ class ProjectInfoView(APIView):
                 'maximum_expected_value': float_to_money(metrics['verified_funds']['maximum_expected_funds']),
                 'outlier_check': get_outlier_color(metrics['verified_funds']['is_outlier']),
                 'reason': reason_text_formatter(
-                    metrics['verified_funds']['total_verified_funds'], 
-                    metrics['verified_funds']['maximum_expected_funds'], 
+                    metrics['verified_funds']['total_verified_funds'],
+                    metrics['verified_funds']['maximum_expected_funds'],
                     to_show_value=float_to_money(metrics['verified_funds']['total_verified_funds']),
                     to_show_expected_max_value=float_to_money(metrics['verified_funds']['maximum_expected_funds'])
                     ),
@@ -551,12 +509,12 @@ class ProjectInfoView(APIView):
                 'outlier_check': get_outlier_color(metrics['approved_funds']['is_outlier']),
                 'reason': reason_text_formatter(
                     metrics['approved_funds']['total_approved_funds'],
-                    metrics['approved_funds']['maximum_expected_funds'], 
+                    metrics['approved_funds']['maximum_expected_funds'],
                     to_show_value=float_to_money(metrics['approved_funds']['total_approved_funds']),
                     to_show_expected_max_value=float_to_money(metrics['approved_funds']['maximum_expected_funds'])
                     ),
             }
-        
+
         valor_aprovado = register_project_metric('valor_aprovado', approved_funds['float_value'], str(approved_funds), financial_complexity_indicator.name, int(pronac))
         approved_funds['metric_id'] = valor_aprovado.id
 
@@ -600,8 +558,8 @@ class ProjectInfoView(APIView):
                 'std': metrics['common_items_ratio']['std'],
                 'uncommon_items': uncommon_items_list,
                 'reason': reason_text_formatter(
-                    (100 - metrics['common_items_ratio']['value'] * 100), 
-                    metrics['common_items_ratio']['mean'] * 100, 
+                    (100 - metrics['common_items_ratio']['value'] * 100),
+                    metrics['common_items_ratio']['mean'] * 100,
                     to_show_value="{0:.2f}%".format(100 - metrics['common_items_ratio']['value'] * 100),
                     to_show_expected_max_value="{0:.2f}%".format(100 - metrics['common_items_ratio']['mean'] * 100)
                     ),
@@ -612,27 +570,6 @@ class ProjectInfoView(APIView):
         common_items_ratio['metric_id'] = itens_orcamentarios_fora_do_comum.id
 
         result['itens_orcamentarios_fora_do_comum'] = common_items_ratio
-
-        # comprovantes_pagamento
-        total_receipts = {
-            'outlier_check': get_outlier_color(False),
-            'total_receipts': 0,
-            'maximum_expected_in_segment': 0,
-            'reason': "Não há registros desta métrica para este projeto"
-        }
-
-        if metrics['total_receipts'] is not None:
-            total_receipts = {
-                'outlier_check': get_outlier_color(metrics['total_receipts']['is_outlier']),
-                'total_receipts': int(metrics['total_receipts']['total_receipts']),
-                'maximum_expected_in_segment': int(metrics['total_receipts']['maximum_expected_in_segment']),
-                'reason': reason_text_formatter(int(metrics['total_receipts']['total_receipts']), int(metrics['total_receipts']['maximum_expected_in_segment']), descriptor=" item(ns)")
-            }
-
-        comprovantes_pagamento = register_project_metric('comprovantes_pagamento', total_receipts['total_receipts'], str(total_receipts), financial_complexity_indicator.name, int(pronac))
-        total_receipts['metric_id'] = comprovantes_pagamento.id
-
-        result['comprovantes_pagamento'] = total_receipts
 
         # novos_fornecedores
         new_providers = {
@@ -672,8 +609,8 @@ class ProjectInfoView(APIView):
                 'outlier_check': get_outlier_color(metrics['new_providers']['is_outlier']),
                 'all_projects_average_percentage': metrics['new_providers']['all_projects_average_percentage'],
                 'reason': reason_text_formatter(
-                    metrics['new_providers']['new_providers_percentage'], 
-                    metrics['new_providers']['all_projects_average_percentage'], 
+                    metrics['new_providers']['new_providers_percentage'],
+                    metrics['new_providers']['all_projects_average_percentage'],
                     to_show_value="{0:.2f}%".format(metrics['new_providers']['new_providers_percentage'] * 100),
                     to_show_expected_max_value="{0:.2f}%".format(metrics['new_providers']['all_projects_average_percentage'] * 100)
                     )
@@ -761,20 +698,34 @@ class ProjectInfoView(APIView):
 
         result['precos_acima_media'] = items_prices
 
-        result['itens_orcamentarios'] = self.get_itens_orcamentarios(metrics, int(pronac), financial_complexity_indicator.name) 
+        #result['itens_orcamentarios'] = self.get_itens_orcamentarios(metrics, int(pronac), financial_complexity_indicator.name) 
+        result['comprovantes_pagamento'] = self.get_comprovantes_pagamento(metrics, int(pronac), financial_complexity_indicator.name) 
 
+        metric_attributes = [
+            {
+                'name': 'items',
+                'metric_name': 'itens_orcamentarios',
+                'value': 'number_of_items'
+            },
+            {
+                'name': 'total_receipts',
+                'metric_name': 'comprovantes_pagamento',
+                'value': 'total_receipts'
+            },
+            {
+                'name': 'verified_funds',
+                'metric_name': 'valor_comprovado',
+                'value': 'total_verified_funds'
+            }
+        ]
         project_indicators = [
             {
                 'name': 'complexidade_financeira',
                 'value': result['easiness']['value'],
                 'metrics': [
-                    {
-                        'metric_id': result['itens_orcamentarios']['metric_id'],
-                        'value': result['itens_orcamentarios']['total_items'],
-                        'is_outlier': result['itens_orcamentarios']['is_outlier'],
-                        'minimum_expected': result['itens_orcamentarios']['minimum_expected'],
-                        'maximum_expected': result['itens_orcamentarios']['maximum_expected'],
-                    },
+                    self.get_itens_orcamentarios(metrics, int(pronac), financial_complexity_indicator.name),
+                    self.get_comprovantes_pagamento(metrics, int(pronac), financial_complexity_indicator.name),
+                    #self.create_metric(metric_attributes[2], metrics, int(pronac), financial_complexity_indicator.name),
                     {
                         'name': 'itens_orcamentarios_fora_do_comum',
                         'name_title': 'Itens orçamentários fora do comum',
@@ -789,17 +740,6 @@ class ProjectInfoView(APIView):
                         'std': result['itens_orcamentarios_fora_do_comum']['std'],
                         'uncommon_items': result['itens_orcamentarios_fora_do_comum']['uncommon_items'],
                         'common_items_not_in_project': result['itens_orcamentarios_fora_do_comum']['common_items_not_in_project']
-                    },
-                    {
-                        'name': 'comprovantes_pagamento',
-                        'name_title': 'Comprovantes de pagamento',
-                        'type': 'bar',
-                        'helper_text':'Compara a quantidade de comprovantes deste projeto com a quantidade mais comum de comprovantes em projetos do mesmo segmento',
-                        'metric_id': result['comprovantes_pagamento']['metric_id'],
-                        'value': result['comprovantes_pagamento']['total_receipts'],
-                        'reason': result['comprovantes_pagamento']['reason'],
-                        'outlier_check': result['comprovantes_pagamento']['outlier_check'],
-                        'maximum_expected_in_segment': result['comprovantes_pagamento']['maximum_expected_in_segment']
                     },
                     {
                         'name': 'precos_acima_media',
@@ -898,7 +838,7 @@ class ProjectInfoView(APIView):
                 'pronac': string_pronac,
                 'indicators': project_indicators,
             }
-        else: project_information = {} 
+        else: project_information = {}
 
         return JsonResponse(project_information)
 
@@ -946,7 +886,7 @@ class SendMetricFeedbackView(APIView):
             'feedback_id': saved_metric_feedback.id,
             'feedback_grade': saved_metric_feedback.grade,
             'feedback_reason': saved_metric_feedback.reason
-        }       
+        }
 
         return JsonResponse(request_response)
 
@@ -970,14 +910,14 @@ class SendProjectFeedbackView(APIView):
         project_feedback_grade = int(request_data['project_feedback_grade'])
 
         project_query = ProjectFeedback.objects.filter(
-            user=user, 
+            user=user,
             entity=entity
         )
 
         if len(project_query) is 0:
             # Creates
             saved_project_feedback = ProjectFeedback.objects.create(
-                user=user, 
+                user=user,
                 entity=entity,
                 grade=project_feedback_grade
             )
@@ -986,12 +926,12 @@ class SendProjectFeedbackView(APIView):
             saved_project_feedback = project_query[0]
             saved_project_feedback.grade = project_feedback_grade
             saved_project_feedback.save()
-        
+
 
         request_response = {
             'feedback_id': saved_project_feedback.id,
             'feedback_grade': saved_project_feedback.grade,
-        }    
+        }
 
         return JsonResponse(request_response)
 
