@@ -400,6 +400,19 @@ class ProjectInfoView(APIView):
         
         return verified_funds
 
+    def get_valor_aprovado(self, metrics, pronac, financial_complexity_indicator_name):
+        approved_funds = self.create_metric_template()
+
+        if metrics['approved_funds'] is not None:
+            approved_funds['value'] = metrics['approved_funds']['total_approved_funds'] # Value is a float number
+            approved_funds['is_outlier'] = get_outlier_color(metrics['approved_funds']['is_outlier'])
+            approved_funds['maximum_expected'] = metrics['approved_funds']['maximum_expected_funds']
+
+        valor_aprovado = register_project_metric('valor_aprovado', approved_funds['value'], str(approved_funds), financial_complexity_indicator_name, pronac)
+        approved_funds['metric_id'] = valor_aprovado.id
+
+        return approved_funds
+
 
     # def post(self, request, format=None, **kwargs):
     def get(self, request, format=None, **kwargs):
@@ -467,34 +480,6 @@ class ProjectInfoView(APIView):
 
         result['easiness'] = easiness
         # return HttpResponse(str(result))
-        # valor_aprovado
-        approved_funds = {
-            'value': float_to_money(0),
-            'float_value': 0.0,
-            'maximum_expected_funds': float_to_money(0.0),
-            'outlier_check': get_outlier_color(False),
-            'reason': "Não há registros desta métrica para este projeto"
-        }
-
-        if metrics['approved_funds'] is not None:
-            approved_funds = {
-                'value': float_to_money(metrics['approved_funds']['total_approved_funds']),
-                'float_value': metrics['approved_funds']['total_approved_funds'],
-                'maximum_expected_funds': float_to_money(metrics['approved_funds']['maximum_expected_funds']),
-                'outlier_check': get_outlier_color(metrics['approved_funds']['is_outlier']),
-                'reason': reason_text_formatter(
-                    metrics['approved_funds']['total_approved_funds'],
-                    metrics['approved_funds']['maximum_expected_funds'],
-                    to_show_value=float_to_money(metrics['approved_funds']['total_approved_funds']),
-                    to_show_expected_max_value=float_to_money(metrics['approved_funds']['maximum_expected_funds'])
-                    ),
-            }
-
-        valor_aprovado = register_project_metric('valor_aprovado', approved_funds['float_value'], str(approved_funds), financial_complexity_indicator.name, int(pronac))
-        approved_funds['metric_id'] = valor_aprovado.id
-
-        result['valor_aprovado'] = approved_funds
-
         # itens_orcamentarios_fora_do_comum
         common_items_ratio = {
             'outlier_check': get_outlier_color(False),
@@ -702,6 +687,7 @@ class ProjectInfoView(APIView):
                     self.get_comprovantes_pagamento(metrics, int(pronac), financial_complexity_indicator.name),
                     self.get_valor_captado(metrics, int(pronac), financial_complexity_indicator.name),
                     self.get_valor_comprovado(metrics, int(pronac), financial_complexity_indicator.name),
+                    self.get_valor_aprovado(metrics, int(pronac), financial_complexity_indicator.name),
                     #self.create_metric(metric_attributes[2], metrics, int(pronac), financial_complexity_indicator.name),
                     {
                         'name': 'itens_orcamentarios_fora_do_comum',
@@ -785,17 +771,17 @@ class ProjectInfoView(APIView):
                         'outlier_check': result['novos_fornecedores']['outlier_check'],
                         'all_projects_average_percentage': result['novos_fornecedores']['all_projects_average_percentage']
                     },
-                    {
-                        'name': 'valor_aprovado',
-                        'name_title': 'Valor aprovado',
-                        'type': 'bar',
-                        'helper_text':'Compara o valor aprovado para este projeto com o valor mais frequentemente aprovado em projetos do mesmo segmento',
-                        'metric_id': result['valor_aprovado']['metric_id'],
-                        'value': result['valor_aprovado']['value'],
-                        'reason': result['valor_aprovado']['reason'],
-                        'outlier_check': result['valor_aprovado']['outlier_check'],
-                        'maximum_expected_funds': result['valor_aprovado']['maximum_expected_funds']
-                    }
+                    # {
+                    #     'name': 'valor_aprovado',
+                    #     'name_title': 'Valor aprovado',
+                    #     'type': 'bar',
+                    #     'helper_text':'Compara o valor aprovado para este projeto com o valor mais frequentemente aprovado em projetos do mesmo segmento',
+                    #     'metric_id': result['valor_aprovado']['metric_id'],
+                    #     'value': result['valor_aprovado']['value'],
+                    #     'reason': result['valor_aprovado']['reason'],
+                    #     'outlier_check': result['valor_aprovado']['outlier_check'],
+                    #     'maximum_expected_funds': result['valor_aprovado']['maximum_expected_funds']
+                    # }
                 ]
             },
         ]
