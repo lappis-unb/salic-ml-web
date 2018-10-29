@@ -337,81 +337,7 @@ class ProjectInfoView(APIView):
         }
         return template
 
-    def get_itens_orcamentarios(self, metrics, pronac, financial_complexity_indicator_name):
-        metric = self.create_metric_template()
-        name = 'items'
-
-        if metrics[name] is not None:
-            metric = {
-                'value': int(metrics[name]['number_of_items']), # Value is a integer number
-                'is_outlier': metrics[name]['is_outlier'],
-                'minimum_expected': int(metrics[name]['minimum_expected']),
-                'maximum_expected': int(metrics[name]['maximum_expected'])
-            }
-
-        itens_orcamentarios = register_project_metric('itens_orcamentarios', metric['value'], str(metric), financial_complexity_indicator_name, pronac)
-        metric['metric_id'] = itens_orcamentarios.id
-
-        return metric
-
-    def get_comprovantes_pagamento(self, metrics, pronac, financial_complexity_indicator_name):
-        total_receipts = self.create_metric_template() 
-        name = 'total_receipts'
-
-        if metrics[name] is not None:
-            total_receipts = {
-                'value': int(metrics[name]['total_receipts']), # Value is a integer number
-                'is_outlier': get_outlier_color(metrics[name]['is_outlier']),
-                'maximum_expected': int(metrics[name]['maximum_expected_in_segment'])
-            }
-
-        comprovantes_pagamento = register_project_metric('comprovantes_pagamento', total_receipts['value'], str(total_receipts), financial_complexity_indicator_name, pronac)
-        total_receipts['metric_id'] = comprovantes_pagamento.id
-
-        return total_receipts
-
-    def get_valor_captado(self, metrics, pronac, financial_complexity_indicator_name):
-        raised_funds = self.create_metric_template() 
-
-        if metrics['raised_funds'] is not None:
-            raised_funds = {
-                'value': metrics['raised_funds']['total_raised_funds'], # Value is a float number
-                'is_outlier': get_outlier_color(metrics['raised_funds']['is_outlier']),
-                'maximum_expected': metrics['raised_funds']['maximum_expected_funds']
-            }
-
-        valor_captado = register_project_metric('valor_captado', raised_funds['value'], str(raised_funds), financial_complexity_indicator_name, pronac)
-        raised_funds['metric_id'] = valor_captado.id
-
-        return raised_funds
-
-    def get_valor_comprovado(self, metrics, pronac, financial_complexity_indicator_name):
-        verified_funds = self.create_metric_template() 
-
-        if metrics['verified_funds'] is not None:
-            verified_funds = {
-                'value': metrics['verified_funds']['total_verified_funds'], # Value is a float number
-                'is_outlier': get_outlier_color(metrics['verified_funds']['is_outlier']),
-                'maximum_expected': metrics['verified_funds']['maximum_expected_funds']
-            }
-
-        valor_comprovado = register_project_metric('valor_comprovado', verified_funds['value'], str(verified_funds), financial_complexity_indicator_name, pronac)
-        verified_funds['metric_id'] = valor_comprovado.id
-        
-        return verified_funds
-
-    def get_valor_aprovado(self, metrics, pronac, financial_complexity_indicator_name):
-        approved_funds = self.create_metric_template()
-
-        if metrics['approved_funds'] is not None:
-            approved_funds['value'] = metrics['approved_funds']['total_approved_funds'] # Value is a float number
-            approved_funds['is_outlier'] = get_outlier_color(metrics['approved_funds']['is_outlier'])
-            approved_funds['maximum_expected'] = metrics['approved_funds']['maximum_expected_funds']
-
-        valor_aprovado = register_project_metric('valor_aprovado', approved_funds['value'], str(approved_funds), financial_complexity_indicator_name, pronac)
-        approved_funds['metric_id'] = valor_aprovado.id
-
-        return approved_funds
+    #def get_itens_orcamentarios(self, metrics, pronac, financial_complexity_indicator_name):
 
     def create_metric(self, metric_attributes, metrics, pronac, financial_complexity_indicator_name):
         metric = self.create_metric_template()
@@ -430,16 +356,6 @@ class ProjectInfoView(APIView):
 
     # def post(self, request, format=None, **kwargs):
     def get(self, request, format=None, **kwargs):
-        # user_data = json.loads(request.body)
-
-        # user_email = user_data['email'] + '@cultura.gov.br'
-        # try:
-        #     user = User.objects.get(email=user_email)
-        # except:
-        #     user_name = user_data['name']
-
-        #     user = User.objects.create(email=user_email, name=user_name)
-
         pronac = kwargs['pronac']
         project = fetch_entity(int(pronac))
         metrics_list = [
@@ -672,13 +588,12 @@ class ProjectInfoView(APIView):
 
         result['precos_acima_media'] = items_prices
 
-        #result['itens_orcamentarios'] = self.get_itens_orcamentarios(metrics, int(pronac), financial_complexity_indicator.name) 
-        result['comprovantes_pagamento'] = self.get_comprovantes_pagamento(metrics, int(pronac), financial_complexity_indicator.name) 
         metric_attributes = [
             {
                 'name': 'items',
                 'metric_name': 'itens_orcamentarios',
-                'value': 'number_of_items'
+                'value': 'number_of_items',
+                'maximum_expected': 'maximum_expected'
             },
             {
                 'name': 'total_receipts',
@@ -710,13 +625,11 @@ class ProjectInfoView(APIView):
                 'name': 'complexidade_financeira',
                 'value': result['easiness']['value'],
                 'metrics': [
+                    self.create_metric(metric_attributes[0], metrics, int(pronac), financial_complexity_indicator.name),
+                    self.create_metric(metric_attributes[1], metrics, int(pronac), financial_complexity_indicator.name),
+                    self.create_metric(metric_attributes[2], metrics, int(pronac), financial_complexity_indicator.name),
+                    self.create_metric(metric_attributes[3], metrics, int(pronac), financial_complexity_indicator.name),
                     self.create_metric(metric_attributes[4], metrics, int(pronac), financial_complexity_indicator.name),
-                    self.get_itens_orcamentarios(metrics, int(pronac), financial_complexity_indicator.name),
-                    self.get_comprovantes_pagamento(metrics, int(pronac), financial_complexity_indicator.name),
-                    self.get_valor_captado(metrics, int(pronac), financial_complexity_indicator.name),
-                    self.get_valor_comprovado(metrics, int(pronac), financial_complexity_indicator.name),
-                    self.get_valor_aprovado(metrics, int(pronac), financial_complexity_indicator.name),
-                    #self.create_metric(metric_attributes[2], metrics, int(pronac), financial_complexity_indicator.name),
                     {
                         'name': 'itens_orcamentarios_fora_do_comum',
                         'name_title': 'Itens orçamentários fora do comum',
@@ -746,33 +659,6 @@ class ProjectInfoView(APIView):
                         'total_items': result['precos_acima_media']['total_items'],
                         'maximum_expected': result['precos_acima_media']['maximum_expected']
                     },
-                    # {
-                    #     'name': 'valor_comprovado',
-                    #     'name_title': 'Valor comprovado',
-                    #     'type': 'bar',
-                    #     'helper_text':'Compara o valor comprovado neste projeto com o valor mais frequentemente comprovado em projetos do mesmo segmento',
-                    #     'metric_id': result['valor_comprovado']['metric_id'],
-                    #     'value': result['valor_comprovado']['value'],
-                    #     'reason': result['valor_comprovado']['reason'],
-                    #     'outlier_check': result['valor_comprovado']['outlier_check']
-                    # },
-                    # {
-                    #     'name': 'valor_captado',
-                    #     'name_title': 'Valor captado',
-                    #     'type': 'bar',
-                    #     'helper_text':'Compara o valor captado neste projeto com o valor mais frequentemente captado em projetos do mesmo segmento',
-                    #     'metric_id': result['valor_captado']['metric_id'],
-                    #     'value': result['valor_captado']['value'],
-                    #     'reason': result['valor_captado']['reason'],
-                    #     'outlier_check': result['valor_captado']['outlier_check']
-                    # },
-                    # {
-                    #     'name': 'mudancas_planilha_orcamentaria',
-                    #     'value': '70',
-                    #     'reason': 'any reason',
-                    #     'outlier_check': '',
-                    #     'document_version': 14,
-                    # },
                     {
                         'name': 'projetos_mesmo_proponente',
                         'name_title': 'Projetos do mesmo proponente',
@@ -799,17 +685,6 @@ class ProjectInfoView(APIView):
                         'outlier_check': result['novos_fornecedores']['outlier_check'],
                         'all_projects_average_percentage': result['novos_fornecedores']['all_projects_average_percentage']
                     },
-                    # {
-                    #     'name': 'valor_aprovado',
-                    #     'name_title': 'Valor aprovado',
-                    #     'type': 'bar',
-                    #     'helper_text':'Compara o valor aprovado para este projeto com o valor mais frequentemente aprovado em projetos do mesmo segmento',
-                    #     'metric_id': result['valor_aprovado']['metric_id'],
-                    #     'value': result['valor_aprovado']['value'],
-                    #     'reason': result['valor_aprovado']['reason'],
-                    #     'outlier_check': result['valor_aprovado']['outlier_check'],
-                    #     'maximum_expected_funds': result['valor_aprovado']['maximum_expected_funds']
-                    # }
                 ]
             },
         ]
