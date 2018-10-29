@@ -337,7 +337,42 @@ class ProjectInfoView(APIView):
         }
         return template
 
-    #def get_itens_orcamentarios(self, metrics, pronac, financial_complexity_indicator_name):
+    def create_list_items(self, metrics, name, item_list_name):
+        items_list = [] 
+        for item_id in metrics[name][item_list_name]:
+            items_list.append({
+                'id': item_id,
+                'name': metrics[name][item_list_name][item_id],
+                'link': '#'
+            })
+        return items_list
+
+    def get_itens_orcamentarios_fora_do_comum(self, metrics, pronac, financial_complexity_indicator_name):
+        common_items_ratio = self.create_metric_template()
+        common_items_ratio['uncommon_items'] = []
+        common_items_ratio['common_items_not_in_project'] = []
+        name = 'common_items_ratio'
+        metric_name = 'itens_orcamentarios_fora_do_comum'
+
+        if metrics[name] is not None:
+            common_items_not_in_project_list = []
+            uncommon_items_list = []
+
+            common_items_not_in_project_list = self.create_list_items(metrics, name, 'common_items_not_in_project')
+            uncommon_items_list = self.create_list_items(metrics, name, 'uncommon_items')
+
+            common_items_ratio = {
+                'is_outlier': get_outlier_color(metrics[name]['is_outlier']),
+                'value': (100 - metrics[name]['value'] * 100),
+                'uncommon_items': uncommon_items_list,
+                'common_items_not_in_project': common_items_not_in_project_list
+            }
+
+        itens = register_project_metric(metric_name, common_items_ratio['value'], "", financial_complexity_indicator_name, pronac)
+        common_items_ratio['metric_id'] = itens.id
+
+        return common_items_ratio
+
 
     def create_metric(self, metric_attributes, metrics, pronac, financial_complexity_indicator_name):
         metric = self.create_metric_template()
@@ -410,57 +445,6 @@ class ProjectInfoView(APIView):
 
         result['easiness'] = easiness
         # return HttpResponse(str(result))
-        # itens_orcamentarios_fora_do_comum
-        common_items_ratio = {
-            'outlier_check': get_outlier_color(False),
-            'value': '0.0%',
-            'float_value': 0.0,
-            'mean': 0.0,
-            'std': 0.0,
-            'uncommon_items': [],
-            'common_items_not_in_project': [],
-            'reason': "Não há registros desta métrica para este projeto"
-        }
-
-        if metrics['common_items_ratio'] is not None:
-            common_items_not_in_project_list = []
-            uncommon_items_list = []
-
-            for item_id in metrics['common_items_ratio']['common_items_not_in_project']:
-                common_items_not_in_project_list.append({
-                    'id': item_id,
-                    'name': metrics['common_items_ratio']['common_items_not_in_project'][item_id],
-                    'link': '#'
-                })
-
-            for item_id in metrics['common_items_ratio']['uncommon_items']:
-                uncommon_items_list.append({
-                    'id': item_id,
-                    'name': metrics['common_items_ratio']['uncommon_items'][item_id],
-                    'link': '#'
-                })
-
-            common_items_ratio = {
-                'outlier_check': get_outlier_color(metrics['common_items_ratio']['is_outlier']),
-                'value': "{0:.2f}%".format(100 - metrics['common_items_ratio']['value'] * 100),
-                'float_value': (100 - metrics['common_items_ratio']['value'] * 100),
-                'mean': metrics['common_items_ratio']['mean'],
-                'std': metrics['common_items_ratio']['std'],
-                'uncommon_items': uncommon_items_list,
-                'reason': reason_text_formatter(
-                    (100 - metrics['common_items_ratio']['value'] * 100),
-                    metrics['common_items_ratio']['mean'] * 100,
-                    to_show_value="{0:.2f}%".format(100 - metrics['common_items_ratio']['value'] * 100),
-                    to_show_expected_max_value="{0:.2f}%".format(100 - metrics['common_items_ratio']['mean'] * 100)
-                    ),
-                'common_items_not_in_project': common_items_not_in_project_list
-            }
-
-        itens_orcamentarios_fora_do_comum = register_project_metric('itens_orcamentarios_fora_do_comum', common_items_ratio['float_value'], "", financial_complexity_indicator.name, int(pronac))
-        common_items_ratio['metric_id'] = itens_orcamentarios_fora_do_comum.id
-
-        result['itens_orcamentarios_fora_do_comum'] = common_items_ratio
-
         # novos_fornecedores
         new_providers = {
             'new_providers_list': [],
@@ -630,61 +614,47 @@ class ProjectInfoView(APIView):
                     self.create_metric(metric_attributes[2], metrics, int(pronac), financial_complexity_indicator.name),
                     self.create_metric(metric_attributes[3], metrics, int(pronac), financial_complexity_indicator.name),
                     self.create_metric(metric_attributes[4], metrics, int(pronac), financial_complexity_indicator.name),
-                    {
-                        'name': 'itens_orcamentarios_fora_do_comum',
-                        'name_title': 'Itens orçamentários fora do comum',
-                        'type': 'items-list',
-                        'helper_text':'Indica os itens orçamentários deste projeto que não estão entre os mais comuns do segmento. \
-                        Também lista os itens que aparecem frequentemente em projetos do segmento, mas que não aparecem neste projeto',
-                        'metric_id': result['itens_orcamentarios_fora_do_comum']['metric_id'],
-                        'value': result['itens_orcamentarios_fora_do_comum']['value'],
-                        'reason': result['itens_orcamentarios_fora_do_comum']['reason'],
-                        'outlier_check': result['itens_orcamentarios_fora_do_comum']['outlier_check'],
-                        'mean': result['itens_orcamentarios_fora_do_comum']['mean'],
-                        'std': result['itens_orcamentarios_fora_do_comum']['std'],
-                        'uncommon_items': result['itens_orcamentarios_fora_do_comum']['uncommon_items'],
-                        'common_items_not_in_project': result['itens_orcamentarios_fora_do_comum']['common_items_not_in_project']
-                    },
-                    {
-                        'name': 'precos_acima_media',
-                        'name_title': 'Preços acima da média',
-                        'type': 'bar',
-                        'helper_text':'Verifica a porcentagem de itens com valor acima da mediana histórica neste projeto \
-                        e compara com a porcentagem mais frequente de itens acima da mediana em projetos do mesmo segmento',
-                        'metric_id': result['precos_acima_media']['metric_id'],
-                        'reason': result['precos_acima_media']['reason'],
-                        'value': result['precos_acima_media']['value'],
-                        'outlier_check': result['precos_acima_media']['outlier_check'],
-                        'items': result['precos_acima_media']['items'],
-                        'total_items': result['precos_acima_media']['total_items'],
-                        'maximum_expected': result['precos_acima_media']['maximum_expected']
-                    },
-                    {
-                        'name': 'projetos_mesmo_proponente',
-                        'name_title': 'Projetos do mesmo proponente',
-                        'type': 'proponents-list',
-                        'helper_text':'Indica os projetos que o proponente já executou no passado.',
-                        'metric_id': result['projetos_mesmo_proponente']['metric_id'],
-                        'value': len(result['projetos_mesmo_proponente']['submitted_projects']),
-                        'reason': result['projetos_mesmo_proponente']['reason'],
-                        'outlier_check': result['projetos_mesmo_proponente']['outlier_check'],
-                        'proponent_projects': result['projetos_mesmo_proponente']['submitted_projects'],
-                    },
-                    {
-                        'name': 'novos_fornecedores',
-                        'name_title': 'Novos fornecedores',
-                        'type': 'providers-list',
-                        'helper_text':' Indica a proporção de fornecedores que nunca participaram de projetos de incentivo antes em \
-                        relação ao total de fornecedores envolvidos com o projeto.Também lista os itens orçamentários dos novos fornecedores.',
-                        'metric_id': result['novos_fornecedores']['metric_id'],
-                        'value': result['novos_fornecedores']['new_providers_quantity'],
-                        'reason': result['novos_fornecedores']['reason'],
-                        'providers': result['novos_fornecedores']['new_providers_list'],
-                        'new_providers_percentage': result['novos_fornecedores']['new_providers_percentage'],
-                        'segment_average_percentage': result['novos_fornecedores']['segment_average_percentage'],
-                        'outlier_check': result['novos_fornecedores']['outlier_check'],
-                        'all_projects_average_percentage': result['novos_fornecedores']['all_projects_average_percentage']
-                    },
+                    self.get_itens_orcamentarios_fora_do_comum(metrics, int(pronac), financial_complexity_indicator.name),
+                    # {
+                    #     'name': 'precos_acima_media',
+                    #     'name_title': 'Preços acima da média',
+                    #     'type': 'bar',
+                    #     'helper_text':'Verifica a porcentagem de itens com valor acima da mediana histórica neste projeto \
+                    #     e compara com a porcentagem mais frequente de itens acima da mediana em projetos do mesmo segmento',
+                    #     'metric_id': result['precos_acima_media']['metric_id'],
+                    #     'reason': result['precos_acima_media']['reason'],
+                    #     'value': result['precos_acima_media']['value'],
+                    #     'outlier_check': result['precos_acima_media']['outlier_check'],
+                    #     'items': result['precos_acima_media']['items'],
+                    #     'total_items': result['precos_acima_media']['total_items'],
+                    #     'maximum_expected': result['precos_acima_media']['maximum_expected']
+                    # },
+                    # {
+                    #     'name': 'projetos_mesmo_proponente',
+                    #     'name_title': 'Projetos do mesmo proponente',
+                    #     'type': 'proponents-list',
+                    #     'helper_text':'Indica os projetos que o proponente já executou no passado.',
+                    #     'metric_id': result['projetos_mesmo_proponente']['metric_id'],
+                    #     'value': len(result['projetos_mesmo_proponente']['submitted_projects']),
+                    #     'reason': result['projetos_mesmo_proponente']['reason'],
+                    #     'outlier_check': result['projetos_mesmo_proponente']['outlier_check'],
+                    #     'proponent_projects': result['projetos_mesmo_proponente']['submitted_projects'],
+                    # },
+                    # {
+                    #     'name': 'novos_fornecedores',
+                    #     'name_title': 'Novos fornecedores',
+                    #     'type': 'providers-list',
+                    #     'helper_text':' Indica a proporção de fornecedores que nunca participaram de projetos de incentivo antes em \
+                    #     relação ao total de fornecedores envolvidos com o projeto.Também lista os itens orçamentários dos novos fornecedores.',
+                    #     'metric_id': result['novos_fornecedores']['metric_id'],
+                    #     'value': result['novos_fornecedores']['new_providers_quantity'],
+                    #     'reason': result['novos_fornecedores']['reason'],
+                    #     'providers': result['novos_fornecedores']['new_providers_list'],
+                    #     'new_providers_percentage': result['novos_fornecedores']['new_providers_percentage'],
+                    #     'segment_average_percentage': result['novos_fornecedores']['segment_average_percentage'],
+                    #     'outlier_check': result['novos_fornecedores']['outlier_check'],
+                    #     'all_projects_average_percentage': result['novos_fornecedores']['all_projects_average_percentage']
+                    # },
                 ]
             },
         ]
