@@ -348,7 +348,11 @@ class ProjectInfoView(APIView):
         return items_list
 
     def get_itens_orcamentarios_fora_do_comum(self, metrics, pronac, financial_complexity_indicator_name):
-        common_items_ratio = self.create_metric_template()
+        common_items_ratio = {
+            'value': 0,
+            'is_outlier': False
+        }
+
         common_items_ratio['uncommon_items'] = []
         common_items_ratio['common_items_not_in_project'] = []
         name = 'common_items_ratio'
@@ -373,6 +377,87 @@ class ProjectInfoView(APIView):
 
         return common_items_ratio
 
+    def get_novos_fornecedores(self, metrics, pronac, financial_complexity_indicator_name):
+        name = 'new_providers'
+        new_providers = {
+            'value': 0,
+            'is_outlier': get_outlier_color(False),
+            'new_providers_list': [],
+        }
+
+        if metrics[name] is not None:
+            new_providers_list = []
+
+            for provider_cnpj_cpf in metrics[name]['new_providers']:
+                items_by_provider = []
+
+                for item_id in metrics[name]['new_providers'][provider_cnpj_cpf]['items']:
+                    items_by_provider.append({
+                        'item_id': item_id,
+                        'item_name': metrics[name]['new_providers'][provider_cnpj_cpf]['items'][item_id],
+                        'item_link': '#'
+                    })
+
+                new_providers_list.append({
+                    'provider_cnpj_cpf': provider_cnpj_cpf,
+                    'provider_name': metrics[name]['new_providers'][provider_cnpj_cpf]['name'],
+                    'provider_items': items_by_provider
+                })
+
+            new_providers = {
+                'value': len(new_providers_list),
+                'is_outlier': get_outlier_color(metrics[name]['is_outlier']),
+                'new_providers_list': new_providers_list,
+            }
+
+        novos_fornecedores = register_project_metric('novos_fornecedores', new_providers['new_providers_quantity'], "", financial_complexity_indicator_name, pronac)
+        new_providers['metric_id'] = novos_fornecedores.id
+
+        return new_providers
+ 
+    def get_projetos_mesmo_proponente(self, metrics, pronac, financial_complexity_indicator_name):
+        proponent_projects = {
+            'cnpj_cpf': '',
+            'value': 0,
+            'submitted_projects': [],
+            'analyzed_projects': [],
+            'is_outlier': get_outlier_color(False),
+        }
+        name = 'proponent_projects'
+
+        if metrics[name] is not None:
+            submitted_projects_list = []
+            analyzed_projects_list = []
+
+            all_pronacs = metrics[name]['submitted_projects']['pronacs_of_this_proponent']
+
+            projects_information = submitted_projects_info.get_projects_name(all_pronacs)
+            for project_pronac in metrics[name]['submitted_projects']['pronacs_of_this_proponent']:
+                submitted_projects_list.append({
+                    'pronac': project_pronac,
+                    'name': projects_information[project_pronac],
+                    'link': '#'
+                })
+
+            for project_pronac in metrics[name]['analyzed_projects']['pronacs_of_this_proponent']:
+                analyzed_projects_list.append({
+                    'pronac': project_pronac,
+                    'name': projects_information[project_pronac],
+                    'link': '#'
+                })
+
+            proponent_projects = {
+                'cnpj_cpf': metrics[name]['cnpj_cpf'],
+                'value': len(submitted_projects_list),
+                'submitted_projects': submitted_projects_list,
+                'analyzed_projects': analyzed_projects_list,
+                'is_outlier': get_outlier_color(False),
+            }
+
+        projetos_mesmo_proponente = register_project_metric('projetos_mesmo_proponente', len(proponent_projects['submitted_projects']), "", financial_complexity_indicator_name, pronac)
+        proponent_projects['metric_id'] = projetos_mesmo_proponente.id
+
+        return proponent_projects
 
     def create_metric(self, metric_attributes, metrics, pronac, financial_complexity_indicator_name):
         metric = self.create_metric_template()
@@ -445,99 +530,6 @@ class ProjectInfoView(APIView):
 
         result['easiness'] = easiness
         # return HttpResponse(str(result))
-        # novos_fornecedores
-        new_providers = {
-            'new_providers_list': [],
-            'new_providers_quantity': 0,
-            'new_providers_percentage': "0.0%",
-            'segment_average_percentage': 0,
-            'outlier_check': get_outlier_color(False),
-            'all_projects_average_percentage': 0,
-            'reason': "Não há registros desta métrica para este projeto"
-        }
-
-        if metrics['new_providers'] is not None:
-            new_providers_list = []
-
-            for provider_cnpj_cpf in metrics['new_providers']['new_providers']:
-                items_by_provider = []
-
-                for item_id in metrics['new_providers']['new_providers'][provider_cnpj_cpf]['items']:
-                    items_by_provider.append({
-                        'item_id': item_id,
-                        'item_name': metrics['new_providers']['new_providers'][provider_cnpj_cpf]['items'][item_id],
-                        'item_link': '#'
-                    })
-
-                new_providers_list.append({
-                    'provider_cnpj_cpf': provider_cnpj_cpf,
-                    'provider_name': metrics['new_providers']['new_providers'][provider_cnpj_cpf]['name'],
-                    'provider_items': items_by_provider
-                })
-
-            new_providers = {
-                'new_providers_quantity': len(new_providers_list),
-                'new_providers_list': new_providers_list,
-                'new_providers_percentage': "{0:.2f}%".format(metrics['new_providers']['new_providers_percentage']),
-                'segment_average_percentage': metrics['new_providers']['segment_average_percentage'],
-                'outlier_check': get_outlier_color(metrics['new_providers']['is_outlier']),
-                'all_projects_average_percentage': metrics['new_providers']['all_projects_average_percentage'],
-                'reason': reason_text_formatter(
-                    metrics['new_providers']['new_providers_percentage'],
-                    metrics['new_providers']['all_projects_average_percentage'],
-                    to_show_value="{0:.2f}%".format(metrics['new_providers']['new_providers_percentage'] * 100),
-                    to_show_expected_max_value="{0:.2f}%".format(metrics['new_providers']['all_projects_average_percentage'] * 100)
-                    )
-            }
-
-        novos_fornecedores = register_project_metric('novos_fornecedores', new_providers['new_providers_quantity'], "", financial_complexity_indicator.name, int(pronac))
-        new_providers['metric_id'] = novos_fornecedores.id
-
-        result['novos_fornecedores'] = new_providers
-
-        # projetos_mesmo_proponente
-        proponent_projects = {
-            'cnpj_cpf': '',
-            'submitted_projects': [],
-            'analyzed_projects': [],
-            'outlier_check': get_outlier_color(False),
-            'reason': "Não há registros desta métrica para este projeto"
-        }
-
-        if metrics['proponent_projects'] is not None:
-            submitted_projects_list = []
-            analyzed_projects_list = []
-
-            all_pronacs = metrics['proponent_projects']['submitted_projects']['pronacs_of_this_proponent']
-
-            projects_information = submitted_projects_info.get_projects_name(all_pronacs)
-            for project_pronac in metrics['proponent_projects']['submitted_projects']['pronacs_of_this_proponent']:
-                submitted_projects_list.append({
-                    'pronac': project_pronac,
-                    'name': projects_information[project_pronac],
-                    'link': '#'
-                })
-
-            for project_pronac in metrics['proponent_projects']['analyzed_projects']['pronacs_of_this_proponent']:
-                analyzed_projects_list.append({
-                    'pronac': project_pronac,
-                    'name': projects_information[project_pronac],
-                    'link': '#'
-                })
-
-            proponent_projects = {
-                'cnpj_cpf': metrics['proponent_projects']['cnpj_cpf'],
-                'submitted_projects': submitted_projects_list,
-                'analyzed_projects': analyzed_projects_list,
-                'outlier_check': get_outlier_color(False),
-                'reason': ""
-            }
-
-        projetos_mesmo_proponente = register_project_metric('projetos_mesmo_proponente', len(proponent_projects['submitted_projects']), "", financial_complexity_indicator.name, int(pronac))
-        proponent_projects['metric_id'] = projetos_mesmo_proponente.id
-
-        result['projetos_mesmo_proponente'] = proponent_projects
-
         # precos_acima_media
         items_prices = {
             'value': 0,
@@ -609,52 +601,28 @@ class ProjectInfoView(APIView):
                 'name': 'complexidade_financeira',
                 'value': result['easiness']['value'],
                 'metrics': [
-                    self.create_metric(metric_attributes[0], metrics, int(pronac), financial_complexity_indicator.name),
-                    self.create_metric(metric_attributes[1], metrics, int(pronac), financial_complexity_indicator.name),
-                    self.create_metric(metric_attributes[2], metrics, int(pronac), financial_complexity_indicator.name),
-                    self.create_metric(metric_attributes[3], metrics, int(pronac), financial_complexity_indicator.name),
-                    self.create_metric(metric_attributes[4], metrics, int(pronac), financial_complexity_indicator.name),
-                    self.get_itens_orcamentarios_fora_do_comum(metrics, int(pronac), financial_complexity_indicator.name),
-                    # {
-                    #     'name': 'precos_acima_media',
-                    #     'name_title': 'Preços acima da média',
-                    #     'type': 'bar',
-                    #     'helper_text':'Verifica a porcentagem de itens com valor acima da mediana histórica neste projeto \
-                    #     e compara com a porcentagem mais frequente de itens acima da mediana em projetos do mesmo segmento',
-                    #     'metric_id': result['precos_acima_media']['metric_id'],
-                    #     'reason': result['precos_acima_media']['reason'],
-                    #     'value': result['precos_acima_media']['value'],
-                    #     'outlier_check': result['precos_acima_media']['outlier_check'],
-                    #     'items': result['precos_acima_media']['items'],
-                    #     'total_items': result['precos_acima_media']['total_items'],
-                    #     'maximum_expected': result['precos_acima_media']['maximum_expected']
-                    # },
-                    # {
-                    #     'name': 'projetos_mesmo_proponente',
-                    #     'name_title': 'Projetos do mesmo proponente',
-                    #     'type': 'proponents-list',
-                    #     'helper_text':'Indica os projetos que o proponente já executou no passado.',
-                    #     'metric_id': result['projetos_mesmo_proponente']['metric_id'],
-                    #     'value': len(result['projetos_mesmo_proponente']['submitted_projects']),
-                    #     'reason': result['projetos_mesmo_proponente']['reason'],
-                    #     'outlier_check': result['projetos_mesmo_proponente']['outlier_check'],
-                    #     'proponent_projects': result['projetos_mesmo_proponente']['submitted_projects'],
-                    # },
-                    # {
-                    #     'name': 'novos_fornecedores',
-                    #     'name_title': 'Novos fornecedores',
-                    #     'type': 'providers-list',
-                    #     'helper_text':' Indica a proporção de fornecedores que nunca participaram de projetos de incentivo antes em \
-                    #     relação ao total de fornecedores envolvidos com o projeto.Também lista os itens orçamentários dos novos fornecedores.',
-                    #     'metric_id': result['novos_fornecedores']['metric_id'],
-                    #     'value': result['novos_fornecedores']['new_providers_quantity'],
-                    #     'reason': result['novos_fornecedores']['reason'],
-                    #     'providers': result['novos_fornecedores']['new_providers_list'],
-                    #     'new_providers_percentage': result['novos_fornecedores']['new_providers_percentage'],
-                    #     'segment_average_percentage': result['novos_fornecedores']['segment_average_percentage'],
-                    #     'outlier_check': result['novos_fornecedores']['outlier_check'],
-                    #     'all_projects_average_percentage': result['novos_fornecedores']['all_projects_average_percentage']
-                    # },
+                    # self.create_metric(metric_attributes[0], metrics, int(pronac), financial_complexity_indicator.name),
+                    # self.create_metric(metric_attributes[1], metrics, int(pronac), financial_complexity_indicator.name),
+                    # self.create_metric(metric_attributes[2], metrics, int(pronac), financial_complexity_indicator.name),
+                    # self.create_metric(metric_attributes[3], metrics, int(pronac), financial_complexity_indicator.name),
+                    # self.create_metric(metric_attributes[4], metrics, int(pronac), financial_complexity_indicator.name),
+                    # self.get_itens_orcamentarios_fora_do_comum(metrics, int(pronac), financial_complexity_indicator.name),
+                    # self.get_novos_fornecedores(metrics, int(pronac), financial_complexity_indicator.name),
+                    self.get_projetos_mesmo_proponente(metrics, int(pronac), financial_complexity_indicator.name),
+                    {
+                        'name': 'precos_acima_media',
+                        'name_title': 'Preços acima da média',
+                        'type': 'bar',
+                        'helper_text':'Verifica a porcentagem de itens com valor acima da mediana histórica neste projeto \
+                        e compara com a porcentagem mais frequente de itens acima da mediana em projetos do mesmo segmento',
+                        'metric_id': result['precos_acima_media']['metric_id'],
+                        'reason': result['precos_acima_media']['reason'],
+                        'value': result['precos_acima_media']['value'],
+                        'outlier_check': result['precos_acima_media']['outlier_check'],
+                        'items': result['precos_acima_media']['items'],
+                        'total_items': result['precos_acima_media']['total_items'],
+                        'maximum_expected': result['precos_acima_media']['maximum_expected']
+                    },
                 ]
             },
         ]
