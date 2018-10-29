@@ -413,6 +413,20 @@ class ProjectInfoView(APIView):
 
         return approved_funds
 
+    def create_metric(self, metric_attributes, metrics, pronac, financial_complexity_indicator_name):
+        metric = self.create_metric_template()
+        name = metric_attributes['name']
+        metric_name = metric_attributes['metric_name']
+
+        if metrics[name] is not None:
+            metric['value'] = metrics[name][metric_attributes['value']]
+            metric['is_outlier'] = get_outlier_color(metrics[name]['is_outlier'])
+            metric['maximum_expected'] = metrics[name][metric_attributes['maximum_expected']]
+
+        metric_id = register_project_metric(metric_name, metric['value'], str(metric), financial_complexity_indicator_name, pronac)
+        metric['metric_id'] = metric_id.id
+
+        return metric 
 
     # def post(self, request, format=None, **kwargs):
     def get(self, request, format=None, **kwargs):
@@ -660,7 +674,6 @@ class ProjectInfoView(APIView):
 
         #result['itens_orcamentarios'] = self.get_itens_orcamentarios(metrics, int(pronac), financial_complexity_indicator.name) 
         result['comprovantes_pagamento'] = self.get_comprovantes_pagamento(metrics, int(pronac), financial_complexity_indicator.name) 
-
         metric_attributes = [
             {
                 'name': 'items',
@@ -670,12 +683,26 @@ class ProjectInfoView(APIView):
             {
                 'name': 'total_receipts',
                 'metric_name': 'comprovantes_pagamento',
-                'value': 'total_receipts'
+                'value': 'total_receipts',
+                'maximum_expected': 'maximum_expected_in_segment'
+            },
+            {
+                'name': 'raised_funds',
+                'metric_name': 'valor_captado',
+                'value': 'total_raised_funds',
+                'maximum_expected': 'maximum_expected_funds'
             },
             {
                 'name': 'verified_funds',
                 'metric_name': 'valor_comprovado',
-                'value': 'total_verified_funds'
+                'value': 'total_verified_funds',
+                'maximum_expected': 'maximum_expected_funds'
+            },
+            {
+                'name': 'approved_funds',
+                'metric_name': 'valor_aprovado',
+                'value': 'total_approved_funds',
+                'maximum_expected': 'maximum_expected_funds'
             }
         ]
         project_indicators = [
@@ -683,6 +710,7 @@ class ProjectInfoView(APIView):
                 'name': 'complexidade_financeira',
                 'value': result['easiness']['value'],
                 'metrics': [
+                    self.create_metric(metric_attributes[4], metrics, int(pronac), financial_complexity_indicator.name),
                     self.get_itens_orcamentarios(metrics, int(pronac), financial_complexity_indicator.name),
                     self.get_comprovantes_pagamento(metrics, int(pronac), financial_complexity_indicator.name),
                     self.get_valor_captado(metrics, int(pronac), financial_complexity_indicator.name),
