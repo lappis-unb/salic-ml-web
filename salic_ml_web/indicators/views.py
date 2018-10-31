@@ -1,146 +1,78 @@
-# Remove this import when has a valid complexity value
-import random, json
-from django.shortcuts import render, get_object_or_404, redirect
-from django.http import HttpResponse
-from .models import Entity, User, ProjectFeedback, MetricFeedback, Metric, Indicator
-from salic_db.utils import test_connection, make_query_from_db
+from rest_framework.renderers import JSONRenderer
+from rest_framework.response import Response
+from rest_framework.views import APIView
+from rest_framework import serializers
+from django.views.decorators.csrf import csrf_exempt
+from django.utils.decorators import method_decorator
+from django.views import generic
+from django.http import JsonResponse
+import json
+import difflib
+from indicators.financial_metrics_instance import financial_metrics, submitted_projects_info, fetch_project_complexity
 from core.utils.get_project_info_from_pronac import GetProjectInfoFromPronac
-from rest_framework import viewsets
-from indicators.financial_metrics_instance import financial_metrics, fetch_project_complexity
-from indicators.serializers import CustomUserSerializer, EntitySerializer, IndicatorSerializer, MetricSerializer, MetricFeedbackSerializer, ProjectFeedbackSerializer
+from indicators.models import Entity, Indicator, Metric, User, MetricFeedback, ProjectFeedback
+from django.shortcuts import get_object_or_404
+from indicators.indicators_requests import http_financial_metrics_instance
+from salic_db.utils import make_query_from_db
 
-class CustomUserViewSet(viewsets.ModelViewSet):
-    """
-    API endpoint that allows custom users to be viewed or edited.
-    """
-    queryset = User.objects.all().order_by('name')
-    serializer_class = CustomUserSerializer
+def projects_to_analyse(request):
+    end_situations = " \
+        'A09', 'A13', 'A14', 'A16', 'A17', 'A18', 'A20', 'A23', 'A24', 'A26', \
+        'A40', 'A41', 'A42', 'C09', 'D18', 'E04', 'E09', 'E36', 'E47', 'E49', \
+        'E63', 'E64', 'E65', 'G16', 'G25', 'G26', 'G29', 'G30', 'G56', 'K00', \
+        'K01', 'K02', 'L01', 'L02', 'L03', 'L04', 'L05', 'L06', 'L08', 'L09', \
+        'L10', 'L11' \
+    "
 
+    query = "SELECT CONCAT(AnoProjeto, Sequencial), NomeProjeto, Analista \
+             FROM SAC.dbo.Projetos WHERE DtFimExecucao < GETDATE() \
+             AND Situacao NOT IN ({})".format(end_situations)
 
-class EntityViewSet(viewsets.ModelViewSet):
-    """
-    API endpoint that allows entities to be viewed or edited.
-    """
-    queryset = Entity.objects.all()
-    serializer_class = EntitySerializer
+    # query = "SELECT TOP 2000 CONCAT(AnoProjeto, Sequencial), NomeProjeto, Analista \
+    #          FROM SAC.dbo.Projetos WHERE DtFimExecucao < GETDATE() \
+    #          AND Situacao NOT IN ({}) ORDER BY DtFimExecucao DESC".format(end_situations)
 
-class IndicatorViewSet(viewsets.ModelViewSet):
-    """
-    API endpoint that allows indicators to be viewed or edited.
-    """
-    queryset = Indicator.objects.all()
-    serializer_class = IndicatorSerializer
+    query_result = make_query_from_db(query)
 
-class MetricViewSet(viewsets.ModelViewSet):
-    """
-    API endpoint that allows metrics to be viewed or edited.
-    """
-    queryset = Metric.objects.all()
-    serializer_class = MetricSerializer
+    filtered_data = [{'pronac': each[0],
+                      'complexidade': int(fetch_project_complexity(int(each[0]))),
+                      'nome': each[1],
+                      'responsavel': each[2]}
+                      for each in query_result]
 
-class MetricFeedbackViewSet(viewsets.ModelViewSet):
-    """
-    API endpoint that allows metric feedbacks to be viewed or edited.
-    """
-    queryset = MetricFeedback.objects.all()
-    serializer_class = MetricFeedbackSerializer
+    return filtered_data
 
-class ProjectFeedbackViewSet(viewsets.ModelViewSet):
-    """
-    API endpoint that allows project feedbacks to be viewed or edited.
-    """
-    queryset = ProjectFeedback.objects.all()
-    serializer_class = ProjectFeedbackSerializer
-
-submitted_projects_info = GetProjectInfoFromPronac()
-def index(request, submit_success=False):
-    try:
-        projects = projects_to_analyse(request)
-    except:
-        projects = [
-        {"pronac": "90021", "complexity": 25,
-            "name": "Indie 2009 - Mostra de Cinema Mundial", "analist": "Florentina"},
-        {"pronac": "153833", "complexity": 75,
-            "name": "TRES SOMBREROS DE COPA", "analist": "Chimbinha"},
-        {"pronac": "160443", "complexity": 95,
-            "name": "SERGIO REIS – CORAÇÃO ESTRADEIRO", "analist": "Cláudia Leitte"},
-        {"pronac": "118593", "complexity": 15,
-            "name": "ÁGUIA  CARNAVAL 2012: TROPICÁLIA! O MOVIMENTO QUE NÃO TERMINOU", "analist": "Ferdinando"},
-        {"pronac": "161533", "complexity": 5,
-            "name": "“Livro sobre Serafim Derenzi” (título provisório)", "analist": "Modelo"},
-        {"pronac": "171372", "complexity": 5,
-            "name": "“Paisagismo Brasileiro, Roberto Burle Marx e Haruyoshi Ono – 60 anos de história”.", "analist": "Modelo"},
-        {"pronac": "92739", "complexity": 5,
-            "name": "Circulação de oficinas e shows - Claudia Cimbleris", "analist": "Modelo"},
-    ]
-    json_dict = projects
-
-    return render(request, 'index.html', {'projects': projects, 'projects_json': json.dumps(json_dict)})
-
-
-def show_metrics(request, pronac):
-    pronac = int(pronac)
+# TODO Move fetch to correspondent class
+def fetch_entity(pronac):
     string_pronac = "{:06}".format(pronac)
     try:
         project = Entity.objects.get(pronac=pronac)
     except:
-        # project_query = "SELECT CONCAT(AnoProjeto, Sequencial), NomeProjeto \
-        # FROM SAC.dbo.Projetos WHERE CONCAT(AnoProjeto, Sequencial) = '{0}'".format(string_pronac)
-        # project_raw_data = make_query_from_db(project_query)
-        # project_data = {
-        #         'pronac': project_raw_data[0][0],
-        #         'name': project_raw_data[0][1]
-        # }
-
-        # project_data = {
-        #     'pronac': pronac,
-        #     'name': 'Mock'
-        # }
-
-
-        info = submitted_projects_info.get_projects_name([string_pronac])
-
+        project_query = "SELECT CONCAT(AnoProjeto, Sequencial), NomeProjeto \
+        FROM SAC.dbo.Projetos WHERE CONCAT(AnoProjeto, Sequencial) = '{0}'".format(string_pronac)
+        project_raw_data = make_query_from_db(project_query)
         project_data = {
-            'pronac': pronac,
-            'name': info[string_pronac]
+                'pronac': project_raw_data[0][0],
+                'name': project_raw_data[0][1]
         }
 
         project = Entity.objects.create(pronac=int(project_data['pronac']), name=project_data['name'])
 
-    current_user = None
-    metrics = []
-    return render(request, 'show_metrics.html', {'project': project, 'user': current_user, 'metrics': metrics, 'string_pronac': string_pronac})
+    return project
 
-def db_connection_test(request):
-    connection_result = test_connection()
-    return HttpResponse(connection_result)
-
-
-def get_items_interval(mean, std):
-    start = 0
-    if mean - (1.5 * std) > 0:
-        start = mean - (1.5 * std)
-
-    end = mean + (1.5 * std)
-
-    result = {
-        'start': int(start),
-        'end': int(end)
-    }
-
-    return result
-
-def get_outlier_color(is_outlier):
-    if is_outlier:
-        return 'Metric-bad'
-    else:
-        return 'Metric-good'
-
+# TODO Improve float_to_money method name
 def float_to_money(value):
     us_value = '{:,.2f}'.format(value)
     v_value = us_value.replace(',','v')
     c_value = v_value.replace('.',',')
-    return 'R$' + c_value.replace('v','.')
+    return c_value.replace('v','.')
+
+# TODO Improve this
+def get_outlier_color(is_outlier):
+    if is_outlier:
+        return False
+    else:
+        return True
 
 def register_project_indicator(pronac, name, value):
     entity = Entity.objects.get(pronac=pronac)
@@ -162,483 +94,540 @@ def register_project_metric(name, value, reason, indicator_name, pronac):
 
     return metric
 
-def set_width_bar(min_interval, max_interval, value):
-    max_value = max_interval*2
+class SearchProjectView(APIView):
+    """
+    Busca todos os projetos. Como retorno tem se como resultado uma lista paginada com todos os projetos ordenados de forma decrescente à complexidade do projeto.
 
-    if max_value is 0:
-        max_value = 1
+    Abaixo acompanha respectivamente um exemplo de como obter uma lista de projetos contida em uma determinada página, como limitar a quantidade de projetos por página e como filtrar a lista de projetos pelo PRONAC.
+    ```
+        https://salicml.lappis.rocks/projetos?page=3
+        https://salicml.lappis.rocks/projetos?per_page=2
+        https://salicml.lappis.rocks/projetos?filter=000001
 
-    return {
-        'max_value': max_value,
-        'min_interval': (min_interval/max_value)*100,
-        'project': ((value/max_value)*100),
-        'interval': (max_interval-min_interval)
-    }
+    ```
+    """
+    renderer_classes = (JSONRenderer, )
 
-def fetch_user_data(request):
-    user_email = request.POST['user_email'] + '@cultura.gov.br'
-    try:
-        user = User.objects.get(email=user_email)
-    except:
-        user_name = str(request.POST['user_first_name'])
+    def paginate_projects(self, full_list, projects_per_page):
+        full_list.sort(key=lambda x : x["complexidade"], reverse=True)
+        paginated_list = [full_list[i:i+projects_per_page] for i in range(0, len(full_list), projects_per_page)]
 
-        user = User.objects.create(email=user_email, name=user_name)
+        return paginated_list
 
-    pronac = request.POST['project_pronac']
-    project = get_object_or_404(Entity, pronac=int(pronac))
+    def get_page(self, paginated_list, page):
+        try:
+            required_list = paginated_list[page - 1]
+        except:
+            required_list = []
 
-    metrics_list = [
-        'items',
-        'raised_funds',
-        'verified_funds',
-        'approved_funds',
-        'common_items_ratio',
-        'total_receipts',
-        'new_providers',
-        'proponent_projects',
-        'easiness',
-        'items_prices'
+        return required_list
+
+
+    @csrf_exempt
+    def get(self, request, format=None, **kwargs):
+
+        try:
+            projects = projects_to_analyse(request)
+        except:
+            projects = []
+
+        projects_processed = [
+            {
+                "pronac": project['pronac'],
+                "complexidade": project['complexidade'],
+                "nome": project['nome'],
+                "analista": project['responsavel']
+            } for project in projects
         ]
 
-    metrics = {}
+        keyword = request.GET.get('filter')
 
-    total_metrics = financial_metrics.get_metrics("{:06}".format(int(pronac)))
+        if keyword is not None:
+            pronac_matches_list = difflib.get_close_matches(
+                keyword,
+                [project['pronac'] for project in projects],
+                n=len(projects),
+                cutoff=1
+            )
 
-    for metric_name in metrics_list:
-        try:
-            metrics[metric_name] = total_metrics[metric_name]
-        except:
-            if metric_name is '':
-                metrics[metric_name] = total_metrics[metric_name]
-            else:
-                metrics[metric_name] = None
+            result_list = [project for project in projects_processed if project['pronac'] in pronac_matches_list]
+        else:
+            result_list = projects
 
-    result = {
-        'pronac': pronac,
-        'received_metrics': metrics
-    }
+        projects_per_page = request.GET.get('per_page')
 
-    # return HttpResponse(str(result))
+        if projects_per_page is None:
+            projects_per_page = 15
+        else:
+            projects_per_page = int(projects_per_page)
 
-    #complexidade_financeira
-    financial_complexity_indicator = register_project_indicator(int(pronac), 'complexidade_financeira', 0)
+        paginated_list = self.paginate_projects(result_list, projects_per_page)
 
-    easiness = {
-        'value': 0,
-    }
+        page = request.GET.get('page')
 
-    if metrics['easiness'] is not None:
-        easiness = {
-            'value': float("{0:.2f}".format(metrics['easiness']['easiness'] * 100))
+        if page is None:
+            page = "1"
+
+        projects_list = self.get_page(paginated_list, int(page))
+
+        next_page_index = int(page) + 1
+
+        if next_page_index > len(paginated_list):
+            next_page = None
+        else:
+            next_page = '/projetos?page={0}'.format(next_page_index)
+
+        prev_page_index = int(page) - 1
+
+        if prev_page_index < 1:
+            prev_page = None
+        else:
+            prev_page = '/projetos?page={0}'.format(prev_page_index)
+
+        content = {
+            'total': len(projects),
+            'per_page': projects_per_page,
+            'current_page': int(page),
+            'last_page': len(paginated_list),
+            'next_page_url': next_page,
+            'prev_page_url': prev_page,
+            'begin_page': 1,
+            'end_page': len(paginated_list),
+            'data': projects_list
         }
 
-    result['easiness'] = easiness
+        return JsonResponse(content)
 
-    # itens_orcamentarios
-    items = {
-            'total_items': 0,
-            'interval_start': 0,
-            'interval_end': 0,
-            'outlier_check': get_outlier_color(False)
-    }
+class ProjectInfoView(APIView):
+    """
+    Busca informações de determinado projeto por meio do seu PRONAC
+    """
+    renderer_classes = (JSONRenderer, )
+    @method_decorator(csrf_exempt)
+    def dispatch(self, request, *args, **kwargs):
+        return generic.View.dispatch(self, request, *args, **kwargs)
 
-    if metrics['items'] is not None:
-        items_interval = get_items_interval(metrics['items']['mean'], metrics['items']['std'])
-        items = {
-            'total_items': metrics['items']['value'],
-            'interval_start': items_interval['start'],
-            'interval_end': items_interval['end'],
-            'outlier_check': get_outlier_color(metrics['items']['is_outlier'])
+    def create_metric_template(self):
+        template = {
+            'value': 0,
+            'is_outlier': False,
+            'minimum_expected': 0,
+            'maximum_expected': 0
         }
+        return template
 
-    result['itens_orcamentarios'] = items
-
-    register_project_metric('itens_orcamentarios', items['total_items'], str(items), financial_complexity_indicator.name, int(pronac))
-
-    # valor_captado
-    raised_funds = {
-        'value': float_to_money(0.0),
-        'float_value': 0.0,
-        'maximum_expected_value': float_to_money(0.0),
-        'outlier_check': get_outlier_color(False)
-    }
-
-    if metrics['raised_funds'] is not None:
-        raised_funds = {
-            'value': float_to_money(metrics['raised_funds']['total_raised_funds']),
-            'float_value': metrics['raised_funds']['total_raised_funds'],
-            'maximum_expected_value': float_to_money(metrics['raised_funds']['maximum_expected_funds']),
-            'outlier_check': get_outlier_color(metrics['raised_funds']['is_outlier'])
-        }
-
-    result['valor_captado'] = raised_funds
-
-    register_project_metric('valor_captado', raised_funds['float_value'], str(raised_funds), financial_complexity_indicator.name, int(pronac))
-
-    # valor_comprovado
-    verified_funds = {
-        'value': float_to_money(0.0),
-        'float_value': 0.0,
-        'maximum_expected_value': float_to_money(0.0),
-        'outlier_check': get_outlier_color(False)
-    }
-
-    if metrics['verified_funds'] is not None:
-        verified_funds = {
-            'value': float_to_money(metrics['verified_funds']['total_verified_funds']),
-            'float_value': metrics['verified_funds']['total_verified_funds'],
-            'maximum_expected_value': float_to_money(metrics['verified_funds']['maximum_expected_funds']),
-            'outlier_check': get_outlier_color(metrics['verified_funds']['is_outlier'])
-        }
-
-    result['valor_comprovado'] = verified_funds
-
-    register_project_metric('valor_comprovado', verified_funds['float_value'], str(verified_funds), financial_complexity_indicator.name, int(pronac))
-
-    # valor_aprovado
-    approved_funds = {
-        'value': float_to_money(0),
-        'float_value': 0.0,
-        'maximum_expected_funds': float_to_money(0.0),
-        'outlier_check': get_outlier_color(False)
-    }
-
-    if metrics['approved_funds'] is not None:
-        approved_funds = {
-            'value': float_to_money(metrics['approved_funds']['total_approved_funds']),
-            'float_value': metrics['approved_funds']['total_approved_funds'],
-            'maximum_expected_funds': float_to_money(metrics['approved_funds']['maximum_expected_funds']),
-            'outlier_check': get_outlier_color(metrics['approved_funds']['is_outlier'])
-        }
-
-    result['valor_aprovado'] = approved_funds
-
-    # itens_orcamentarios_fora_do_comum
-
-
-    common_items_ratio = {
-        'outlier_check': get_outlier_color(False),
-        'value': 0.0,
-        'float_value': 0.0,
-        'mean': 0.0,
-        'std': 0.0,
-        'uncommon_items': [],
-        'common_items_not_in_project': []
-    }
-
-    if metrics['common_items_ratio'] is not None:
-        common_items_not_in_project_list = []
-        uncommon_items_list = []
-
-        for item_id in metrics['common_items_ratio']['common_items_not_in_project']:
-            common_items_not_in_project_list.append({
+    def create_list_items(self, metrics, name, item_list_name):
+        items_list = [] 
+        for item_id in metrics[name][item_list_name]:
+            items_list.append({
                 'id': item_id,
-                'name': metrics['common_items_ratio']['common_items_not_in_project'][item_id],
+                'name': metrics[name][item_list_name][item_id],
                 'link': '#'
             })
+        return items_list
 
-        for item_id in metrics['common_items_ratio']['uncommon_items']:
-            uncommon_items_list.append({
-                'id': item_id,
-                'name': metrics['common_items_ratio']['uncommon_items'][item_id],
-                'link': '#'
-            })
-
+    def get_itens_orcamentarios_fora_do_comum(self, metrics, pronac, financial_complexity_indicator_name):
         common_items_ratio = {
-            'outlier_check': get_outlier_color(metrics['common_items_ratio']['is_outlier']),
-            'value': "{0:.2f}".format(100 - metrics['common_items_ratio']['value'] * 100),
-            'float_value': (100 - metrics['common_items_ratio']['value'] * 100),
-            'mean': metrics['common_items_ratio']['mean'],
-            'std': metrics['common_items_ratio']['std'],
-            'uncommon_items': uncommon_items_list,
-            'common_items_not_in_project': common_items_not_in_project_list
+            'value': 0,
+            'is_outlier': False
         }
 
-    result['itens_orcamentarios_fora_do_comum'] = common_items_ratio
+        common_items_ratio['uncommon_items'] = []
+        common_items_ratio['common_items_not_in_project'] = []
+        name = 'common_items_ratio'
+        metric_name = 'itens_orcamentarios_fora_do_comum'
 
-    register_project_metric('itens_orcamentarios_fora_do_comum', common_items_ratio['value'], "", financial_complexity_indicator.name, int(pronac))
+        if metrics[name] is not None:
+            common_items_not_in_project_list = []
+            uncommon_items_list = []
 
-    # comprovantes_pagamento
-    total_receipts = {
-        'outlier_check': get_outlier_color(False),
-        'total_receipts': 0,
-        'maximum_expected_in_segment': 0
-    }
+            common_items_not_in_project_list = self.create_list_items(metrics, name, 'common_items_not_in_project')
+            uncommon_items_list = self.create_list_items(metrics, name, 'uncommon_items')
 
-    if metrics['total_receipts'] is not None:
-        total_receipts = {
-            'outlier_check': get_outlier_color(metrics['total_receipts']['is_outlier']),
-            'total_receipts': metrics['total_receipts']['total_receipts'],
-            'maximum_expected_in_segment': metrics['total_receipts']['maximum_expected_in_segment']
+            common_items_ratio = {
+                'is_outlier': get_outlier_color(metrics[name]['is_outlier']),
+                'value': (100 - metrics[name]['value'] * 100),
+                'uncommon_items': uncommon_items_list,
+                'common_items_not_in_project': common_items_not_in_project_list
+            }
+
+        itens = register_project_metric(metric_name, common_items_ratio['value'], "", financial_complexity_indicator_name, pronac)
+        common_items_ratio['metric_id'] = itens.id
+
+        return common_items_ratio
+
+    def get_novos_fornecedores(self, metrics, pronac, financial_complexity_indicator_name):
+        name = 'new_providers'
+        new_providers = {
+            'value': 0,
+            'is_outlier': get_outlier_color(False),
+            'new_providers_list': [],
         }
 
-    result['comprovantes_pagamento'] = total_receipts
+        if metrics[name] is not None:
+            new_providers_list = []
 
-    register_project_metric('comprovantes_pagamento', total_receipts['total_receipts'], str(total_receipts), financial_complexity_indicator.name, int(pronac))
+            for provider_cnpj_cpf in metrics[name]['new_providers']:
+                items_by_provider = []
 
-    # novos_fornecedores
-    new_providers = {
-        'new_providers_list': [],
-        'new_providers_quantity': 0,
-        'new_providers_percentage': 0,
-        'segment_average_percentage': 0,
-        'outlier_check': get_outlier_color(False),
-        'all_projects_average_percentage': 0
-    }
+                for item_id in metrics[name]['new_providers'][provider_cnpj_cpf]['items']:
+                    items_by_provider.append({
+                        'item_id': item_id,
+                        'item_name': metrics[name]['new_providers'][provider_cnpj_cpf]['items'][item_id],
+                        'item_link': '#'
+                    })
 
-    if metrics['new_providers'] is not None:
-        new_providers_list = []
-
-        for provider_cnpj_cpf in metrics['new_providers']['new_providers']:
-            items_by_provider = []
-
-            for item_id in metrics['new_providers']['new_providers'][provider_cnpj_cpf]['items']:
-                items_by_provider.append({
-                    'item_id': item_id,
-                    'item_name': metrics['new_providers']['new_providers'][provider_cnpj_cpf]['items'][item_id],
-                    'item_link': '#'
+                new_providers_list.append({
+                    'provider_cnpj_cpf': provider_cnpj_cpf,
+                    'provider_name': metrics[name]['new_providers'][provider_cnpj_cpf]['name'],
+                    'provider_items': items_by_provider
                 })
 
-            new_providers_list.append({
-                'provider_cnpj_cpf': provider_cnpj_cpf,
-                'provider_name': metrics['new_providers']['new_providers'][provider_cnpj_cpf]['name'],
-                'provider_items': items_by_provider
-            })
+            new_providers = {
+                'value': len(new_providers_list),
+                'is_outlier': get_outlier_color(metrics[name]['is_outlier']),
+                'new_providers_list': new_providers_list,
+            }
 
-        new_providers = {
-            'new_providers_quantity': len(new_providers_list),
-            'new_providers_list': new_providers_list,
-            'new_providers_percentage': metrics['new_providers']['new_providers_percentage'],
-            'segment_average_percentage': metrics['new_providers']['segment_average_percentage'],
-            'outlier_check': get_outlier_color(metrics['new_providers']['is_outlier']),
-            'all_projects_average_percentage': metrics['new_providers']['all_projects_average_percentage']
-        }
+        novos_fornecedores = register_project_metric('novos_fornecedores', new_providers['value'], "", financial_complexity_indicator_name, pronac)
+        new_providers['metric_id'] = novos_fornecedores.id
 
-    result['novos_fornecedores'] = new_providers
-
-    register_project_metric('novos_fornecedores', new_providers['new_providers_quantity'], "", financial_complexity_indicator.name, int(pronac))
-
-    # projetos_mesmo_proponente
-    proponent_projects = {
-        'cnpj_cpf': '',
-        'submitted_projects': [],
-        'analyzed_projects': [],
-        'outlier_check': get_outlier_color(False)
-    }
-
-    if metrics['proponent_projects'] is not None:
-        submitted_projects_list = []
-        analyzed_projects_list = []
-
-        all_pronacs = metrics['proponent_projects']['submitted_projects']['pronacs_of_this_proponent']
-
-        projects_information = submitted_projects_info.get_projects_name(all_pronacs)
-        for project_pronac in metrics['proponent_projects']['submitted_projects']['pronacs_of_this_proponent']:
-            submitted_projects_list.append({
-                'pronac': project_pronac,
-                'name': projects_information[project_pronac],
-                'link': '#'
-            })
-
-        for project_pronac in metrics['proponent_projects']['analyzed_projects']['pronacs_of_this_proponent']:
-            analyzed_projects_list.append({
-                'pronac': project_pronac,
-                'name': projects_information[project_pronac],
-                'link': '#'
-            })
-
+        return new_providers
+ 
+    def get_projetos_mesmo_proponente(self, metrics, pronac, financial_complexity_indicator_name):
         proponent_projects = {
-            'cnpj_cpf': metrics['proponent_projects']['cnpj_cpf'],
-            'submitted_projects': submitted_projects_list,
-            'analyzed_projects': analyzed_projects_list,
-            'outlier_check': get_outlier_color(False)
+            'cnpj_cpf': '',
+            'value': 0,
+            'submitted_projects': [],
+            'analyzed_projects': [],
+            'is_outlier': get_outlier_color(False),
         }
 
-    result['projetos_mesmo_proponente'] = proponent_projects
+        name = 'proponent_projects'
 
-    # precos_acima_media
-    items_prices = {
-        'value': 0,
-        'outlier_check': get_outlier_color(False),
-        'items': [],
-        'total_items': 0,
-        'maximum_expected': 0
-    }
+        if metrics[name] is not None:
+            submitted_projects_list = []
+            analyzed_projects_list = []
 
-    if metrics['items_prices'] is not None:
-        items_list = []
+            all_pronacs = metrics[name]['submitted_projects']['pronacs_of_this_proponent']
 
-        for item_id in metrics['items_prices']['outlier_items']:
-            items_list.append({
-                'item_id': item_id,
-                'item_name': metrics['items_prices']['outlier_items'][item_id],
-                'link': '#'
-            })
+            projects_information = submitted_projects_info.get_projects_name(all_pronacs)
+            for project_pronac in metrics[name]['submitted_projects']['pronacs_of_this_proponent']:
+                submitted_projects_list.append({
+                    'pronac': project_pronac,
+                    'name': projects_information[project_pronac],
+                    'link': '#'
+                })
 
+            for project_pronac in metrics[name]['analyzed_projects']['pronacs_of_this_proponent']:
+                analyzed_projects_list.append({
+                    'pronac': project_pronac,
+                    'name': projects_information[project_pronac],
+                    'link': '#'
+                })
+
+            proponent_projects = {
+                'cnpj_cpf': metrics[name]['cnpj_cpf'],
+                'value': len(submitted_projects_list),
+                'submitted_projects': submitted_projects_list,
+                'analyzed_projects': analyzed_projects_list,
+                'is_outlier': get_outlier_color(False),
+            }
+
+        projetos_mesmo_proponente = register_project_metric('projetos_mesmo_proponente', len(proponent_projects['submitted_projects']), "", financial_complexity_indicator_name, pronac)
+        proponent_projects['metric_id'] = projetos_mesmo_proponente.id
+
+        return proponent_projects
+
+
+    def get_precos_acima_media(self, metrics, pronac, financial_complexity_indicator_name):
+        name = 'items_prices'
         items_prices = {
-            'value': metrics['items_prices']['number_items_outliers'],
-            'outlier_check': get_outlier_color(metrics['items_prices']['is_outlier']),
-            'items': items_list,
-            'total_items': metrics['items_prices']['total_items'],
-            'maximum_expected': int(metrics['items_prices']['maximum_expected'])
+            'value': 0,
+            'is_outlier': get_outlier_color(False),
+            'items': [],
+            'total_items': 0,
+            'maximum_expected': 0,
         }
 
-    result['precos_acima_media'] = items_prices
+        if metrics[name] is not None:
+            items_list = []
+            items_list = self.create_list_items(metrics, 'items_prices', 'outlier_items')
+
+            items_prices = {
+                'value': int(metrics[name]['number_items_outliers']),
+                'is_outlier': get_outlier_color(metrics[name]['is_outlier']),
+                'items': items_list,
+                'total_items': int(metrics[name]['total_items']),
+                'maximum_expected': int(metrics[name]['maximum_expected']),
+            }
+
+        precos_acima_media = register_project_metric('precos_acima_media', items_prices['value'], "", financial_complexity_indicator_name, pronac)
+        items_prices['metric_id'] = precos_acima_media.id
+
+        return items_prices
 
 
-    project_indicators = [
-        {
-            'name': 'complexidade_financeira',
-            'value': result['easiness']['value'],
-            'metrics': [
-                {
-                    'name': 'itens_orcamentarios',
-                    'value': result['itens_orcamentarios']['total_items'],
-                    'reason': 'any reason',
-                    'outlier_check': result['itens_orcamentarios']['outlier_check'],
-                    'interval_start': result['itens_orcamentarios']['interval_start'],
-                    'interval_end': result['itens_orcamentarios']['interval_end'],
-                    'bar': set_width_bar(result['itens_orcamentarios']['interval_start'],
-                                         result['itens_orcamentarios']['interval_end'],
-                                         result['itens_orcamentarios']['total_items'])
+    def create_metric(self, metric_attributes, metrics, pronac, financial_complexity_indicator_name):
+        metric = self.create_metric_template()
+        name = metric_attributes['name']
+        metric_name = metric_attributes['metric_name']
 
-                },
-                {
-                    'name': 'itens_orcamentarios_fora_do_comum',
-                    'value': result['itens_orcamentarios_fora_do_comum']['value'],
-                    'reason': 'any reason',
-                    'outlier_check': result['itens_orcamentarios_fora_do_comum']['outlier_check'],
-                    'mean': result['itens_orcamentarios_fora_do_comum']['mean'],
-                    'std': result['itens_orcamentarios_fora_do_comum']['std'],
-                    'expected_itens': result['itens_orcamentarios_fora_do_comum']['uncommon_items'],
-                    'missing_itens': result['itens_orcamentarios_fora_do_comum']['common_items_not_in_project']
-                },
-                {
-                    'name': 'comprovantes_pagamento',
-                    'value': result['comprovantes_pagamento']['total_receipts'],
-                    'reason': 'any reason',
-                    'outlier_check': result['comprovantes_pagamento']['outlier_check'],
-                    'maximum_expected_in_segment': result['comprovantes_pagamento']['maximum_expected_in_segment']
-                },
-                {
-                    'name': 'precos_acima_media',
-                    'reason': 'any reason',
-                    'value': result['precos_acima_media']['value'],
-                    'outlier_check': result['precos_acima_media']['outlier_check'],
-                    'items': result['precos_acima_media']['items'],
-                    'total_items': result['precos_acima_media']['total_items'],
-                    'maximum_expected': result['precos_acima_media']['maximum_expected']
-                },
-                {
-                    'name': 'valor_comprovado',
-                    'value': result['valor_comprovado']['value'],
-                    'reason': result['valor_comprovado']['maximum_expected_value'],
-                    'outlier_check': result['valor_comprovado']['outlier_check']
-                },
-                {
-                    'name': 'valor_captado',
-                    'value': result['valor_captado']['value'],
-                    'reason': result['valor_captado']['maximum_expected_value'],
-                    'outlier_check': result['valor_captado']['outlier_check']
-                },
-                {
-                    'name': 'mudancas_planilha_orcamentaria',
-                    'value': '70',
-                    'reason': 'any reason',
-                    'outlier_check': '',
-                    'document_version': 14,
-                },
-                {
-                    'name': 'projetos_mesmo_proponente',
-                    'value': len(result['projetos_mesmo_proponente']['submitted_projects']),
-                    'reason': 'any reason',
-                    'outlier_check': result['projetos_mesmo_proponente']['outlier_check'],
-                    'proponent_projects': result['projetos_mesmo_proponente']['submitted_projects'],
-                },
-                {
-                    'name': 'novos_fornecedores',
-                    'value': result['novos_fornecedores']['new_providers_quantity'],
-                    'reason': 'any reason',
-                    'providers': result['novos_fornecedores']['new_providers_list'],
-                    'new_providers_percentage': result['novos_fornecedores']['new_providers_percentage'],
-                    'segment_average_percentage': result['novos_fornecedores']['segment_average_percentage'],
-                    'outlier_check': result['novos_fornecedores']['outlier_check'],
-                    'all_projects_average_percentage': result['novos_fornecedores']['all_projects_average_percentage']
-                },
-                {
-                    'name': 'valor_aprovado',
-                    'value': result['valor_aprovado']['value'],
-                    'reason': 'any reason',
-                    'outlier_check': result['valor_aprovado']['outlier_check'],
-                    'maximum_expected_funds': result['valor_aprovado']['maximum_expected_funds']
-                }
-            ]
-        },
-    ]
-    project_feedback_list = ['Muito simples',
-                             'Simples', 'Normal', 'Complexo', 'Muito complexo']
+        if metrics[name] is not None:
+            metric['value'] = metrics[name][metric_attributes['value']]
+            metric['is_outlier'] = get_outlier_color(metrics[name]['is_outlier'])
+            metric['maximum_expected'] = metrics[name][metric_attributes['maximum_expected']]
 
-    string_pronac = "{:06}".format(int(pronac))
+        metric_id = register_project_metric(metric_name, metric['value'], str(metric), financial_complexity_indicator_name, pronac)
+        metric['metric_id'] = metric_id.id
 
-    return render(request, 'show_metrics.html', {'project': project, 'user': user, 'project_indicators': project_indicators, 'project_feedback_list': project_feedback_list, 'string_pronac': string_pronac})
-    # return HttpResponse(str(result))
+        return metric 
 
-def post_metrics_feedback(request):
+    # def post(self, request, format=None, **kwargs):
+    def get(self, request, format=None, **kwargs):
+        pronac = kwargs['pronac']
+        project = fetch_entity(int(pronac))
+        metrics_list = [
+            'items',
+            'raised_funds',
+            'verified_funds',
+            'approved_funds',
+            'common_items_ratio',
+            'total_receipts',
+            'new_providers',
+            'proponent_projects',
+            'easiness',
+            'items_prices'
+        ]
 
-    entity = Entity.objects.get(pronac=request.POST['project_pronac'])
-    user = User.objects.get(email=request.POST['user_email'])
-    indicators = Indicator.objects.filter(entity=entity)
+        metrics = {}
 
-    saved_data = {}
+        total_metrics = financial_metrics.get_metrics("{:06}".format(int(pronac)))
 
-    # Creates project feedback object
-    project_feedback_grade = request.POST['project_feedback_grade']
-    saved_project_feedback = ProjectFeedback.objects.create(
-        user=user, entity=entity, grade=project_feedback_grade)
+        for metric_name in metrics_list:
+            try:
+                metrics[metric_name] = total_metrics[metric_name]
+            except:
+                if metric_name is '':
+                    metrics[metric_name] = total_metrics[metric_name]
+                else:
+                    metrics[metric_name] = None
 
-    saved_data['project_feedback'] = saved_project_feedback.grade
+        metrics['items'] = http_financial_metrics_instance.number_of_items(pronac="090105")
 
-    saved_data['metrics_feedback'] = []
+        result = {
+            'pronac': pronac,
+            'received_metrics': metrics
+        }
 
-    ratings = list(request.POST['all_ratings'])
-    ratings.reverse()
+        #complexidade_financeira
+        financial_complexity_indicator = register_project_indicator(int(pronac), 'complexidade_financeira', 0)
 
-    # Creates metric feedback objects
-    for indicator in indicators:
-        for metric in indicator.metrics.all():
-            metric_feedback_text_tag = metric.name + '_text'
+        easiness = {
+            'value': 1,
+        }
 
-            metric_feedback_rating = ratings.pop()
-            metric_feedback_text = request.POST[metric_feedback_text_tag]
+        if metrics['easiness'] is not None:
+            complexity = int((1 - metrics['easiness']['easiness']) * 100) # Converts easiness to complexity
 
-            saved_metric_feedback = MetricFeedback.objects.create(
-                user=user, metric=metric, grade=int(metric_feedback_rating), reason=metric_feedback_text)
+            if complexity is 0:
+                complexity = 1
 
-            saved_data['metrics_feedback'].append({
-                'metric_name': saved_metric_feedback.metric.name,
-                'grade': saved_metric_feedback.grade,
-                'reason': saved_metric_feedback.reason
-            })
+            easiness = { 'value': complexity }
 
-    # return HttpResponse(status=201)
-    try:
-        projects = projects_to_analyse(request)
-    except:
-        projects = [
-        {"pronac": "90021", "complexity": 25,
-            "name": "Indie 2009 - Mostra de Cinema Mundial", "analist": "Florentina"},
-        {"pronac": "153833", "complexity": 75,
-            "name": "TRES SOMBREROS DE COPA", "analist": "Chimbinha"},
-        {"pronac": "160443", "complexity": 95,
-            "name": "SERGIO REIS – CORAÇÃO ESTRADEIRO", "analist": "Cláudia Leitte"},
-        {"pronac": "118593", "complexity": 15,
-            "name": "ÁGUIA  CARNAVAL 2012: TROPICÁLIA! O MOVIMENTO QUE NÃO TERMINOU", "analist": "Ferdinando"},
-        {"pronac": "161533", "complexity": 5,
-            "name": "“Livro sobre Serafim Derenzi” (título provisório)", "analist": "Modelo"},
-        {"pronac": "171372", "complexity": 5,
-            "name": "“Paisagismo Brasileiro, Roberto Burle Marx e Haruyoshi Ono – 60 anos de história”.", "analist": "Modelo"},
-        {"pronac": "92739", "complexity": 5,
-            "name": "Circulação de oficinas e shows - Claudia Cimbleris", "analist": "Modelo"},
-    ]
-    # return redirect(index, submit_success = True)
-    return render(request, 'index.html', {'submit_success': True, 'projects': projects})
+        result['easiness'] = easiness
+
+        metric_attributes = [
+            {
+                'name': 'items',
+                'metric_name': 'itens_orcamentarios',
+                'value': 'number_of_items',
+                'maximum_expected': 'maximum_expected'
+            },
+            {
+                'name': 'total_receipts',
+                'metric_name': 'comprovantes_pagamento',
+                'value': 'total_receipts',
+                'maximum_expected': 'maximum_expected_in_segment'
+            },
+            {
+                'name': 'raised_funds',
+                'metric_name': 'valor_captado',
+                'value': 'total_raised_funds',
+                'maximum_expected': 'maximum_expected_funds'
+            },
+            {
+                'name': 'verified_funds',
+                'metric_name': 'valor_comprovado',
+                'value': 'total_verified_funds',
+                'maximum_expected': 'maximum_expected_funds'
+            },
+            {
+                'name': 'approved_funds',
+                'metric_name': 'valor_aprovado',
+                'value': 'total_approved_funds',
+                'maximum_expected': 'maximum_expected_funds'
+            }
+        ]
+
+        project_indicators = [
+            {
+                'name': 'complexidade_financeira',
+                'value': result['easiness']['value'],
+                'metrics': [
+                    self.create_metric(metric_attributes[0], metrics, int(pronac), financial_complexity_indicator.name),
+                    self.create_metric(metric_attributes[1], metrics, int(pronac), financial_complexity_indicator.name),
+                    self.create_metric(metric_attributes[2], metrics, int(pronac), financial_complexity_indicator.name),
+                    self.create_metric(metric_attributes[3], metrics, int(pronac), financial_complexity_indicator.name),
+                    self.create_metric(metric_attributes[4], metrics, int(pronac), financial_complexity_indicator.name),
+                    self.get_itens_orcamentarios_fora_do_comum(metrics, int(pronac), financial_complexity_indicator.name),
+                    self.get_novos_fornecedores(metrics, int(pronac), financial_complexity_indicator.name),
+                    self.get_projetos_mesmo_proponente(metrics, int(pronac), financial_complexity_indicator.name),
+                    self.get_precos_acima_media(metrics, int(pronac), financial_complexity_indicator.name),
+                ]
+            }
+        ]
+
+        indicators = [
+            {
+                'name': 'complexidade_financeira',
+                'complexity': result['easiness']['value']
+            }
+        ]
+
+        string_pronac = "{:06}".format(int(pronac))
+
+        if(project is not None):
+            project_information = {
+                'name': project.name,
+                'pronac': string_pronac,
+                'indicators': project_indicators
+            }
+        else: project_information = {}
+
+        return JsonResponse(project_information)
+
+# class SendMetricFeedbackView(APIView):
+#     """
+#     A view that receives a single metric feedback
+#     """
+#     renderer_classes = (JSONRenderer, )
+#     @method_decorator(csrf_exempt)
+#     def dispatch(self, request, *args, **kwargs):
+#         return generic.View.dispatch(self, request, *args, **kwargs)
+# 
+#     @csrf_exempt
+#     def post(self, request, format=None):
+#         request_data = json.loads(request.body)
+# 
+#         user_email = "{0}@cultura.gov.br".format(request_data['user_email'])
+# 
+#         user = get_object_or_404(User, email=user_email)
+#         metric = get_object_or_404(Metric, id=int(request_data['metric_id']))
+#         metric_feedback_rating = int(request_data['metric_feedback_rating'])
+#         metric_feedback_text = request_data['metric_feedback_text']
+# 
+#         metric_query = MetricFeedback.objects.filter(
+#             user=user,
+#             metric=metric
+#         )
+# 
+#         if len(metric_query) is 0:
+#             # Creates metric
+#             saved_metric_feedback = MetricFeedback.objects.create(
+#                 user=user,
+#                 metric=metric,
+#                 grade=metric_feedback_rating,
+#                 reason=metric_feedback_text
+#             )
+#         else:
+#             # Updates metric
+#             saved_metric_feedback = metric_query[0]
+#             saved_metric_feedback.grade = metric_feedback_rating
+#             saved_metric_feedback.reason = metric_feedback_text
+#             saved_metric_feedback.save()
+# 
+#         request_response = {
+#             'feedback_id': saved_metric_feedback.id,
+#             'feedback_grade': saved_metric_feedback.grade,
+#             'feedback_reason': saved_metric_feedback.reason
+#         }
+# 
+#         return JsonResponse(request_response)
+# 
+# class SendProjectFeedbackView(APIView):
+#     """
+#     A view that receives a single metric feedback
+#     """
+#     renderer_classes = (JSONRenderer, )
+#     @method_decorator(csrf_exempt)
+#     def dispatch(self, request, *args, **kwargs):
+#         return generic.View.dispatch(self, request, *args, **kwargs)
+# 
+#     @csrf_exempt
+#     def post(self, request, format=None):
+#         request_data = json.loads(request.body)
+# 
+#         user_email = "{0}@cultura.gov.br".format(request_data['user_email'])
+# 
+#         user = get_object_or_404(User, email=user_email)
+#         entity = get_object_or_404(Entity, pronac=int(request_data['pronac']))
+#         project_feedback_grade = int(request_data['project_feedback_grade'])
+# 
+#         project_query = ProjectFeedback.objects.filter(
+#             user=user,
+#             entity=entity
+#         )
+# 
+#         if len(project_query) is 0:
+#             # Creates
+#             saved_project_feedback = ProjectFeedback.objects.create(
+#                 user=user,
+#                 entity=entity,
+#                 grade=project_feedback_grade
+#             )
+#         else:
+#             # Updates
+#             saved_project_feedback = project_query[0]
+#             saved_project_feedback.grade = project_feedback_grade
+#             saved_project_feedback.save()
+# 
+# 
+#         request_response = {
+#             'feedback_id': saved_project_feedback.id,
+#             'feedback_grade': saved_project_feedback.grade,
+#         }
+# 
+#         return JsonResponse(request_response)
+# 
+# class CreateSingleUserView(APIView):
+#     """
+#     A view that creates a single user if not created
+#     """
+#     renderer_classes = (JSONRenderer, )
+#     @method_decorator(csrf_exempt)
+#     def dispatch(self, request, *args, **kwargs):
+#         return generic.View.dispatch(self, request, *args, **kwargs)
+# 
+#     @csrf_exempt
+#     def post(self, request, format=None):
+#         user_data = json.loads(request.body)
+# 
+#         user_email = '{0}@cultura.gov.br'.format(user_data['email'])
+# 
+#         user_query = User.objects.filter(email=user_email)
+# 
+#         if len(user_query) is 0:
+#             user_name = user_data['name']
+# 
+#             user = User.objects.create(email=user_email, name=user_name)
+#         else:
+#             user = user_query[0]
+# 
+#         user_response = {
+#             'id': user.id,
+#             'name': user.name,
+#             'email': user.email
+#         }
+# 
+#         return JsonResponse(user_response)
