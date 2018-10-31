@@ -38,3 +38,27 @@ services:
     privileged: true
     cap_add:
       - NET-ADMIN
+
+  redis:
+    image: redis:4.0.5-alpine
+    command: ["redis-server"]
+    hostname: redis
+    volumes:
+      - redis-data:/data
+
+  nginx: 
+    build:
+      context: .
+      dockerfile: ./nginx.dockerfile
+    ports:
+      - "80:80"
+    volumes:
+      - ./static:/usr/share/nginx/html/static
+    depends_on:
+      - web
+
+volumes:
+  redis-data: {}
+  nginx-salic-ml-web: {}
+
+

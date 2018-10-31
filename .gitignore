@@ -127,3 +127,7 @@ data/
 
 ### VisualStudioCode ###
 .vscode/*
+
+## Django statics
+
+salic_ml_web/static/

@@ -8,12 +8,15 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         python3-crypto \
         python3-setuptools \
         python3-pyodbc \
+        python3-dev \
         tdsodbc \
         unixodbc-dev \
         # libmysqlclient-dev \
         unixodbc \
         freetds-dev \
-        cron
+        cron \
+        gunicorn \
+        build-essential
 
 RUN apt-get install --reinstall -y locales tzdata && \
         sed -i 's/# pt_BR.UTF-8 UTF-8/pt_BR.UTF-8 UTF-8/' /etc/locale.gen && \
