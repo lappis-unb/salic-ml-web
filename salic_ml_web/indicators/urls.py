@@ -22,7 +22,6 @@ urlpatterns = [
     url(r'^', RedirectView.as_view(pattern_name='swagger_index', permanent=False)),
     # path('', views.index, name='index'),
     # url(r'^oi/', include(indicators_router.urls)),
-    # url(r'^project/(?P<page>[0-9]+)', csrf_exempt(api_views.ProjectsView.as_view()), name='index'),
     # url(r'^send_metric_feedback', csrf_exempt(api_views.SendMetricFeedbackView.as_view()), name='send_metric_feedback_view'),
     # url(r'^send_project_feedback', csrf_exempt(api_views.SendProjectFeedbackView.as_view()), name='send_project_feedback_view'),
     # url(r'^create_single_user', csrf_exempt(api_views.CreateSingleUserView.as_view()), name='create_single_user_view'),

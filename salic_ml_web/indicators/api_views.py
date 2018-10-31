@@ -116,61 +116,6 @@ def get_page(paginated_list, page):
 
     return required_list
 
-
-class ProjectsView(APIView):
-    """
-    A view that returns a list containing all the projects
-    """
-    renderer_classes = (JSONRenderer, )
-    @csrf_exempt
-    def get(self, request, format=None, **kwargs):
-
-        try:
-            projects = projects_to_analyse(request)
-        except:
-            projects = [ ]
-
-        projects_bk = projects
-
-        for i in range(100):
-            projects = projects + projects_bk
-
-        paginated_list = paginate_projects(projects, request.GET.get('per_page'))
-
-        page = request.GET.get('page')
-
-        projects_list = get_page(paginated_list, int(page))
-
-        # content = {'projects': projects_list, 'last_page':len(paginated_list)}
-
-        next_page_index = int(page) + 1
-
-        if next_page_index > len(paginated_list):
-            next_page = None
-        else:
-            next_page = '/indicators/projects/{0}'.format(next_page_index)
-
-        prev_page_index = int(kwargs['page']) - 1
-
-        if prev_page_index < 1:
-            prev_page = None
-        else:
-            prev_page = '/indicators/projects/{0}'.format(prev_page_index)
-
-        content = {
-            'total': len(projects),
-            'per_page': 10,
-            'current_page': int(page),
-            'last_page': len(paginated_list),
-            'next_page_url': next_page,
-            'prev_page_url': prev_page,
-            'from': 1,
-            'to': len(paginated_list),
-            'data': projects_list
-        }
-
-        return JsonResponse(content)
-
 class SearchProjectView(APIView):
     """
     Busca todos os projetos. Como retorno tem se como resultado uma lista paginada com todos os projetos ordenados de forma decrescente à complexidade do projeto.
@@ -192,12 +137,14 @@ class SearchProjectView(APIView):
         except:
             projects = []
 
-        projects_processed = [{
-            "pronac": project['pronac'],
-            "complexidade": project['complexidade'],
-            "nome": project['nome'],
-            "analista": project['responsavel']
-        } for project in projects]
+        projects_processed = [
+            {
+                "pronac": project['pronac'],
+                "complexidade": project['complexidade'],
+                "nome": project['nome'],
+                "analista": project['responsavel']
+            } for project in projects
+        ]
 
         keyword = request.GET.get('filter')
 
@@ -372,6 +319,7 @@ class ProjectInfoView(APIView):
             'analyzed_projects': [],
             'is_outlier': get_outlier_color(False),
         }
+
         name = 'proponent_projects'
 
         if metrics[name] is not None:
@@ -502,9 +450,7 @@ class ProjectInfoView(APIView):
             if complexity is 0:
                 complexity = 1
 
-            easiness = {
-                'value': complexity
-            }
+            easiness = { 'value': complexity }
 
         result['easiness'] = easiness
 
@@ -556,13 +502,13 @@ class ProjectInfoView(APIView):
                     self.get_projetos_mesmo_proponente(metrics, int(pronac), financial_complexity_indicator.name),
                     self.get_precos_acima_media(metrics, int(pronac), financial_complexity_indicator.name),
                 ]
-            },
+            }
         ]
 
         indicators = [
             {
                 'name': 'complexidade_financeira',
-                'complexity': result['easiness']['value'],
+                'complexity': result['easiness']['value']
             }
         ]
 
@@ -572,7 +518,7 @@ class ProjectInfoView(APIView):
             project_information = {
                 'name': project.name,
                 'pronac': string_pronac,
-                'indicators': project_indicators,
+                'indicators': project_indicators
             }
         else: project_information = {}
 
@@ -684,7 +630,7 @@ class CreateSingleUserView(APIView):
     def post(self, request, format=None):
         user_data = json.loads(request.body)
 
-        user_email =  '{0}@cultura.gov.br'.format(user_data['email'])
+        user_email = '{0}@cultura.gov.br'.format(user_data['email'])
 
         user_query = User.objects.filter(email=user_email)
 
