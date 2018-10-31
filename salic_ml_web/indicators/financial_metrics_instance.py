@@ -3,7 +3,6 @@ from core.utils.get_project_info_from_pronac import GetProjectInfoFromPronac
 from .models import Entity
 import redis
 import pickle
-from pymemcache.client import base
 
 # Redis instance
 redis_connection = redis.Redis(host='redis', port=6379, db=0)
