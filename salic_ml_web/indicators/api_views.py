@@ -2,7 +2,6 @@ from rest_framework.renderers import JSONRenderer
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import serializers
-from indicators.views import projects_to_analyse
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 from django.views import generic
@@ -15,51 +14,42 @@ from indicators.models import Entity, Indicator, Metric, User, MetricFeedback, P
 from django.shortcuts import get_object_or_404
 from indicators.indicators_requests import http_financial_metrics_instance
 
+def projects_to_analyse(request):
+    end_situations = " \
+        'A09', 'A13', 'A14', 'A16', 'A17', 'A18', 'A20', 'A23', 'A24', 'A26', \
+        'A40', 'A41', 'A42', 'C09', 'D18', 'E04', 'E09', 'E36', 'E47', 'E49', \
+        'E63', 'E64', 'E65', 'G16', 'G25', 'G26', 'G29', 'G30', 'G56', 'K00', \
+        'K01', 'K02', 'L01', 'L02', 'L03', 'L04', 'L05', 'L06', 'L08', 'L09', \
+        'L10', 'L11' \
+    "
+
+    query = "SELECT CONCAT(AnoProjeto, Sequencial), NomeProjeto, Analista \
+             FROM SAC.dbo.Projetos WHERE DtFimExecucao < GETDATE() \
+             AND Situacao NOT IN ({})".format(end_situations)
+
+    # query = "SELECT TOP 2000 CONCAT(AnoProjeto, Sequencial), NomeProjeto, Analista \
+    #          FROM SAC.dbo.Projetos WHERE DtFimExecucao < GETDATE() \
+    #          AND Situacao NOT IN ({}) ORDER BY DtFimExecucao DESC".format(end_situations)
+
+    query_result = make_query_from_db(query)
+
+    filtered_data = [{'pronac': each[0],
+                      'complexidade': int(fetch_project_complexity(int(each[0]))),
+                      'nome': each[1],
+                      'responsavel': each[2]}
+                      for each in query_result]
+
+    return filtered_data
+
+# TODO Move fetch to correspondent class
 def fetch_entity(pronac):
     string_pronac = "{:06}".format(pronac)
-    # project = get_object_or_404(Entity, pronac=pronac)
     try:
         project = Entity.objects.get(pronac=pronac)
     except:
-        # project_query = "SELECT CONCAT(AnoProjeto, Sequencial), NomeProjeto \
-        # FROM SAC.dbo.Projetos WHERE CONCAT(AnoProjeto, Sequencial) = '{0}'".format(string_pronac)
-        # project_raw_data = make_query_from_db(project_query)
-        # project_data = {
-        #         'pronac': project_raw_data[0][0],
-        #         'name': project_raw_data[0][1]
-        # }
-        """
-        project_data = {
-            'pronac': pronac,
-            'name': 'Mock'
-        }
-
-        info = submitted_projects_info.get_projects_name([string_pronac])
-
-        project_data = {
-            'pronac': pronac,
-            'name': info[string_pronac]
-        }
-        """
-        #project = Entity.objects.create(pronac=int(project_data['pronac']), name=project_data['name'])
         project = None
 
     return project
-
-
-def get_items_interval(mean, std):
-    start = 0
-    if mean - (1.5 * std) > 0:
-        start = mean - (1.5 * std)
-
-    end = mean + (1.5 * std)
-
-    result = {
-        'start': int(start),
-        'end': int(end)
-    }
-
-    return result
 
 # TODO Improve float_to_money method name
 def float_to_money(value):
@@ -68,6 +58,7 @@ def float_to_money(value):
     c_value = v_value.replace('.',',')
     return c_value.replace('v','.')
 
+# TODO Improve this
 def get_outlier_color(is_outlier):
     if is_outlier:
         return False
@@ -94,28 +85,6 @@ def register_project_metric(name, value, reason, indicator_name, pronac):
 
     return metric
 
-def calculate_search_cutoff(keyword_len):
-    if keyword_len >= 6:
-        cutoff = 0.3
-    else:
-        cutoff = keyword_len * 0.05
-
-    return cutoff
-
-def paginate_projects(full_list, projects_per_page):
-    full_list.sort(key=lambda x : x["complexidade"], reverse=True)
-    paginated_list = [full_list[i:i+projects_per_page] for i in range(0, len(full_list), projects_per_page)]
-
-    return paginated_list
-
-def get_page(paginated_list, page):
-    try:
-        required_list = paginated_list[page - 1]
-    except:
-        required_list = []
-
-    return required_list
-
 class SearchProjectView(APIView):
     """
     Busca todos os projetos. Como retorno tem se como resultado uma lista paginada com todos os projetos ordenados de forma decrescente à complexidade do projeto.
@@ -129,6 +98,22 @@ class SearchProjectView(APIView):
     ```
     """
     renderer_classes = (JSONRenderer, )
+
+    def paginate_projects(self, full_list, projects_per_page):
+        full_list.sort(key=lambda x : x["complexidade"], reverse=True)
+        paginated_list = [full_list[i:i+projects_per_page] for i in range(0, len(full_list), projects_per_page)]
+
+        return paginated_list
+
+    def get_page(self, paginated_list, page):
+        try:
+            required_list = paginated_list[page - 1]
+        except:
+            required_list = []
+
+        return required_list
+
+
     @csrf_exempt
     def get(self, request, format=None, **kwargs):
 
@@ -149,15 +134,6 @@ class SearchProjectView(APIView):
         keyword = request.GET.get('filter')
 
         if keyword is not None:
-            # NAME_CUTOFF = calculate_search_cutoff(len(keyword))
-
-            # name_matches_list = difflib.get_close_matches(
-            #     keyword.lower(),
-            #     [project['name_lowered'] for project in projects_processed],
-            #     n=len(projects),
-            #     cutoff=NAME_CUTOFF
-            # )
-
             pronac_matches_list = difflib.get_close_matches(
                 keyword,
                 [project['pronac'] for project in projects],
@@ -176,16 +152,14 @@ class SearchProjectView(APIView):
         else:
             projects_per_page = int(projects_per_page)
 
-        paginated_list = paginate_projects(result_list, projects_per_page)
+        paginated_list = self.paginate_projects(result_list, projects_per_page)
 
         page = request.GET.get('page')
 
         if page is None:
             page = "1"
 
-        projects_list = get_page(paginated_list, int(page))
-
-        # content = {'projects': projects_list, 'last_page': len(paginated_list)}
+        projects_list = self.get_page(paginated_list, int(page))
 
         next_page_index = int(page) + 1
 
@@ -524,127 +498,127 @@ class ProjectInfoView(APIView):
 
         return JsonResponse(project_information)
 
-class SendMetricFeedbackView(APIView):
-    """
-    A view that receives a single metric feedback
-    """
-    renderer_classes = (JSONRenderer, )
-    @method_decorator(csrf_exempt)
-    def dispatch(self, request, *args, **kwargs):
-        return generic.View.dispatch(self, request, *args, **kwargs)
-
-    @csrf_exempt
-    def post(self, request, format=None):
-        request_data = json.loads(request.body)
-
-        user_email = "{0}@cultura.gov.br".format(request_data['user_email'])
-
-        user = get_object_or_404(User, email=user_email)
-        metric = get_object_or_404(Metric, id=int(request_data['metric_id']))
-        metric_feedback_rating = int(request_data['metric_feedback_rating'])
-        metric_feedback_text = request_data['metric_feedback_text']
-
-        metric_query = MetricFeedback.objects.filter(
-            user=user,
-            metric=metric
-        )
-
-        if len(metric_query) is 0:
-            # Creates metric
-            saved_metric_feedback = MetricFeedback.objects.create(
-                user=user,
-                metric=metric,
-                grade=metric_feedback_rating,
-                reason=metric_feedback_text
-            )
-        else:
-            # Updates metric
-            saved_metric_feedback = metric_query[0]
-            saved_metric_feedback.grade = metric_feedback_rating
-            saved_metric_feedback.reason = metric_feedback_text
-            saved_metric_feedback.save()
-
-        request_response = {
-            'feedback_id': saved_metric_feedback.id,
-            'feedback_grade': saved_metric_feedback.grade,
-            'feedback_reason': saved_metric_feedback.reason
-        }
-
-        return JsonResponse(request_response)
-
-class SendProjectFeedbackView(APIView):
-    """
-    A view that receives a single metric feedback
-    """
-    renderer_classes = (JSONRenderer, )
-    @method_decorator(csrf_exempt)
-    def dispatch(self, request, *args, **kwargs):
-        return generic.View.dispatch(self, request, *args, **kwargs)
-
-    @csrf_exempt
-    def post(self, request, format=None):
-        request_data = json.loads(request.body)
-
-        user_email = "{0}@cultura.gov.br".format(request_data['user_email'])
-
-        user = get_object_or_404(User, email=user_email)
-        entity = get_object_or_404(Entity, pronac=int(request_data['pronac']))
-        project_feedback_grade = int(request_data['project_feedback_grade'])
-
-        project_query = ProjectFeedback.objects.filter(
-            user=user,
-            entity=entity
-        )
-
-        if len(project_query) is 0:
-            # Creates
-            saved_project_feedback = ProjectFeedback.objects.create(
-                user=user,
-                entity=entity,
-                grade=project_feedback_grade
-            )
-        else:
-            # Updates
-            saved_project_feedback = project_query[0]
-            saved_project_feedback.grade = project_feedback_grade
-            saved_project_feedback.save()
-
-
-        request_response = {
-            'feedback_id': saved_project_feedback.id,
-            'feedback_grade': saved_project_feedback.grade,
-        }
-
-        return JsonResponse(request_response)
-
-class CreateSingleUserView(APIView):
-    """
-    A view that creates a single user if not created
-    """
-    renderer_classes = (JSONRenderer, )
-    @method_decorator(csrf_exempt)
-    def dispatch(self, request, *args, **kwargs):
-        return generic.View.dispatch(self, request, *args, **kwargs)
-
-    @csrf_exempt
-    def post(self, request, format=None):
-        user_data = json.loads(request.body)
-
-        user_email = '{0}@cultura.gov.br'.format(user_data['email'])
-
-        user_query = User.objects.filter(email=user_email)
-
-        if len(user_query) is 0:
-            user_name = user_data['name']
-
-            user = User.objects.create(email=user_email, name=user_name)
-        else:
-            user = user_query[0]
-
-        user_response = {
-            'id': user.id,
-            'name': user.name,
-            'email': user.email
-        }
-
-        return JsonResponse(user_response)
+# class SendMetricFeedbackView(APIView):
+#     """
+#     A view that receives a single metric feedback
+#     """
+#     renderer_classes = (JSONRenderer, )
+#     @method_decorator(csrf_exempt)
+#     def dispatch(self, request, *args, **kwargs):
+#         return generic.View.dispatch(self, request, *args, **kwargs)
+# 
+#     @csrf_exempt
+#     def post(self, request, format=None):
+#         request_data = json.loads(request.body)
+# 
+#         user_email = "{0}@cultura.gov.br".format(request_data['user_email'])
+# 
+#         user = get_object_or_404(User, email=user_email)
+#         metric = get_object_or_404(Metric, id=int(request_data['metric_id']))
+#         metric_feedback_rating = int(request_data['metric_feedback_rating'])
+#         metric_feedback_text = request_data['metric_feedback_text']
+# 
+#         metric_query = MetricFeedback.objects.filter(
+#             user=user,
+#             metric=metric
+#         )
+# 
+#         if len(metric_query) is 0:
+#             # Creates metric
+#             saved_metric_feedback = MetricFeedback.objects.create(
+#                 user=user,
+#                 metric=metric,
+#                 grade=metric_feedback_rating,
+#                 reason=metric_feedback_text
+#             )
+#         else:
+#             # Updates metric
+#             saved_metric_feedback = metric_query[0]
+#             saved_metric_feedback.grade = metric_feedback_rating
+#             saved_metric_feedback.reason = metric_feedback_text
+#             saved_metric_feedback.save()
+# 
+#         request_response = {
+#             'feedback_id': saved_metric_feedback.id,
+#             'feedback_grade': saved_metric_feedback.grade,
+#             'feedback_reason': saved_metric_feedback.reason
+#         }
+# 
+#         return JsonResponse(request_response)
+# 
+# class SendProjectFeedbackView(APIView):
+#     """
+#     A view that receives a single metric feedback
+#     """
+#     renderer_classes = (JSONRenderer, )
+#     @method_decorator(csrf_exempt)
+#     def dispatch(self, request, *args, **kwargs):
+#         return generic.View.dispatch(self, request, *args, **kwargs)
+# 
+#     @csrf_exempt
+#     def post(self, request, format=None):
+#         request_data = json.loads(request.body)
+# 
+#         user_email = "{0}@cultura.gov.br".format(request_data['user_email'])
+# 
+#         user = get_object_or_404(User, email=user_email)
+#         entity = get_object_or_404(Entity, pronac=int(request_data['pronac']))
+#         project_feedback_grade = int(request_data['project_feedback_grade'])
+# 
+#         project_query = ProjectFeedback.objects.filter(
+#             user=user,
+#             entity=entity
+#         )
+# 
+#         if len(project_query) is 0:
+#             # Creates
+#             saved_project_feedback = ProjectFeedback.objects.create(
+#                 user=user,
+#                 entity=entity,
+#                 grade=project_feedback_grade
+#             )
+#         else:
+#             # Updates
+#             saved_project_feedback = project_query[0]
+#             saved_project_feedback.grade = project_feedback_grade
+#             saved_project_feedback.save()
+# 
+# 
+#         request_response = {
+#             'feedback_id': saved_project_feedback.id,
+#             'feedback_grade': saved_project_feedback.grade,
+#         }
+# 
+#         return JsonResponse(request_response)
+# 
+# class CreateSingleUserView(APIView):
+#     """
+#     A view that creates a single user if not created
+#     """
+#     renderer_classes = (JSONRenderer, )
+#     @method_decorator(csrf_exempt)
+#     def dispatch(self, request, *args, **kwargs):
+#         return generic.View.dispatch(self, request, *args, **kwargs)
+# 
+#     @csrf_exempt
+#     def post(self, request, format=None):
+#         user_data = json.loads(request.body)
+# 
+#         user_email = '{0}@cultura.gov.br'.format(user_data['email'])
+# 
+#         user_query = User.objects.filter(email=user_email)
+# 
+#         if len(user_query) is 0:
+#             user_name = user_data['name']
+# 
+#             user = User.objects.create(email=user_email, name=user_name)
+#         else:
+#             user = user_query[0]
+# 
+#         user_response = {
+#             'id': user.id,
+#             'name': user.name,
+#             'email': user.email
+#         }
+# 
+#         return JsonResponse(user_response)

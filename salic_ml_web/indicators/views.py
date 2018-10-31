@@ -116,33 +116,6 @@ def db_connection_test(request):
     return HttpResponse(connection_result)
 
 
-def projects_to_analyse(request):
-    end_situations = " \
-        'A09', 'A13', 'A14', 'A16', 'A17', 'A18', 'A20', 'A23', 'A24', 'A26', \
-        'A40', 'A41', 'A42', 'C09', 'D18', 'E04', 'E09', 'E36', 'E47', 'E49', \
-        'E63', 'E64', 'E65', 'G16', 'G25', 'G26', 'G29', 'G30', 'G56', 'K00', \
-        'K01', 'K02', 'L01', 'L02', 'L03', 'L04', 'L05', 'L06', 'L08', 'L09', \
-        'L10', 'L11' \
-    "
-
-    query = "SELECT CONCAT(AnoProjeto, Sequencial), NomeProjeto, Analista \
-             FROM SAC.dbo.Projetos WHERE DtFimExecucao < GETDATE() \
-             AND Situacao NOT IN ({})".format(end_situations)
-
-    # query = "SELECT TOP 2000 CONCAT(AnoProjeto, Sequencial), NomeProjeto, Analista \
-    #          FROM SAC.dbo.Projetos WHERE DtFimExecucao < GETDATE() \
-    #          AND Situacao NOT IN ({}) ORDER BY DtFimExecucao DESC".format(end_situations)
-
-    query_result = make_query_from_db(query)
-
-    filtered_data = [{'pronac': each[0],
-                      'complexidade': int(fetch_project_complexity(int(each[0]))),
-                      'nome': each[1],
-                      'responsavel': each[2]}
-                      for each in query_result]
-
-    return filtered_data
-
 def get_items_interval(mean, std):
     start = 0
     if mean - (1.5 * std) > 0:
