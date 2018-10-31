@@ -8,11 +8,12 @@ from django.views import generic
 from django.http import JsonResponse
 import json
 import difflib
-from indicators.financial_metrics_instance import financial_metrics, submitted_projects_info
+from indicators.financial_metrics_instance import financial_metrics, submitted_projects_info, fetch_project_complexity
 from core.utils.get_project_info_from_pronac import GetProjectInfoFromPronac
 from indicators.models import Entity, Indicator, Metric, User, MetricFeedback, ProjectFeedback
 from django.shortcuts import get_object_or_404
 from indicators.indicators_requests import http_financial_metrics_instance
+from salic_db.utils import make_query_from_db
 
 def projects_to_analyse(request):
     end_situations = " \
