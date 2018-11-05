@@ -15,6 +15,7 @@ from django.shortcuts import get_object_or_404
 from indicators.indicators_requests import http_financial_metrics_instance
 from salic_db.utils import make_query_from_db
 
+
 def projects_to_analyse(request):
     end_situations = " \
         'A09', 'A13', 'A14', 'A16', 'A17', 'A18', 'A20', 'A23', 'A24', 'A26', \
@@ -38,11 +39,13 @@ def projects_to_analyse(request):
                       'complexidade': int(fetch_project_complexity(int(each[0]))),
                       'nome': each[1],
                       'responsavel': each[2]}
-                      for each in query_result]
+                     for each in query_result]
 
     return filtered_data
 
 # TODO Move fetch to correspondent class
+
+
 def fetch_entity(pronac):
     string_pronac = "{:06}".format(pronac)
     try:
@@ -52,26 +55,31 @@ def fetch_entity(pronac):
         FROM SAC.dbo.Projetos WHERE CONCAT(AnoProjeto, Sequencial) = '{0}'".format(string_pronac)
         project_raw_data = make_query_from_db(project_query)
         project_data = {
-                'pronac': project_raw_data[0][0],
-                'name': project_raw_data[0][1]
+            'pronac': project_raw_data[0][0],
+            'name': project_raw_data[0][1]
         }
 
-        project = Entity.objects.create(pronac=int(project_data['pronac']), name=project_data['name'])
+        project = Entity.objects.create(pronac=int(
+            project_data['pronac']), name=project_data['name'])
 
     return project
 
 # TODO Improve float_to_money method name
+
+
 def float_to_money(value):
     us_value = '{:,.2f}'.format(value)
-    v_value = us_value.replace(',','v')
-    c_value = v_value.replace('.',',')
-    return c_value.replace('v','.')
+    v_value = us_value.replace(',', 'v')
+    c_value = v_value.replace('.', ',')
+    return c_value.replace('v', '.')
+
 
 def verify_outlier(is_outlier):
     if is_outlier:
         return False
     else:
         return True
+
 
 def register_project_indicator(pronac, name, value):
     entity = Entity.objects.get(pronac=pronac)
@@ -81,6 +89,7 @@ def register_project_indicator(pronac, name, value):
     indicator.save()
 
     return indicator
+
 
 def register_project_metric(name, value, reason, indicator_name, pronac):
     entity = Entity.objects.get(pronac=pronac)
@@ -92,6 +101,7 @@ def register_project_metric(name, value, reason, indicator_name, pronac):
     metric.save()
 
     return metric
+
 
 class SearchProjectView(APIView):
     """
@@ -108,8 +118,9 @@ class SearchProjectView(APIView):
     renderer_classes = (JSONRenderer, )
 
     def paginate_projects(self, full_list, projects_per_page):
-        full_list.sort(key=lambda x : x["complexidade"], reverse=True)
-        paginated_list = [full_list[i:i+projects_per_page] for i in range(0, len(full_list), projects_per_page)]
+        full_list.sort(key=lambda x: x["complexidade"], reverse=True)
+        paginated_list = [full_list[i:i+projects_per_page]
+                          for i in range(0, len(full_list), projects_per_page)]
 
         return paginated_list
 
@@ -126,7 +137,7 @@ class SearchProjectView(APIView):
             projects_per_page = 15
         else:
             projects_per_page = int(projects_per_page)
-        
+
         return projects_per_page
 
     def get_next_or_prev_page(self, x, y):
@@ -150,7 +161,7 @@ class SearchProjectView(APIView):
         else:
             prev_page = '/projetos?page={0}'.format(prev_page_index)
 
-        return {'next': next_page, 'prev': prev_page }
+        return {'next': next_page, 'prev': prev_page}
 
     @csrf_exempt
     def get(self, request, format=None, **kwargs):
@@ -179,17 +190,20 @@ class SearchProjectView(APIView):
                 cutoff=1
             )
 
-            result_list = [project for project in projects_processed if project['pronac'] in pronac_matches_list]
+            result_list = [
+                project for project in projects_processed if project['pronac'] in pronac_matches_list]
         else:
             result_list = projects
 
-        projects_per_page = self.get_projects_per_page(request.GET.get('per_page'))
+        projects_per_page = self.get_projects_per_page(
+            request.GET.get('per_page'))
         paginated_list = self.paginate_projects(result_list, projects_per_page)
 
         page = request.GET.get('page')
 
-        if page is None: page = "1"
-        
+        if page is None:
+            page = "1"
+
         projects_list = self.get_page(paginated_list, int(page))
 
         pages = self.get_next_and_prev(len(paginated_list), int(page))
@@ -208,11 +222,13 @@ class SearchProjectView(APIView):
 
         return JsonResponse(content)
 
+
 class ProjectInfoView(APIView):
     """
     Busca informações de determinado projeto por meio do seu PRONAC
     """
     renderer_classes = (JSONRenderer, )
+
     @method_decorator(csrf_exempt)
     def dispatch(self, request, *args, **kwargs):
         return generic.View.dispatch(self, request, *args, **kwargs)
@@ -227,7 +243,7 @@ class ProjectInfoView(APIView):
         return template
 
     def create_list_items(self, metrics, name, item_list_name):
-        items_list = [] 
+        items_list = []
         for item_id in metrics[name][item_list_name]:
             items_list.append({
                 'id': item_id,
@@ -251,8 +267,10 @@ class ProjectInfoView(APIView):
             common_items_not_in_project_list = []
             uncommon_items_list = []
 
-            common_items_not_in_project_list = self.create_list_items(metrics, name, 'common_items_not_in_project')
-            uncommon_items_list = self.create_list_items(metrics, name, 'uncommon_items')
+            common_items_not_in_project_list = self.create_list_items(
+                metrics, name, 'common_items_not_in_project')
+            uncommon_items_list = self.create_list_items(
+                metrics, name, 'uncommon_items')
 
             common_items_ratio = {
                 'is_outlier': verify_outlier(metrics[name]['is_outlier']),
@@ -261,7 +279,8 @@ class ProjectInfoView(APIView):
                 'common_items_not_in_project': common_items_not_in_project_list
             }
 
-        itens = register_project_metric(metric_name, common_items_ratio['value'], "", financial_complexity_indicator_name, pronac)
+        itens = register_project_metric(
+            metric_name, common_items_ratio['value'], "", financial_complexity_indicator_name, pronac)
         common_items_ratio['metric_id'] = itens.id
 
         return common_items_ratio
@@ -299,11 +318,12 @@ class ProjectInfoView(APIView):
                 'new_providers_list': new_providers_list,
             }
 
-        novos_fornecedores = register_project_metric('novos_fornecedores', new_providers['value'], "", financial_complexity_indicator_name, pronac)
+        novos_fornecedores = register_project_metric(
+            'novos_fornecedores', new_providers['value'], "", financial_complexity_indicator_name, pronac)
         new_providers['metric_id'] = novos_fornecedores.id
 
         return new_providers
- 
+
     def get_projetos_mesmo_proponente(self, metrics, pronac, financial_complexity_indicator_name):
         proponent_projects = {
             'cnpj_cpf': '',
@@ -321,7 +341,8 @@ class ProjectInfoView(APIView):
 
             all_pronacs = metrics[name]['submitted_projects']['pronacs_of_this_proponent']
 
-            projects_information = submitted_projects_info.get_projects_name(all_pronacs)
+            projects_information = submitted_projects_info.get_projects_name(
+                all_pronacs)
             for project_pronac in metrics[name]['submitted_projects']['pronacs_of_this_proponent']:
                 submitted_projects_list.append({
                     'pronac': project_pronac,
@@ -344,11 +365,11 @@ class ProjectInfoView(APIView):
                 'is_outlier': verify_outlier(False),
             }
 
-        projetos_mesmo_proponente = register_project_metric('projetos_mesmo_proponente', len(proponent_projects['submitted_projects']), "", financial_complexity_indicator_name, pronac)
+        projetos_mesmo_proponente = register_project_metric('projetos_mesmo_proponente', len(
+            proponent_projects['submitted_projects']), "", financial_complexity_indicator_name, pronac)
         proponent_projects['metric_id'] = projetos_mesmo_proponente.id
 
         return proponent_projects
-
 
     def get_precos_acima_media(self, metrics, pronac, financial_complexity_indicator_name):
         name = 'items_prices'
@@ -362,7 +383,8 @@ class ProjectInfoView(APIView):
 
         if metrics[name] is not None:
             items_list = []
-            items_list = self.create_list_items(metrics, 'items_prices', 'outlier_items')
+            items_list = self.create_list_items(
+                metrics, 'items_prices', 'outlier_items')
 
             items_prices = {
                 'value': int(metrics[name]['number_items_outliers']),
@@ -372,11 +394,11 @@ class ProjectInfoView(APIView):
                 'maximum_expected': int(metrics[name]['maximum_expected']),
             }
 
-        precos_acima_media = register_project_metric('precos_acima_media', items_prices['value'], "", financial_complexity_indicator_name, pronac)
+        precos_acima_media = register_project_metric(
+            'precos_acima_media', items_prices['value'], "", financial_complexity_indicator_name, pronac)
         items_prices['metric_id'] = precos_acima_media.id
 
         return items_prices
-
 
     def create_metric(self, metric_attributes, metrics, pronac, financial_complexity_indicator_name):
         metric = self.create_metric_template()
@@ -388,10 +410,11 @@ class ProjectInfoView(APIView):
             metric['is_outlier'] = verify_outlier(metrics[name]['is_outlier'])
             metric['maximum_expected'] = metrics[name][metric_attributes['maximum_expected']]
 
-        metric_id = register_project_metric(metric_name, metric['value'], str(metric), financial_complexity_indicator_name, pronac)
+        metric_id = register_project_metric(metric_name, metric['value'], str(
+            metric), financial_complexity_indicator_name, pronac)
         metric['metric_id'] = metric_id.id
 
-        return metric 
+        return metric
 
     def get(self, request, format=None, **kwargs):
         pronac = kwargs['pronac']
@@ -411,7 +434,8 @@ class ProjectInfoView(APIView):
 
         metrics = {}
 
-        total_metrics = financial_metrics.get_metrics("{:06}".format(int(pronac)))
+        total_metrics = financial_metrics.get_metrics(
+            "{:06}".format(int(pronac)))
 
         for metric_name in metrics_list:
             try:
@@ -422,27 +446,30 @@ class ProjectInfoView(APIView):
                 else:
                     metrics[metric_name] = None
 
-        metrics['items'] = http_financial_metrics_instance.number_of_items(pronac="090105")
+        metrics['items'] = http_financial_metrics_instance.number_of_items(
+            pronac="090105")
 
         result = {
             'pronac': pronac,
             'received_metrics': metrics
         }
 
-        #complexidade_financeira
-        financial_complexity_indicator = register_project_indicator(int(pronac), 'complexidade_financeira', 0)
+        # complexidade_financeira
+        financial_complexity_indicator = register_project_indicator(
+            int(pronac), 'complexidade_financeira', 0)
 
         easiness = {
             'value': 1,
         }
 
         if metrics['easiness'] is not None:
-            complexity = int((1 - metrics['easiness']['easiness']) * 100) # Converts easiness to complexity
+            # Converts easiness to complexity
+            complexity = int((1 - metrics['easiness']['easiness']) * 100)
 
             if complexity is 0:
                 complexity = 1
 
-            easiness = { 'value': complexity }
+            easiness = {'value': complexity}
 
         result['easiness'] = easiness
 
@@ -484,15 +511,24 @@ class ProjectInfoView(APIView):
                 'name': 'complexidade_financeira',
                 'value': result['easiness']['value'],
                 'metrics': [
-                    self.create_metric(metric_attributes[0], metrics, int(pronac), financial_complexity_indicator.name),
-                    self.create_metric(metric_attributes[1], metrics, int(pronac), financial_complexity_indicator.name),
-                    self.create_metric(metric_attributes[2], metrics, int(pronac), financial_complexity_indicator.name),
-                    self.create_metric(metric_attributes[3], metrics, int(pronac), financial_complexity_indicator.name),
-                    self.create_metric(metric_attributes[4], metrics, int(pronac), financial_complexity_indicator.name),
-                    self.get_itens_orcamentarios_fora_do_comum(metrics, int(pronac), financial_complexity_indicator.name),
-                    self.get_novos_fornecedores(metrics, int(pronac), financial_complexity_indicator.name),
-                    self.get_projetos_mesmo_proponente(metrics, int(pronac), financial_complexity_indicator.name),
-                    self.get_precos_acima_media(metrics, int(pronac), financial_complexity_indicator.name),
+                    self.create_metric(metric_attributes[0], metrics, int(
+                        pronac), financial_complexity_indicator.name),
+                    self.create_metric(metric_attributes[1], metrics, int(
+                        pronac), financial_complexity_indicator.name),
+                    self.create_metric(metric_attributes[2], metrics, int(
+                        pronac), financial_complexity_indicator.name),
+                    self.create_metric(metric_attributes[3], metrics, int(
+                        pronac), financial_complexity_indicator.name),
+                    self.create_metric(metric_attributes[4], metrics, int(
+                        pronac), financial_complexity_indicator.name),
+                    self.get_itens_orcamentarios_fora_do_comum(
+                        metrics, int(pronac), financial_complexity_indicator.name),
+                    self.get_novos_fornecedores(metrics, int(
+                        pronac), financial_complexity_indicator.name),
+                    self.get_projetos_mesmo_proponente(metrics, int(
+                        pronac), financial_complexity_indicator.name),
+                    self.get_precos_acima_media(metrics, int(
+                        pronac), financial_complexity_indicator.name),
                 ]
             }
         ]
@@ -505,7 +541,8 @@ class ProjectInfoView(APIView):
                 'pronac': string_pronac,
                 'indicators': project_indicators
             }
-        else: project_information = {}
+        else:
+            project_information = {}
 
         return JsonResponse(project_information)
 
@@ -517,23 +554,23 @@ class ProjectInfoView(APIView):
 #     @method_decorator(csrf_exempt)
 #     def dispatch(self, request, *args, **kwargs):
 #         return generic.View.dispatch(self, request, *args, **kwargs)
-# 
+#
 #     @csrf_exempt
 #     def post(self, request, format=None):
 #         request_data = json.loads(request.body)
-# 
+#
 #         user_email = "{0}@cultura.gov.br".format(request_data['user_email'])
-# 
+#
 #         user = get_object_or_404(User, email=user_email)
 #         metric = get_object_or_404(Metric, id=int(request_data['metric_id']))
 #         metric_feedback_rating = int(request_data['metric_feedback_rating'])
 #         metric_feedback_text = request_data['metric_feedback_text']
-# 
+#
 #         metric_query = MetricFeedback.objects.filter(
 #             user=user,
 #             metric=metric
 #         )
-# 
+#
 #         if len(metric_query) is 0:
 #             # Creates metric
 #             saved_metric_feedback = MetricFeedback.objects.create(
@@ -548,15 +585,15 @@ class ProjectInfoView(APIView):
 #             saved_metric_feedback.grade = metric_feedback_rating
 #             saved_metric_feedback.reason = metric_feedback_text
 #             saved_metric_feedback.save()
-# 
+#
 #         request_response = {
 #             'feedback_id': saved_metric_feedback.id,
 #             'feedback_grade': saved_metric_feedback.grade,
 #             'feedback_reason': saved_metric_feedback.reason
 #         }
-# 
+#
 #         return JsonResponse(request_response)
-# 
+#
 # class SendProjectFeedbackView(APIView):
 #     """
 #     A view that receives a single metric feedback
@@ -565,22 +602,22 @@ class ProjectInfoView(APIView):
 #     @method_decorator(csrf_exempt)
 #     def dispatch(self, request, *args, **kwargs):
 #         return generic.View.dispatch(self, request, *args, **kwargs)
-# 
+#
 #     @csrf_exempt
 #     def post(self, request, format=None):
 #         request_data = json.loads(request.body)
-# 
+#
 #         user_email = "{0}@cultura.gov.br".format(request_data['user_email'])
-# 
+#
 #         user = get_object_or_404(User, email=user_email)
 #         entity = get_object_or_404(Entity, pronac=int(request_data['pronac']))
 #         project_feedback_grade = int(request_data['project_feedback_grade'])
-# 
+#
 #         project_query = ProjectFeedback.objects.filter(
 #             user=user,
 #             entity=entity
 #         )
-# 
+#
 #         if len(project_query) is 0:
 #             # Creates
 #             saved_project_feedback = ProjectFeedback.objects.create(
@@ -593,15 +630,15 @@ class ProjectInfoView(APIView):
 #             saved_project_feedback = project_query[0]
 #             saved_project_feedback.grade = project_feedback_grade
 #             saved_project_feedback.save()
-# 
-# 
+#
+#
 #         request_response = {
 #             'feedback_id': saved_project_feedback.id,
 #             'feedback_grade': saved_project_feedback.grade,
 #         }
-# 
+#
 #         return JsonResponse(request_response)
-# 
+#
 # class CreateSingleUserView(APIView):
 #     """
 #     A view that creates a single user if not created
@@ -610,26 +647,26 @@ class ProjectInfoView(APIView):
 #     @method_decorator(csrf_exempt)
 #     def dispatch(self, request, *args, **kwargs):
 #         return generic.View.dispatch(self, request, *args, **kwargs)
-# 
+#
 #     @csrf_exempt
 #     def post(self, request, format=None):
 #         user_data = json.loads(request.body)
-# 
+#
 #         user_email = '{0}@cultura.gov.br'.format(user_data['email'])
-# 
+#
 #         user_query = User.objects.filter(email=user_email)
-# 
+#
 #         if len(user_query) is 0:
 #             user_name = user_data['name']
-# 
+#
 #             user = User.objects.create(email=user_email, name=user_name)
 #         else:
 #             user = user_query[0]
-# 
+#
 #         user_response = {
 #             'id': user.id,
 #             'name': user.name,
 #             'email': user.email
 #         }
-# 
+#
 #         return JsonResponse(user_response)

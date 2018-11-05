@@ -1,5 +1,6 @@
 from django.db import models
 
+
 class Entity(models.Model):
     class Meta:
         verbose_name_plural = "Entities"
@@ -14,7 +15,7 @@ class Entity(models.Model):
 
 class Indicator(models.Model):
     entity = models.ForeignKey(
-        Entity, 
+        Entity,
         on_delete=models.CASCADE,
         related_name='indicators')
     name = models.CharField(max_length=200)
@@ -28,7 +29,7 @@ class Indicator(models.Model):
 
 class Metric(models.Model):
     indicator = models.ForeignKey(
-        Indicator, 
+        Indicator,
         on_delete=models.CASCADE,
         related_name='metrics')
     value = models.FloatField(default=0.0)
@@ -43,7 +44,7 @@ class Metric(models.Model):
 
 class Evidence(models.Model):
     metric = models.ForeignKey(
-        Metric, 
+        Metric,
         on_delete=models.CASCADE,
         related_name='evidences')
     slug = models.TextField(max_length=280)
@@ -59,10 +60,12 @@ class Evidence(models.Model):
 
 class User(models.Model):
     name = models.CharField(max_length=200, blank=False)
-    email = models.EmailField(max_length=254, blank=False, null=False, unique=True)
+    email = models.EmailField(
+        max_length=254, blank=False, null=False, unique=True)
 
     def __str__(self):
         return self.name
+
 
 class MetricFeedback(models.Model):
     user = models.ForeignKey(
@@ -80,13 +83,14 @@ class MetricFeedback(models.Model):
 
     def __str__(self):
         return "{0} <{1}> {2}/{3} - {4} <{5}>".format(
-            self.metric.indicator.entity.name, 
-            self.metric.indicator.entity.pronac, 
-            self.metric.indicator.name, 
-            self.metric.name, 
-            self.user.name, 
+            self.metric.indicator.entity.name,
+            self.metric.indicator.entity.pronac,
+            self.metric.indicator.name,
+            self.metric.name,
+            self.user.name,
             self.user.email
-            )
+        )
+
 
 class ProjectFeedback(models.Model):
     user = models.ForeignKey(
@@ -103,8 +107,8 @@ class ProjectFeedback(models.Model):
 
     def __str__(self):
         return "{0} <{1}> - {2} <{3}> ".format(
-            self.entity.name, 
-            self.entity.pronac, 
-            self.user.name, 
+            self.entity.name,
+            self.entity.pronac,
+            self.user.name,
             self.user.email
-            )
+        )
