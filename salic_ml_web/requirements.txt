@@ -7,3 +7,4 @@ psycopg2
 pyodbc
 salic-ml==0.0.4
 django-cors-headers
+flake8

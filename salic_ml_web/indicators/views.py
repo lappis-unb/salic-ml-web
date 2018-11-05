@@ -67,8 +67,7 @@ def float_to_money(value):
     c_value = v_value.replace('.',',')
     return c_value.replace('v','.')
 
-# TODO Improve this
-def get_outlier_color(is_outlier):
+def verify_outlier(is_outlier):
     if is_outlier:
         return False
     else:
@@ -122,6 +121,36 @@ class SearchProjectView(APIView):
 
         return required_list
 
+    def get_projects_per_page(self, projects_per_page):
+        if projects_per_page is None:
+            projects_per_page = 15
+        else:
+            projects_per_page = int(projects_per_page)
+        
+        return projects_per_page
+
+    def get_next_or_prev_page(self, x, y):
+        if prev_page_index < 1:
+            prev_page = None
+        else:
+            prev_page = '/projetos?page={0}'.format(prev_page_index)
+
+    def get_next_and_prev(self, paginated_list, page):
+        next_page_index = int(page) + 1
+
+        if next_page_index > paginated_list:
+            next_page = None
+        else:
+            next_page = '/projetos?page={0}'.format(next_page_index)
+
+        prev_page_index = int(page) - 1
+
+        if prev_page_index < 1:
+            prev_page = None
+        else:
+            prev_page = '/projetos?page={0}'.format(prev_page_index)
+
+        return {'next': next_page, 'prev': prev_page }
 
     @csrf_exempt
     def get(self, request, format=None, **kwargs):
@@ -154,43 +183,24 @@ class SearchProjectView(APIView):
         else:
             result_list = projects
 
-        projects_per_page = request.GET.get('per_page')
-
-        if projects_per_page is None:
-            projects_per_page = 15
-        else:
-            projects_per_page = int(projects_per_page)
-
+        projects_per_page = self.get_projects_per_page(request.GET.get('per_page'))
         paginated_list = self.paginate_projects(result_list, projects_per_page)
 
         page = request.GET.get('page')
 
-        if page is None:
-            page = "1"
-
+        if page is None: page = "1"
+        
         projects_list = self.get_page(paginated_list, int(page))
 
-        next_page_index = int(page) + 1
-
-        if next_page_index > len(paginated_list):
-            next_page = None
-        else:
-            next_page = '/projetos?page={0}'.format(next_page_index)
-
-        prev_page_index = int(page) - 1
-
-        if prev_page_index < 1:
-            prev_page = None
-        else:
-            prev_page = '/projetos?page={0}'.format(prev_page_index)
+        pages = self.get_next_and_prev(len(paginated_list), int(page))
 
         content = {
             'total': len(projects),
             'per_page': projects_per_page,
             'current_page': int(page),
             'last_page': len(paginated_list),
-            'next_page_url': next_page,
-            'prev_page_url': prev_page,
+            'next_page_url': pages['next'],
+            'prev_page_url': pages['prev'],
             'begin_page': 1,
             'end_page': len(paginated_list),
             'data': projects_list
@@ -245,7 +255,7 @@ class ProjectInfoView(APIView):
             uncommon_items_list = self.create_list_items(metrics, name, 'uncommon_items')
 
             common_items_ratio = {
-                'is_outlier': get_outlier_color(metrics[name]['is_outlier']),
+                'is_outlier': verify_outlier(metrics[name]['is_outlier']),
                 'value': (100 - metrics[name]['value'] * 100),
                 'uncommon_items': uncommon_items_list,
                 'common_items_not_in_project': common_items_not_in_project_list
@@ -260,7 +270,7 @@ class ProjectInfoView(APIView):
         name = 'new_providers'
         new_providers = {
             'value': 0,
-            'is_outlier': get_outlier_color(False),
+            'is_outlier': verify_outlier(False),
             'new_providers_list': [],
         }
 
@@ -285,7 +295,7 @@ class ProjectInfoView(APIView):
 
             new_providers = {
                 'value': len(new_providers_list),
-                'is_outlier': get_outlier_color(metrics[name]['is_outlier']),
+                'is_outlier': verify_outlier(metrics[name]['is_outlier']),
                 'new_providers_list': new_providers_list,
             }
 
@@ -300,7 +310,7 @@ class ProjectInfoView(APIView):
             'value': 0,
             'submitted_projects': [],
             'analyzed_projects': [],
-            'is_outlier': get_outlier_color(False),
+            'is_outlier': verify_outlier(False),
         }
 
         name = 'proponent_projects'
@@ -331,7 +341,7 @@ class ProjectInfoView(APIView):
                 'value': len(submitted_projects_list),
                 'submitted_projects': submitted_projects_list,
                 'analyzed_projects': analyzed_projects_list,
-                'is_outlier': get_outlier_color(False),
+                'is_outlier': verify_outlier(False),
             }
 
         projetos_mesmo_proponente = register_project_metric('projetos_mesmo_proponente', len(proponent_projects['submitted_projects']), "", financial_complexity_indicator_name, pronac)
@@ -344,7 +354,7 @@ class ProjectInfoView(APIView):
         name = 'items_prices'
         items_prices = {
             'value': 0,
-            'is_outlier': get_outlier_color(False),
+            'is_outlier': verify_outlier(False),
             'items': [],
             'total_items': 0,
             'maximum_expected': 0,
@@ -356,7 +366,7 @@ class ProjectInfoView(APIView):
 
             items_prices = {
                 'value': int(metrics[name]['number_items_outliers']),
-                'is_outlier': get_outlier_color(metrics[name]['is_outlier']),
+                'is_outlier': verify_outlier(metrics[name]['is_outlier']),
                 'items': items_list,
                 'total_items': int(metrics[name]['total_items']),
                 'maximum_expected': int(metrics[name]['maximum_expected']),
@@ -375,7 +385,7 @@ class ProjectInfoView(APIView):
 
         if metrics[name] is not None:
             metric['value'] = metrics[name][metric_attributes['value']]
-            metric['is_outlier'] = get_outlier_color(metrics[name]['is_outlier'])
+            metric['is_outlier'] = verify_outlier(metrics[name]['is_outlier'])
             metric['maximum_expected'] = metrics[name][metric_attributes['maximum_expected']]
 
         metric_id = register_project_metric(metric_name, metric['value'], str(metric), financial_complexity_indicator_name, pronac)
@@ -383,7 +393,6 @@ class ProjectInfoView(APIView):
 
         return metric 
 
-    # def post(self, request, format=None, **kwargs):
     def get(self, request, format=None, **kwargs):
         pronac = kwargs['pronac']
         project = fetch_entity(int(pronac))
@@ -485,13 +494,6 @@ class ProjectInfoView(APIView):
                     self.get_projetos_mesmo_proponente(metrics, int(pronac), financial_complexity_indicator.name),
                     self.get_precos_acima_media(metrics, int(pronac), financial_complexity_indicator.name),
                 ]
-            }
-        ]
-
-        indicators = [
-            {
-                'name': 'complexidade_financeira',
-                'complexity': result['easiness']['value']
             }
         ]
 
