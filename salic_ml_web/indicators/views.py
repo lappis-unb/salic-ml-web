@@ -43,36 +43,6 @@ def projects_to_analyse(request):
 
     return filtered_data
 
-# TODO Move fetch to correspondent class
-
-
-def fetch_entity(pronac):
-    string_pronac = "{:06}".format(pronac)
-    try:
-        project = Entity.objects.get(pronac=pronac)
-    except:
-        project_query = "SELECT CONCAT(AnoProjeto, Sequencial), NomeProjeto \
-        FROM SAC.dbo.Projetos WHERE CONCAT(AnoProjeto, Sequencial) = '{0}'".format(string_pronac)
-        project_raw_data = make_query_from_db(project_query)
-        project_data = {
-            'pronac': project_raw_data[0][0],
-            'name': project_raw_data[0][1]
-        }
-
-        project = Entity.objects.create(pronac=int(
-            project_data['pronac']), name=project_data['name'])
-
-    return project
-
-# TODO Improve float_to_money method name
-
-
-def float_to_money(value):
-    us_value = '{:,.2f}'.format(value)
-    v_value = us_value.replace(',', 'v')
-    c_value = v_value.replace('.', ',')
-    return c_value.replace('v', '.')
-
 
 def verify_outlier(is_outlier):
     if is_outlier:
@@ -238,6 +208,7 @@ class ProjectInfoView(APIView):
             'value': 0,
             'is_outlier': False,
             'minimum_expected': 0,
+            'is_valid_value': False,
             'maximum_expected': 0
         }
         return template
@@ -255,6 +226,7 @@ class ProjectInfoView(APIView):
     def get_itens_orcamentarios_fora_do_comum(self, metrics, pronac, financial_complexity_indicator_name):
         common_items_ratio = {
             'value': 0,
+            'is_valid_value': False,
             'is_outlier': False
         }
 
@@ -275,6 +247,7 @@ class ProjectInfoView(APIView):
             common_items_ratio = {
                 'is_outlier': verify_outlier(metrics[name]['is_outlier']),
                 'value': (100 - metrics[name]['value'] * 100),
+                'is_valid_value': True,
                 'uncommon_items': uncommon_items_list,
                 'common_items_not_in_project': common_items_not_in_project_list
             }
@@ -291,6 +264,7 @@ class ProjectInfoView(APIView):
             'value': 0,
             'is_outlier': verify_outlier(False),
             'new_providers_list': [],
+            'is_valid_value': False,
         }
 
         if metrics[name] is not None:
@@ -315,7 +289,8 @@ class ProjectInfoView(APIView):
             new_providers = {
                 'value': len(new_providers_list),
                 'is_outlier': verify_outlier(metrics[name]['is_outlier']),
-                'new_providers_list': new_providers_list,
+                'new_providers': new_providers_list,
+                'is_valid_value': True,
             }
 
         novos_fornecedores = register_project_metric(
@@ -330,6 +305,7 @@ class ProjectInfoView(APIView):
             'value': 0,
             'submitted_projects': [],
             'analyzed_projects': [],
+            'is_valid_value': False,
             'is_outlier': verify_outlier(False),
         }
 
@@ -363,6 +339,7 @@ class ProjectInfoView(APIView):
                 'submitted_projects': submitted_projects_list,
                 'analyzed_projects': analyzed_projects_list,
                 'is_outlier': verify_outlier(False),
+                'is_valid_value': True,
             }
 
         projetos_mesmo_proponente = register_project_metric('projetos_mesmo_proponente', len(
@@ -379,6 +356,7 @@ class ProjectInfoView(APIView):
             'items': [],
             'total_items': 0,
             'maximum_expected': 0,
+            'is_valid_value': False,
         }
 
         if metrics[name] is not None:
@@ -392,6 +370,7 @@ class ProjectInfoView(APIView):
                 'items': items_list,
                 'total_items': int(metrics[name]['total_items']),
                 'maximum_expected': int(metrics[name]['maximum_expected']),
+                'is_valid_value': True,
             }
 
         precos_acima_media = register_project_metric(
@@ -409,6 +388,7 @@ class ProjectInfoView(APIView):
             metric['value'] = metrics[name][metric_attributes['value']]
             metric['is_outlier'] = verify_outlier(metrics[name]['is_outlier'])
             metric['maximum_expected'] = metrics[name][metric_attributes['maximum_expected']]
+            metric['is_valid_value'] = True
 
         metric_id = register_project_metric(metric_name, metric['value'], str(
             metric), financial_complexity_indicator_name, pronac)
@@ -416,9 +396,27 @@ class ProjectInfoView(APIView):
 
         return metric
 
+    def fetch_entity(self, pronac):
+        string_pronac = "{:06}".format(pronac)
+        try:
+            project = Entity.objects.get(pronac=pronac)
+        except:
+            project_query = "SELECT CONCAT(AnoProjeto, Sequencial), NomeProjeto \
+            FROM SAC.dbo.Projetos WHERE CONCAT(AnoProjeto, Sequencial) = '{0}'".format(string_pronac)
+            project_raw_data = make_query_from_db(project_query)
+            project_data = {
+                'pronac': project_raw_data[0][0],
+                'name': project_raw_data[0][1]
+            }
+
+            project = Entity.objects.create(pronac=int(
+                project_data['pronac']), name=project_data['name'])
+
+        return project
+    
     def get(self, request, format=None, **kwargs):
         pronac = kwargs['pronac']
-        project = fetch_entity(int(pronac))
+        project = self.fetch_entity(int(pronac))
         metrics_list = [
             'items',
             'raised_funds',
@@ -510,26 +508,46 @@ class ProjectInfoView(APIView):
             {
                 'name': 'complexidade_financeira',
                 'value': result['easiness']['value'],
-                'metrics': [
-                    self.create_metric(metric_attributes[0], metrics, int(
+                'metrics': {
+                    'itens_orcamentarios': self.create_metric(metric_attributes[0], metrics, int(
                         pronac), financial_complexity_indicator.name),
-                    self.create_metric(metric_attributes[1], metrics, int(
-                        pronac), financial_complexity_indicator.name),
-                    self.create_metric(metric_attributes[2], metrics, int(
-                        pronac), financial_complexity_indicator.name),
-                    self.create_metric(metric_attributes[3], metrics, int(
-                        pronac), financial_complexity_indicator.name),
-                    self.create_metric(metric_attributes[4], metrics, int(
-                        pronac), financial_complexity_indicator.name),
-                    self.get_itens_orcamentarios_fora_do_comum(
+                    'itens_orcamentarios_inesperados': self.get_itens_orcamentarios_fora_do_comum(
                         metrics, int(pronac), financial_complexity_indicator.name),
-                    self.get_novos_fornecedores(metrics, int(
+                    'precos_acima_da_media': self.get_precos_acima_media(metrics, int(
                         pronac), financial_complexity_indicator.name),
-                    self.get_projetos_mesmo_proponente(metrics, int(
+                    'comprovantes_de_pagamento': self.create_metric(metric_attributes[1], metrics, int(
                         pronac), financial_complexity_indicator.name),
-                    self.get_precos_acima_media(metrics, int(
+                    'valor_captado': self.create_metric(metric_attributes[2], metrics, int(
                         pronac), financial_complexity_indicator.name),
-                ]
+                    'valor_comprovado': self.create_metric(metric_attributes[3], metrics, int(
+                        pronac), financial_complexity_indicator.name),
+                    'projetos_do_mesmo_proponente': self.get_projetos_mesmo_proponente(metrics, int(
+                        pronac), financial_complexity_indicator.name),
+                    'novos_fornecedores': self.get_novos_fornecedores(metrics, int(
+                        pronac), financial_complexity_indicator.name),
+                    'valor_aprovado': self.create_metric(metric_attributes[4], metrics, int(
+                        pronac), financial_complexity_indicator.name),
+                    }
+                # 'metrics': {
+                #     'budget_items': self.create_metric(metric_attributes[0], metrics, int(
+                #         pronac), financial_complexity_indicator.name),
+                #     'proof_payment': self.create_metric(metric_attributes[1], metrics, int(
+                #         pronac), financial_complexity_indicator.name),
+                #     'captured_value': self.create_metric(metric_attributes[2], metrics, int(
+                #         pronac), financial_complexity_indicator.name),
+                #     'proven_value': self.create_metric(metric_attributes[3], metrics, int(
+                #         pronac), financial_complexity_indicator.name),
+                #     'approved_value': self.create_metric(metric_attributes[4], metrics, int(
+                #         pronac), financial_complexity_indicator.name),
+                #     'budget_items_unusual': self.get_itens_orcamentarios_fora_do_comum(
+                #         metrics, int(pronac), financial_complexity_indicator.name),
+                #     'new_providers': self.get_novos_fornecedores(metrics, int(
+                #         pronac), financial_complexity_indicator.name),
+                #     'projects_same_proponent': self.get_projetos_mesmo_proponente(metrics, int(
+                #         pronac), financial_complexity_indicator.name),
+                #     'above_average_prices': self.get_precos_acima_media(metrics, int(
+                #         pronac), financial_complexity_indicator.name),
+                #     }
             }
         ]
 
