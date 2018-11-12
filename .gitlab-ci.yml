@@ -36,7 +36,7 @@ build-api:
         - docker push $WEB_IMAGE
         - docker push $CI_REGISTRY_IMAGE/web:api_latest
     only:
-        - /djangorest/
+        - /stable_djangorest/
     tags:
         - docker
 
