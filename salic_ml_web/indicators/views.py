@@ -110,12 +110,6 @@ class SearchProjectView(APIView):
 
         return projects_per_page
 
-    def get_next_or_prev_page(self, x, y):
-        if prev_page_index < 1:
-            prev_page = None
-        else:
-            prev_page = '/projetos?page={0}'.format(prev_page_index)
-
     def get_next_and_prev(self, paginated_list, page):
         next_page_index = int(page) + 1
 
@@ -180,7 +174,7 @@ class SearchProjectView(APIView):
 
         content = {
             'total': len(projects),
-            'per_page': projects_per_page,
+            'per_page': int(projects_per_page),
             'current_page': int(page),
             'last_page': len(paginated_list),
             'next_page_url': pages['next'],
@@ -385,9 +379,9 @@ class ProjectInfoView(APIView):
         metric_name = metric_attributes['metric_name']
 
         if metrics[name] is not None:
-            metric['valor'] = metrics[name][metric_attributes['valor']]
+            metric['valor'] = int(metrics[name][metric_attributes['valor']])
             metric['outlier'] = verify_outlier(metrics[name]['is_outlier'])
-            metric['maximo_esperado'] = metrics[name][metric_attributes['maximo_esperado']]
+            metric['maximo_esperado'] = int(metrics[name][metric_attributes['maximo_esperado']])
             metric['valor_valido'] = True
 
         metric_id = register_project_metric(metric_name, metric['valor'], str(
