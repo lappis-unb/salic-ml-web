@@ -282,7 +282,7 @@ class ProjectInfoView(APIView):
 
             new_providers = {
                 'valor': len(new_providers_list),
-                'outlier': verify_outlier(metrics[name]['outlier']),
+                'outlier': verify_outlier(metrics[name]['is_outlier']),
                 'new_providers': new_providers_list,
                 'valor_valido': True,
             }
