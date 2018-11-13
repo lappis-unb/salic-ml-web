@@ -44,7 +44,7 @@ build-api:
 deploy to lappis.rocks:
     stage: deploy
     image: cdrx/rancher-gitlab-deploy
-    environment: prod
+    environment: production
     script:
         - upgrade --environment $RANCHER_ENVIRONMENT --stack SALIC-ML-WEB --service web --debug
         - upgrade --environment $RANCHER_ENVIRONMENT --stack SALIC-ML-WEB --service nginx --debug
