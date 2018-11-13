@@ -25,11 +25,14 @@ def fetch_general_data(pronac_list):
             NomeProjeto, \
             situacao.Descricao as Situacao, \
             DtInicioExecucao, \
-            DtFimExecucao \
-            FROM SAC.dbo.Projetos \
+            DtFimExecucao, \
+            verificacao.Descricao as Etapa \
+            FROM SAC.dbo.Projetos projetos \
             INNER JOIN SAC.dbo.Situacao situacao ON projetos.Situacao = situacao.Codigo \
+            INNER JOIN SAC.dbo.tbProjetoFase fase ON (fase.idPronac = projetos.IdPRONAC) \
+            INNER JOIN SAC.dbo.Verificacao verificacao ON (fase.idFase = verificacao.idVerificacao) \
             WHERE (projetos.AnoProjeto + projetos.Sequencial) in {}".format(string_formatter.list_to_string_tuple(pronac_list))
-    
+
     query_data = make_query_from_db(query)
 
     result = {}
@@ -40,7 +43,8 @@ def fetch_general_data(pronac_list):
             'name': line[1],
             'situation': line[2],
             'start_date': line[3],
-            'end_date': line[4]
+            'end_date': line[4],
+            'stage': line[5]
         }
 
     return result  

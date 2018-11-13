@@ -358,7 +358,8 @@ class ProjectInfoView(APIView):
                     project_fetched_data = {
                         'situation': '',
                         'start_date': '',
-                        'end_date': ''
+                        'end_date': '',
+                        'stage': ''
                     }
 
                 submitted_projects_list.append({
@@ -370,6 +371,7 @@ class ProjectInfoView(APIView):
                     'link': '#',
                     'valor_captado': raised_funds,
                     'valor_comprovado': verified_funds,
+                    'etapa': project_fetched_data['stage'],
                     'complexidade': complexity
                 })
 
