@@ -314,6 +314,12 @@ class ProjectInfoView(APIView):
 
             projects_information = submitted_projects_info.get_projects_name(
                 all_pronacs)
+
+            projects_db_fetched_information = {}
+            projects_db_fetched_information['general_data'] = project_info.fetch_general_data(all_pronacs)
+            # projects_db_fetched_information['raised_funds'] = project_info.fetch_raised_funds(all_pronacs)
+            # projects_db_fetched_information['verified_funds'] = project_info.fetch_verified_funds(all_pronacs)
+
             for project_pronac in metrics[name]['submitted_projects']['pronacs_of_this_proponent']:
                 
                 metrics_list = [
@@ -333,10 +339,27 @@ class ProjectInfoView(APIView):
 
                 try:
                     complexity = int((1 - total_metrics['easiness']['easiness']) * 100)
-                except:
+                except KeyError:
                     complexity = 0
 
-                project_fetched_data = project_info.fetch_general_data(project_pronac)
+                try:
+                    verified_funds = total_metrics['verified_funds']['total_verified_funds']
+                except KeyError:
+                    verified_funds = 0
+
+                try:
+                    raised_funds = total_metrics['raised_funds']['total_raised_funds']
+                except KeyError:
+                    raised_funds = 0
+
+                try:
+                    project_fetched_data = projects_db_fetched_information['general_data'][project_pronac]
+                except KeyError:
+                    project_fetched_data = {
+                        'situation': '',
+                        'start_date': '',
+                        'end_date': ''
+                    }
 
                 submitted_projects_list.append({
                     'pronac': project_pronac,
@@ -345,8 +368,8 @@ class ProjectInfoView(APIView):
                     'data_inicio': project_fetched_data['start_date'],
                     'data_fim': project_fetched_data['end_date'],
                     'link': '#',
-                    'valor_captado': project_info.fetch_raised_funds(project_pronac),
-                    'valor_comprovado': project_info.fetch_verified_funds(project_pronac),
+                    'valor_captado': raised_funds,
+                    'valor_comprovado': verified_funds,
                     'complexidade': complexity
                 })
 
