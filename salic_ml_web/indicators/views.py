@@ -315,6 +315,27 @@ class ProjectInfoView(APIView):
             projects_information = submitted_projects_info.get_projects_name(
                 all_pronacs)
             for project_pronac in metrics[name]['submitted_projects']['pronacs_of_this_proponent']:
+                
+                metrics_list = [
+                    'items',
+                    'raised_funds',
+                    'verified_funds',
+                    'approved_funds',
+                    'common_items_ratio',
+                    'total_receipts',
+                    'new_providers',
+                    'proponent_projects',
+                    'items_prices',
+                    'easiness'
+                ]
+
+                total_metrics = financial_metrics.get_metrics(project_pronac)
+
+                try:
+                    complexity = int((1 - total_metrics['easiness']['easiness']) * 100)
+                except:
+                    complexity = 0
+
                 project_fetched_data = project_info.fetch_general_data(project_pronac)
 
                 submitted_projects_list.append({
@@ -325,7 +346,8 @@ class ProjectInfoView(APIView):
                     'data_fim': project_fetched_data['end_date'],
                     'link': '#',
                     'valor_captado': project_info.fetch_raised_funds(project_pronac),
-                    'valor_comprovado': project_info.fetch_verified_funds(project_pronac)
+                    'valor_comprovado': project_info.fetch_verified_funds(project_pronac),
+                    'complexidade': complexity
                 })
 
             for project_pronac in metrics[name]['analyzed_projects']['pronacs_of_this_proponent']:
