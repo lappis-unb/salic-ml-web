@@ -14,6 +14,7 @@ from indicators.models import Entity, Indicator, Metric, User, MetricFeedback, P
 from django.shortcuts import get_object_or_404
 from indicators.indicators_requests import http_financial_metrics_instance
 from salic_db.utils import make_query_from_db
+from indicators.utils import project_info
 
 
 def projects_to_analyse(request):
@@ -314,10 +315,17 @@ class ProjectInfoView(APIView):
             projects_information = submitted_projects_info.get_projects_name(
                 all_pronacs)
             for project_pronac in metrics[name]['submitted_projects']['pronacs_of_this_proponent']:
+                project_fetched_data = project_info.fetch_general_data(project_pronac)
+
                 submitted_projects_list.append({
                     'pronac': project_pronac,
-                    'name': projects_information[project_pronac],
-                    'link': '#'
+                    'nome': projects_information[project_pronac],
+                    'situacao': project_fetched_data['situation'],
+                    'data_inicio': project_fetched_data['start_date'],
+                    'data_fim': project_fetched_data['end_date'],
+                    'link': '#',
+                    'valor_captado': project_info.fetch_raised_funds(project_pronac),
+                    'valor_comprovado': project_info.fetch_verified_funds(project_pronac)
                 })
 
             for project_pronac in metrics[name]['analyzed_projects']['pronacs_of_this_proponent']:
@@ -379,10 +387,27 @@ class ProjectInfoView(APIView):
         metric_name = metric_attributes['metric_name']
 
         if metrics[name] is not None:
-            metric['valor'] = int(metrics[name][metric_attributes['valor']])
-            metric['outlier'] = verify_outlier(metrics[name]['is_outlier'])
-            metric['maximo_esperado'] = int(metrics[name][metric_attributes['maximo_esperado']])
-            metric['valor_valido'] = True
+            try:
+                metric['valor'] = int(metrics[name][metric_attributes['valor']])
+            except:
+                metric['valor'] = None
+                metric['valor_valido'] = False
+            
+            try:
+                metric['outlier'] = verify_outlier(metrics[name]['is_outlier'])
+            except:
+                metric['outlier'] = None
+                metric['valor_valido'] = False
+
+            try:
+                metric['maximo_esperado'] = int(metrics[name][metric_attributes['maximo_esperado']])
+            except:
+                metric['maximo_esperado'] = None
+                metric['valor_valido'] = False
+
+            if metric['valor_valido'] != False:
+                metric['valor_valido'] = True
+            
 
         metric_id = register_project_metric(metric_name, metric['valor'], str(
             metric), financial_complexity_indicator_name, pronac)
@@ -438,8 +463,8 @@ class ProjectInfoView(APIView):
                 else:
                     metrics[metric_name] = None
 
-        metrics['items'] = http_financial_metrics_instance.number_of_items(
-            pronac="090105")
+        # metrics['items'] = http_financial_metrics_instance.number_of_items(
+        #     pronac="090105")
 
         result = {
             'pronac': pronac,
@@ -469,7 +494,7 @@ class ProjectInfoView(APIView):
             {
                 'name': 'items',
                 'metric_name': 'itens_orcamentarios',
-                'valor': 'number_of_items',
+                'valor': 'value',
                 'maximo_esperado': 'maximum_expected'
             },
             {

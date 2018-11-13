@@ -17,8 +17,12 @@ def fetch_raised_funds(pronac):
             'raised_funds': line[1]
         })
 
-    return result
-    
+    final_data = None
+
+    if len(result) == 1:
+        final_data = result[0]['raised_funds']
+
+    return final_data  
 
 def fetch_general_data(pronac):
     query = "SELECT projetos.AnoProjeto + projetos.Sequencial as PRONAC, \
@@ -43,7 +47,21 @@ def fetch_general_data(pronac):
             'end_date': line[4]
         })
 
-    return result
+    final_data = None
+
+    if len(result) == 1:
+        final_data = result[0]
+    else:
+        final_data = {
+            'pronac': pronac,
+            'name': '',
+            'situation': '',
+            'start_date': '',
+            'end_date': ''
+        }
+
+    return final_data  
+
     
 
 def fetch_verified_funds(pronac):
@@ -69,4 +87,9 @@ def fetch_verified_funds(pronac):
             'verified_funds': line[1]
         })
 
-    return result
+    final_data = None
+
+    if len(result) == 1:
+        final_data = result[0]['verified_funds']
+
+    return final_data  
