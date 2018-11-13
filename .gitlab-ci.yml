@@ -40,6 +40,19 @@ build-api:
     tags:
         - docker
 
+deploy to lappis.rocks:
+    stage: deploy
+    image: cdrx/rancher-gitlab-deploy
+    environment: prod
+    script:
+        - upgrade --environment $RANCHER_ENVIRONMENT --stack SALIC-ML-WEB --service web --debug
+        - upgrade --environment $RANCHER_ENVIRONMENT --stack SALIC-ML-WEB --service nginx --debug
+    only:
+        - /stable_djangorest/
+    tags:
+        - docker
+
+
 deploy_homolog_minc:
     image: debian:buster-slim
     stage: deploy_homolog
