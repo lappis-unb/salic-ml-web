@@ -46,8 +46,8 @@ deploy to lappis.rocks:
     image: cdrx/rancher-gitlab-deploy
     environment: production
     script:
-        - upgrade --environment $RANCHER_ENVIRONMENT --stack SALIC-ML-WEB --service web --debug
-        - upgrade --environment $RANCHER_ENVIRONMENT --stack SALIC-ML-WEB --service nginx --debug
+        - upgrade --environment $RANCHER_ENVIRONMENT --stack $RANCHER_STACK --service web --debug
+        - upgrade --environment $RANCHER_ENVIRONMENT --stack $RANCHER_STACK --service nginx --debug
     only:
         - /stable_djangorest/
     tags:
