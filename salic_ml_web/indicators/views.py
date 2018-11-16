@@ -45,11 +45,12 @@ def projects_to_analyse(request):
     return filtered_data
 
 
-def verify_outlier(is_outlier):
+def convert_outlier_to_bool(is_outlier):
+    #   is_outlier is generally a numpy.bool_ type, which is not JSON
+    # serializable.
     if is_outlier:
-        return False
-    else:
         return True
+    return False
 
 
 def register_project_indicator(pronac, name, value):
@@ -213,7 +214,7 @@ class ProjectInfoView(APIView):
         for item_id in metrics[name][item_list_name]:
             items_list.append({
                 'id': item_id,
-                'name': metrics[name][item_list_name][item_id],
+                'nome': metrics[name][item_list_name][item_id],
                 'link': '#'
             })
         return items_list
@@ -240,7 +241,7 @@ class ProjectInfoView(APIView):
                 metrics, name, 'uncommon_items')
 
             common_items_ratio = {
-                'outlier': verify_outlier(metrics[name]['is_outlier']),
+                'outlier': convert_outlier_to_bool(metrics[name]['is_outlier']),
                 'valor': (100 - metrics[name]['value'] * 100),
                 'valor_valido': True,
                 'uncommon_items': uncommon_items_list,
@@ -257,7 +258,7 @@ class ProjectInfoView(APIView):
         name = 'new_providers'
         new_providers = {
             'valor': 0,
-            'outlier': verify_outlier(False),
+            'outlier': convert_outlier_to_bool(False),
             'new_providers_list': [],
             'valor_valido': False,
         }
@@ -283,7 +284,7 @@ class ProjectInfoView(APIView):
 
             new_providers = {
                 'valor': len(new_providers_list),
-                'outlier': verify_outlier(metrics[name]['is_outlier']),
+                'outlier': convert_outlier_to_bool(metrics[name]['is_outlier']),
                 'new_providers': new_providers_list,
                 'valor_valido': True,
             }
@@ -301,7 +302,7 @@ class ProjectInfoView(APIView):
             'submitted_projects': [],
             'analyzed_projects': [],
             'valor_valido': False,
-            'outlier': verify_outlier(False),
+            'outlier': convert_outlier_to_bool(False),
         }
 
         name = 'proponent_projects'
@@ -387,7 +388,7 @@ class ProjectInfoView(APIView):
                 'valor': len(submitted_projects_list),
                 'projetos_submetidos': submitted_projects_list,
                 'projetos_analisados': analyzed_projects_list,
-                'outlier': verify_outlier(False),
+                'outlier': convert_outlier_to_bool(False),
                 'valor_valido': True,
             }
 
@@ -401,7 +402,7 @@ class ProjectInfoView(APIView):
         name = 'items_prices'
         items_prices = {
             'valor': 0,
-            'outlier': verify_outlier(False),
+            'outlier': False,
             'items': [],
             'total_items': 0,
             'maximo_esperado': 0,
@@ -415,7 +416,7 @@ class ProjectInfoView(APIView):
 
             items_prices = {
                 'valor': int(metrics[name]['number_items_outliers']),
-                'outlier': verify_outlier(metrics[name]['is_outlier']),
+                'outlier': convert_outlier_to_bool(metrics[name]['is_outlier']),
                 'items': items_list,
                 'total_items': int(metrics[name]['total_items']),
                 'maximo_esperado': int(metrics[name]['maximum_expected']),
@@ -428,33 +429,69 @@ class ProjectInfoView(APIView):
 
         return items_prices
 
+    def get_itens_orcamentarios(self, metrics, pronac, financial_complexity_indicator_name):
+        metric = self.create_metric_template()
+        name = 'items'
+        metric_name = 'itens_orcamentarios'
+
+        metric['valor_valido'] = False
+
+        if metrics[name] is not None:
+            metric['valor_valido'] = True
+
+            try:
+                metric['valor'] = int(metrics[name]['value'])
+            except:
+                metric['valor'] = 0
+                metric['valor_valido'] = False
+            
+            try:
+                metric['outlier'] = convert_outlier_to_bool(metrics[name]['is_outlier'])
+            except:
+                metric['outlier'] = False
+                metric['valor_valido'] = False
+
+            try:
+                metric['maximo_esperado'] = metrics[name]['mean'] + (1.5 * metrics[name]['std'])
+            except:
+                metric['maximo_esperado'] = 0
+                metric['valor_valido'] = False
+
+        metric_id = register_project_metric(metric_name, metric['valor'], str(
+            metric), financial_complexity_indicator_name, pronac)
+        metric['metric_id'] = metric_id.id
+
+        return metric
+        
+
+    
     def create_metric(self, metric_attributes, metrics, pronac, financial_complexity_indicator_name):
         metric = self.create_metric_template()
         name = metric_attributes['name']
         metric_name = metric_attributes['metric_name']
 
+        metric['valor_valido'] = False
+
         if metrics[name] is not None:
+            metric['valor_valido'] = True
+
             try:
                 metric['valor'] = int(metrics[name][metric_attributes['valor']])
             except:
-                metric['valor'] = None
+                metric['valor'] = 0
                 metric['valor_valido'] = False
             
             try:
-                metric['outlier'] = verify_outlier(metrics[name]['is_outlier'])
+                metric['outlier'] = convert_outlier_to_bool(metrics[name]['is_outlier'])
             except:
-                metric['outlier'] = None
+                metric['outlier'] = False
                 metric['valor_valido'] = False
 
             try:
                 metric['maximo_esperado'] = int(metrics[name][metric_attributes['maximo_esperado']])
             except:
-                metric['maximo_esperado'] = None
+                metric['maximo_esperado'] = 0
                 metric['valor_valido'] = False
-
-            if metric['valor_valido'] != False:
-                metric['valor_valido'] = True
-            
 
         metric_id = register_project_metric(metric_name, metric['valor'], str(
             metric), financial_complexity_indicator_name, pronac)
@@ -575,7 +612,7 @@ class ProjectInfoView(APIView):
                 'nome': 'complexidade_financeira',
                 'valor': result['easiness']['valor'],
                 'metricas': {
-                    'itens_orcamentarios': self.create_metric(metric_attributes[0], metrics, int(
+                    'itens_orcamentarios': self.get_itens_orcamentarios(metrics, int(
                         pronac), financial_complexity_indicator.name),
                     'itens_orcamentarios_inesperados': self.get_itens_orcamentarios_fora_do_comum(
                         metrics, int(pronac), financial_complexity_indicator.name),
