@@ -10,8 +10,8 @@ def list_to_string_tuple(elements_list):
 
     return final_string
 
-def not_null_or_valid_string(value):
+def empty_or_valid_string(value):
     if value is None:
         return ''
     else:
-        value
+        return str(value)

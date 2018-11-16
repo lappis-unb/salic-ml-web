@@ -15,7 +15,7 @@ def fetch_raised_funds(pronac_list):
     for line in query_data:
         result[line[0]] = {
             'pronac': line[0],
-            'raised_funds': string_formatter.not_null_or_valid_string(line[1])
+            'raised_funds': string_formatter.empty_or_valid_string(line[1])
         }
 
     return result  
@@ -38,13 +38,14 @@ def fetch_general_data(pronac_list):
     result = {}
 
     for line in query_data:
+        print(line)
         result[line[0]] = {
             'pronac': line[0],
             'name': line[1],
-            'situation': string_formatter.not_null_or_valid_string(line[2]),
-            'start_date': string_formatter.not_null_or_valid_string(line[3]),
-            'end_date': string_formatter.not_null_or_valid_string(line[4]),
-            'stage': string_formatter.not_null_or_valid_string(line[5])
+            'situation': string_formatter.empty_or_valid_string(line[2]),
+            'start_date': string_formatter.empty_or_valid_string(line[3]),
+            'end_date': string_formatter.empty_or_valid_string(line[4]),
+            'stage': string_formatter.empty_or_valid_string(line[5])
         }
 
     return result  
@@ -71,7 +72,7 @@ def fetch_verified_funds(pronac_list):
     for line in query_data:
         result[line[0]] = {
             'pronac': line[0],
-            'verified_funds': string_formatter.not_null_or_valid_string(line[1])
+            'verified_funds': string_formatter.empty_or_valid_string(line[1])
         }
 
     return result  
