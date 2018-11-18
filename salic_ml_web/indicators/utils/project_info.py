@@ -38,7 +38,6 @@ def fetch_general_data(pronac_list):
     result = {}
 
     for line in query_data:
-        print(line)
         result[line[0]] = {
             'pronac': line[0],
             'name': line[1],

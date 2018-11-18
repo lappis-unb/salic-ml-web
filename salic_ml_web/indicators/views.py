@@ -462,6 +462,67 @@ class ProjectInfoView(APIView):
         metric['metric_id'] = metric_id.id
 
         return metric
+
+
+    def get_comprovantes_acima_de_50(self, metrics, pronac, financial_complexity_indicator_name):
+        metric = self.create_metric_template()
+        name = 'verified_approved'
+        metric_name = 'comprovantes_acima_de_50'
+
+        metric['valor_valido'] = False
+
+        if metrics[name] is not None:
+            metric['valor_valido'] = True
+
+            try:
+                metric['valor'] = int(metrics[name]['number_of_outliers'])
+            except:
+                metric['valor'] = 0
+                metric['valor_valido'] = False
+            
+            try:
+                metric['outlier'] = convert_outlier_to_bool(metrics[name]['is_outlier'])
+            except:
+                metric['outlier'] = False
+                metric['valor_valido'] = False
+
+            try:
+                metric['maximo_esperado'] = int(metrics[name]['maximum_expected'])
+            except:
+                metric['maximo_esperado'] = 0
+                metric['valor_valido'] = False
+
+            try:
+                metric['minimo_esperado'] = int(metrics[name]['minimum_expected'])
+            except:
+                metric['minimo_esperado'] = 0
+                metric['valor_valido'] = False
+
+            try:
+                metric['lista_de_comprovantes'] = []
+
+                for voucher in metrics[name]['outlier_items']:
+                    to_append_voucher = {
+                        'nome': voucher['item'],
+                        'link': '#',
+                        'porcentagem': int((voucher['verified_value']/voucher['approved_value']) * 100) - 100
+                    }
+
+                    metric['lista_de_comprovantes'].append(to_append_voucher)
+
+            except:
+                metric['lista_de_comprovantes'] = []
+                metric['valor_valido'] = False
+
+        metric_id = register_project_metric(metric_name, metric['valor'], 
+            str({'outlier': metric['outlier'], 'valor_valido': metric['valor_valido'],
+            'maximo_esperado': metric['maximo_esperado'],
+            'minimo_esperado': metric['minimo_esperado']}), 
+            financial_complexity_indicator_name, pronac
+            )
+        metric['metric_id'] = metric_id.id
+
+        return metric
         
 
     
@@ -530,7 +591,12 @@ class ProjectInfoView(APIView):
             'new_providers',
             'proponent_projects',
             'easiness',
-            'items_prices'
+            'items_prices',
+            'verified_approved'
+        ]
+
+        http_fetched_metrics = [
+            'verified_approved'
         ]
 
         metrics = {}
@@ -540,7 +606,10 @@ class ProjectInfoView(APIView):
 
         for metric_name in metrics_list:
             try:
-                metrics[metric_name] = total_metrics[metric_name]
+                if metric_name in http_fetched_metrics:
+                    metrics[metric_name] = http_financial_metrics_instance.fetch_metric(metric_name, pronac)
+                else:
+                    metrics[metric_name] = total_metrics[metric_name]
             except:
                 if metric_name is '':
                     metrics[metric_name] = total_metrics[metric_name]
@@ -630,6 +699,8 @@ class ProjectInfoView(APIView):
                         pronac), financial_complexity_indicator.name),
                     'valor_aprovado': self.create_metric(metric_attributes[4], metrics, int(
                         pronac), financial_complexity_indicator.name),
+                    'comprovantes_acima_de_50': self.get_comprovantes_acima_de_50(metrics, int(
+                        pronac), financial_complexity_indicator.name)
                     }
                 # 'metrics': {
                 #     'budget_items': self.create_metric(metric_attributes[0], metrics, int(

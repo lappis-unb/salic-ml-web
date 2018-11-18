@@ -1,6 +1,6 @@
 import requests
 
-BASE_URL = "http://www.mocky.io"
+BASE_URL = "https://lappislearning.lappis.rocks"
 
 
 class HttpFinancialMetrics:
@@ -13,9 +13,22 @@ class HttpFinancialMetrics:
         return json
 
     def number_of_items(self, pronac):
-        endpoint = "/v2/5bba5c823100007400148c5b"
+        endpoint = "/metric/number_of_items/{0}".format(pronac)
         response = self.request_json(endpoint)
         return response
+
+    def verified_approved(self, pronac):
+        endpoint = "/metric/verified_approved/{0}".format(pronac)
+        response = self.request_json(endpoint)
+        return response
+
+    def fetch_metric(self, metric_name, pronac):
+        metric_names = {
+            'verified_approved': self.verified_approved,
+            'number_of_items': self.number_of_items
+        }
+
+        return metric_names[metric_name](pronac)
 
 
 http_financial_metrics_instance = HttpFinancialMetrics(BASE_URL)
