@@ -226,8 +226,8 @@ class ProjectInfoView(APIView):
             'outlier': False
         }
 
-        common_items_ratio['uncommon_items'] = []
-        common_items_ratio['common_items_not_in_project'] = []
+        common_items_ratio['items_incomuns'] = []
+        common_items_ratio['items_comuns_que_o_projeto_nao_possui'] = []
         name = 'common_items_ratio'
         metric_name = 'itens_orcamentarios_fora_do_comum'
 
@@ -244,8 +244,8 @@ class ProjectInfoView(APIView):
                 'outlier': convert_outlier_to_bool(metrics[name]['is_outlier']),
                 'valor': (100 - metrics[name]['value'] * 100),
                 'valor_valido': True,
-                'uncommon_items': uncommon_items_list,
-                'common_items_not_in_project': common_items_not_in_project_list
+                'items_incomuns': uncommon_items_list,
+                'items_comuns_que_o_projeto_nao_possui': common_items_not_in_project_list
             }
 
         itens = register_project_metric(
@@ -259,7 +259,7 @@ class ProjectInfoView(APIView):
         new_providers = {
             'valor': 0,
             'outlier': convert_outlier_to_bool(False),
-            'new_providers_list': [],
+            'lista_de_novos_fornecedores': [],
             'valor_valido': False,
         }
 
@@ -271,21 +271,21 @@ class ProjectInfoView(APIView):
 
                 for item_id in metrics[name]['new_providers'][provider_cnpj_cpf]['items']:
                     items_by_provider.append({
-                        'item_id': item_id,
-                        'item_name': metrics[name]['new_providers'][provider_cnpj_cpf]['items'][item_id],
-                        'item_link': '#'
+                        'id': item_id,
+                        'nome': metrics[name]['new_providers'][provider_cnpj_cpf]['items'][item_id],
+                        'link': '#'
                     })
 
                 new_providers_list.append({
-                    'provider_cnpj_cpf': provider_cnpj_cpf,
-                    'provider_name': metrics[name]['new_providers'][provider_cnpj_cpf]['name'],
-                    'provider_items': items_by_provider
+                    'cnpj_cpf': provider_cnpj_cpf,
+                    'nome': metrics[name]['new_providers'][provider_cnpj_cpf]['name'],
+                    'items': items_by_provider
                 })
 
             new_providers = {
                 'valor': len(new_providers_list),
                 'outlier': convert_outlier_to_bool(metrics[name]['is_outlier']),
-                'new_providers': new_providers_list,
+                'lista_de_novos_fornecedores': new_providers_list,
                 'valor_valido': True,
             }
 
@@ -299,8 +299,8 @@ class ProjectInfoView(APIView):
         proponent_projects = {
             'cnpj_cpf': '',
             'valor': 0,
-            'submitted_projects': [],
-            'analyzed_projects': [],
+            'projetos_submetidos': [],
+            'projetos_analisados': [],
             'valor_valido': False,
             'outlier': convert_outlier_to_bool(False),
         }
