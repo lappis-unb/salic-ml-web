@@ -14,8 +14,7 @@ from indicators.models import Entity, Indicator, Metric, User, MetricFeedback, P
 from django.shortcuts import get_object_or_404
 from indicators.indicators_requests import http_financial_metrics_instance
 from salic_db.utils import make_query_from_db
-from indicators.utils import project_info
-
+from indicators.utils import project_info, indicators_average
 
 def projects_to_analyse(request):
     end_situations = " \
@@ -339,9 +338,9 @@ class ProjectInfoView(APIView):
                 total_metrics = financial_metrics.get_metrics(project_pronac)
 
                 try:
-                    complexity = int((1 - total_metrics['easiness']['easiness']) * 100)
+                    complexity = 1 - self.get_weighted_financial_complexity(total_metrics)
                 except KeyError:
-                    complexity = 0
+                    complexity = 1
 
                 try:
                     verified_funds = total_metrics['verified_funds']['total_verified_funds']
@@ -462,6 +461,11 @@ class ProjectInfoView(APIView):
         metric['metric_id'] = metric_id.id
 
         return metric
+
+    def get_weighted_financial_complexity(self, metrics):
+        value = indicators_average.fetch_weighted_complexity(metrics)
+
+        return value
 
 
     def get_comprovantes_acima_de_50(self, metrics, pronac, financial_complexity_indicator_name):
@@ -625,23 +629,18 @@ class ProjectInfoView(APIView):
         }
 
         # complexidade_financeira
-        financial_complexity_indicator = register_project_indicator(
-            int(pronac), 'complexidade_financeira', 0)
 
-        easiness = {
-            'valor': 1,
-        }
+        try:
+            easiness_value = 1 - self.get_weighted_financial_complexity(metrics)
+        except:
+            easiness_value = 1
 
-        if metrics['easiness'] is not None:
-            # Converts easiness to complexity
-            complexity = int((1 - metrics['easiness']['easiness']) * 100)
-
-            if complexity is 0:
-                complexity = 1
-
-            easiness = {'valor': complexity}
+        easiness = {'valor': easiness_value}
 
         result['easiness'] = easiness
+
+        financial_complexity_indicator = register_project_indicator(
+            int(pronac), 'complexidade_financeira', result['easiness']['valor'])
 
         metric_attributes = [
             {
