@@ -21,7 +21,7 @@ def fetch_raised_funds(pronac_list):
     return result  
 
 def fetch_general_data(pronac_list):
-    if len(pronac_list) != 0:
+    if len(pronac_list) == 0:
         return {}
 
     query = "SELECT projetos.AnoProjeto + projetos.Sequencial as PRONAC, \
