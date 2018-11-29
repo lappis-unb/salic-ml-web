@@ -4,7 +4,8 @@ def list_to_string_tuple(elements_list):
     for each in elements_list:
         final_string += "'" + str(each) + "', "
 
-    final_string = final_string[:-2]
+    if len(elements_list) != 0:
+        final_string = final_string[:-2]
 
     final_string += ')'
 
