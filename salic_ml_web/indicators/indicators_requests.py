@@ -1,6 +1,7 @@
 import requests
+import os
 
-BASE_URL = "https://lappislearning.lappis.rocks"
+BASE_URL = os.environ.get('LAPPIS_LEARNING_URL', 'https://lappislearning.lappis.rocks')
 
 
 class HttpFinancialMetrics:

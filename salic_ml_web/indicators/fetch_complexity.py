@@ -1,15 +1,16 @@
 from .views import projects_to_analyse, register_project_indicator
 from .models import Entity, Metric, Indicator
 from .financial_metrics_instance import financial_metrics
+from .utils import indicators_average
 
 
 def get_financial_complexity(metrics):
     try:
-        complexity = 100 - (metrics['easiness']['easiness'] * 100)
+        value = indicators_average.fetch_weighted_complexity(metrics)
     except:
-        complexity = 1
+        value = 1
 
-    return complexity
+    return value
 
 
 def pre_fetch_financial_complexity():
@@ -33,19 +34,6 @@ def pre_fetch_financial_complexity():
              "project_name": "Circulação de oficinas e shows - Claudia Cimbleris", "analist": "Modelo"},
         ]
 
-    metrics_list = [
-        'items',
-        'raised_funds',
-        'verified_funds',
-        'approved_funds',
-        'common_items_ratio',
-        'total_receipts',
-        'new_providers',
-        'proponent_projects',
-        'easiness',
-        'items_prices'
-    ]
-
     for project in projects:
         try:
             entity = Entity.objects.get(pronac=int(project['pronac']))
@@ -54,6 +42,6 @@ def pre_fetch_financial_complexity():
                 project['pronac']), name=project['project_name'])
 
         metrics = financial_metrics.get_metrics(project['pronac'])
-        print(get_financial_complexity(metrics))
+        print("Complexity value:", get_financial_complexity(metrics))
         financial_complexity_indicator = register_project_indicator(int(
             project['pronac']), 'complexidade_financeira', get_financial_complexity(metrics))
