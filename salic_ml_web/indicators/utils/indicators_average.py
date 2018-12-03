@@ -1,7 +1,7 @@
 def fetch_weighted_complexity(metrics):
     metrics_weights = {
         'items': 1,
-        'to_approve_funds': 5,
+        'to_verify_funds': 5,
         'proponent_projects': 2,
         'new_provders': 1,
         'verified_approved': 2,

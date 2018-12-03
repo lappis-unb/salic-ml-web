@@ -15,6 +15,7 @@ from django.shortcuts import get_object_or_404
 from indicators.indicators_requests import http_financial_metrics_instance
 from salic_db.utils import make_query_from_db
 from indicators.utils import project_info, indicators_average
+import math
 
 def projects_to_analyse(request):
     end_situations = " \
@@ -332,10 +333,12 @@ class ProjectInfoView(APIView):
                     'new_providers',
                     'proponent_projects',
                     'items_prices',
-                    'easiness'
+                    'easiness',
+                    'to_verify_funds'
                 ]
 
                 total_metrics = financial_metrics.get_metrics(project_pronac)
+                total_metrics['to_verify_funds'] = self.fetch_to_verify_funds(total_metrics)
 
                 try:
                     complexity = 1 - self.get_weighted_financial_complexity(total_metrics)
@@ -581,6 +584,29 @@ class ProjectInfoView(APIView):
                 project_data['pronac']), name=project_data['name'])
 
         return project
+
+    def fetch_to_verify_funds(self, metrics):
+        try:
+            raised_funds = metrics['raised_funds']
+        except KeyError:
+            raised_funds = None
+
+        try:
+            verified_funds = metrics['verified_funds']
+        except KeyError:
+            verified_funds = None
+
+        if verified_funds is not None and raised_funds is not None:
+            value = raised_funds['total_raised_funds'] - verified_funds['total_verified_funds']
+            to_verify_funds = {
+                'total_to_verify_funds': math.ceil(value),
+                'is_outlier': value != 0,
+                'maximum_expected_funds': 0
+            }
+        else:
+            to_verify_funds = None
+
+        return to_verify_funds
     
     def get(self, request, format=None, **kwargs):
         pronac = kwargs['pronac']
@@ -596,7 +622,8 @@ class ProjectInfoView(APIView):
             'proponent_projects',
             'easiness',
             'items_prices',
-            'verified_approved'
+            'verified_approved',
+            'to_verify_funds'
         ]
 
         http_fetched_metrics = [
@@ -604,9 +631,14 @@ class ProjectInfoView(APIView):
         ]
 
         metrics = {}
-
+    
         total_metrics = financial_metrics.get_metrics(
             "{:06}".format(int(pronac)))
+
+        # adds to_verify_funds metric
+        total_metrics['to_verify_funds'] = self.fetch_to_verify_funds(total_metrics)
+
+        print(total_metrics['to_verify_funds'])
 
         for metric_name in metrics_list:
             try:
@@ -672,6 +704,12 @@ class ProjectInfoView(APIView):
                 'metric_name': 'valor_aprovado',
                 'valor': 'total_approved_funds',
                 'maximo_esperado': 'maximum_expected_funds'
+            },
+            {
+                'name': 'to_verify_funds',
+                'metric_name': 'valor_a_ser_comprovado',
+                'valor': 'total_to_verify_funds',
+                'maximo_esperado': 'maximum_expected_funds'
             }
         ]
 
@@ -699,6 +737,8 @@ class ProjectInfoView(APIView):
                     'valor_aprovado': self.create_metric(metric_attributes[4], metrics, int(
                         pronac), financial_complexity_indicator.name),
                     'comprovantes_acima_de_50': self.get_comprovantes_acima_de_50(metrics, int(
+                        pronac), financial_complexity_indicator.name),
+                    'valor_a_ser_comprovado': self.create_metric(metric_attributes[5], metrics, int(
                         pronac), financial_complexity_indicator.name)
                     }
                 # 'metrics': {
