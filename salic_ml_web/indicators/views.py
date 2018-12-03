@@ -598,6 +598,8 @@ class ProjectInfoView(APIView):
 
         if verified_funds is not None and raised_funds is not None:
             value = raised_funds['total_raised_funds'] - verified_funds['total_verified_funds']
+            if value < 0:
+                value = 0
             to_verify_funds = {
                 'total_to_verify_funds': math.ceil(value),
                 'is_outlier': value != 0,
