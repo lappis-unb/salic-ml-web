@@ -583,7 +583,7 @@ class ProjectInfoView(APIView):
 
         return project
 
-    def fetch_to_approve_funds(self, metrics):
+    def fetch_to_verify_funds(self, metrics):
         try:
             raised_funds = metrics['raised_funds']
         except KeyError:
@@ -596,15 +596,15 @@ class ProjectInfoView(APIView):
 
         if verified_funds is not None and raised_funds is not None:
             value = raised_funds['total_raised_funds'] - verified_funds['total_verified_funds']
-            to_approve_funds = {
-                'total_to_approve_funds': math.ceil(value),
+            to_verify_funds = {
+                'total_to_verify_funds': math.ceil(value),
                 'is_outlier': value != 0,
                 'maximum_expected_funds': 0
             }
         else:
-            to_approve_funds = None
+            to_verify_funds = None
 
-        return to_approve_funds
+        return to_verify_funds
     
     def get(self, request, format=None, **kwargs):
         pronac = kwargs['pronac']
@@ -621,7 +621,7 @@ class ProjectInfoView(APIView):
             'easiness',
             'items_prices',
             'verified_approved',
-            'to_approve_funds'
+            'to_verify_funds'
         ]
 
         http_fetched_metrics = [
@@ -633,10 +633,10 @@ class ProjectInfoView(APIView):
         total_metrics = financial_metrics.get_metrics(
             "{:06}".format(int(pronac)))
 
-        # adds to_approve_funds metric
-        total_metrics['to_approve_funds'] = self.fetch_to_approve_funds(total_metrics)
+        # adds to_verify_funds metric
+        total_metrics['to_verify_funds'] = self.fetch_to_verify_funds(total_metrics)
 
-        print(total_metrics['to_approve_funds'])
+        print(total_metrics['to_verify_funds'])
 
         for metric_name in metrics_list:
             try:
@@ -704,9 +704,9 @@ class ProjectInfoView(APIView):
                 'maximo_esperado': 'maximum_expected_funds'
             },
             {
-                'name': 'to_approve_funds',
+                'name': 'to_verify_funds',
                 'metric_name': 'valor_a_ser_comprovado',
-                'valor': 'total_to_approve_funds',
+                'valor': 'total_to_verify_funds',
                 'maximo_esperado': 'maximum_expected_funds'
             }
         ]
