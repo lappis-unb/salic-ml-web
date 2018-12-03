@@ -333,10 +333,12 @@ class ProjectInfoView(APIView):
                     'new_providers',
                     'proponent_projects',
                     'items_prices',
-                    'easiness'
+                    'easiness',
+                    'to_verify_funds'
                 ]
 
                 total_metrics = financial_metrics.get_metrics(project_pronac)
+                total_metrics['to_verify_funds'] = self.fetch_to_verify_funds(total_metrics)
 
                 try:
                     complexity = 1 - self.get_weighted_financial_complexity(total_metrics)
