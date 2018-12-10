@@ -343,7 +343,7 @@ class ProjectInfoView(APIView):
                 try:
                     complexity = self.get_weighted_financial_complexity(total_metrics)
                 except KeyError:
-                    complexity = 10
+                    complexity = '10'
 
                 try:
                     verified_funds = total_metrics['verified_funds']['total_verified_funds']
@@ -468,7 +468,12 @@ class ProjectInfoView(APIView):
     def get_weighted_financial_complexity(self, metrics):
         value = indicators_average.fetch_weighted_complexity(metrics)
 
-        return value * 10
+        final_value = "{:.1f}".format(value * 10)
+
+        if final_value[-1] == '0':
+            final_value = "{:.0f}".format(value * 10)
+
+        return final_value
 
 
     def get_comprovantes_acima_de_50(self, metrics, pronac, financial_complexity_indicator_name):
@@ -665,7 +670,7 @@ class ProjectInfoView(APIView):
         try:
             easiness_value = self.get_weighted_financial_complexity(metrics)
         except:
-            easiness_value = 10
+            easiness_value = '10'
 
         easiness = {'valor': easiness_value}
 
