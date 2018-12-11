@@ -8,7 +8,7 @@ def get_financial_complexity(metrics):
     try:
         value = indicators_average.fetch_weighted_complexity(metrics)
     except:
-        value = 1
+        value = 10
 
     return value
 
@@ -17,29 +17,14 @@ def pre_fetch_financial_complexity():
     try:
         projects = projects_to_analyse(None)
     except:
-        projects = [
-            {"pronac": "90021", "complexity": 25,
-             "project_name": "Indie 2009 - Mostra de Cinema Mundial", "analist": "Florentina"},
-            {"pronac": "153833", "complexity": 75,
-             "project_name": "TRES SOMBREROS DE COPA", "analist": "Chimbinha"},
-            {"pronac": "160443", "complexity": 95,
-             "project_name": "SERGIO REIS – CORAÇÃO ESTRADEIRO", "analist": "Cláudia Leitte"},
-            {"pronac": "118593", "complexity": 15,
-             "project_name": "ÁGUIA  CARNAVAL 2012: TROPICÁLIA! O MOVIMENTO QUE NÃO TERMINOU", "analist": "Ferdinando"},
-            {"pronac": "161533", "complexity": 5,
-             "project_name": "“Livro sobre Serafim Derenzi” (título provisório)", "analist": "Modelo"},
-            {"pronac": "171372", "complexity": 5,
-             "project_name": "“Paisagismo Brasileiro, Roberto Burle Marx e Haruyoshi Ono – 60 anos de história”.", "analist": "Modelo"},
-            {"pronac": "92739", "complexity": 5,
-             "project_name": "Circulação de oficinas e shows - Claudia Cimbleris", "analist": "Modelo"},
-        ]
+        projects = []
 
     for project in projects:
         try:
             entity = Entity.objects.get(pronac=int(project['pronac']))
         except:
             entity = Entity.objects.create(pronac=int(
-                project['pronac']), name=project['project_name'])
+                project['pronac']), name=project['nome'])
 
         metrics = financial_metrics.get_metrics(project['pronac'])
         print("Complexity value:", get_financial_complexity(metrics))

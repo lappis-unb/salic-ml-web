@@ -26,5 +26,14 @@ def fetch_weighted_complexity(metrics):
             pass
 
     value = total/max_total
+    value = 1 - value
 
-    return 1 - value
+    final_value = "{:.1f}".format(value * 10)
+
+    if final_value[-1] == '0':
+        final_value = "{:.0f}".format(value * 10)
+        final_value = int(final_value)
+    else:
+        final_value = float(final_value)
+
+    return final_value

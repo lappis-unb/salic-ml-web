@@ -29,7 +29,8 @@ def fetch_general_data(pronac_list):
             situacao.Descricao as Situacao, \
             DtInicioExecucao, \
             DtFimExecucao, \
-            verificacao.Descricao as Etapa \
+            verificacao.Descricao as Etapa, \
+            situacao.Codigo as CodigoSituacao \
             FROM SAC.dbo.Projetos projetos \
             INNER JOIN SAC.dbo.Situacao situacao ON projetos.Situacao = situacao.Codigo \
             INNER JOIN SAC.dbo.tbProjetoFase fase ON (fase.idPronac = projetos.IdPRONAC) \
@@ -44,7 +45,7 @@ def fetch_general_data(pronac_list):
         result[line[0]] = {
             'pronac': line[0],
             'name': line[1],
-            'situation': string_formatter.empty_or_valid_string(line[2]),
+            'situation': string_formatter.empty_or_valid_string(line[2]) + ' - ' + string_formatter.empty_or_valid_string(line[6]),
             'start_date': string_formatter.empty_or_valid_string(line[3]),
             'end_date': string_formatter.empty_or_valid_string(line[4]),
             'stage': string_formatter.empty_or_valid_string(line[5])

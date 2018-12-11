@@ -472,6 +472,9 @@ class ProjectInfoView(APIView):
 
         if final_value[-1] == '0':
             final_value = "{:.0f}".format(value * 10)
+            final_value = int(final_value)
+        else:
+            final_value = float(final_value)
 
         return final_value
 
