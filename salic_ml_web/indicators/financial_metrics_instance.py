@@ -34,6 +34,6 @@ def fetch_project_complexity(pronac):
     try:
         indicator_value = pre_fetched_indicators["{0}".format(pronac)]
     except:
-        indicator_value = 0
+        indicator_value = 10
 
     return indicator_value

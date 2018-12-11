@@ -343,7 +343,7 @@ class ProjectInfoView(APIView):
                 try:
                     complexity = self.get_weighted_financial_complexity(total_metrics)
                 except KeyError:
-                    complexity = '10'
+                    complexity = 10
 
                 try:
                     verified_funds = total_metrics['verified_funds']['total_verified_funds']
@@ -467,16 +467,8 @@ class ProjectInfoView(APIView):
 
     def get_weighted_financial_complexity(self, metrics):
         value = indicators_average.fetch_weighted_complexity(metrics)
-
-        final_value = "{:.1f}".format(value * 10)
-
-        if final_value[-1] == '0':
-            final_value = "{:.0f}".format(value * 10)
-            final_value = int(final_value)
-        else:
-            final_value = float(final_value)
-
-        return final_value
+        
+        return value
 
 
     def get_comprovantes_acima_de_50(self, metrics, pronac, financial_complexity_indicator_name):
@@ -639,18 +631,19 @@ class ProjectInfoView(APIView):
         ]
 
         metrics = {}
-    
+        print("Fetching metrics from financial_metrics")
         total_metrics = financial_metrics.get_metrics(
             "{:06}".format(int(pronac)))
 
         # adds to_verify_funds metric
         total_metrics['to_verify_funds'] = self.fetch_to_verify_funds(total_metrics)
 
-        print(total_metrics['to_verify_funds'])
-
+        print('to_verify_funds:', total_metrics['to_verify_funds'])
+        print("Building metrics_list")
         for metric_name in metrics_list:
             try:
                 if metric_name in http_fetched_metrics:
+                    print("Requesting http_financial_metrics_instance")
                     metrics[metric_name] = http_financial_metrics_instance.fetch_metric(metric_name, pronac)
                 else:
                     metrics[metric_name] = total_metrics[metric_name]
@@ -669,11 +662,11 @@ class ProjectInfoView(APIView):
         }
 
         # complexidade_financeira
-
+        print("Attempting to calculate weighted_financial_complexity")
         try:
             easiness_value = self.get_weighted_financial_complexity(metrics)
         except:
-            easiness_value = '10'
+            easiness_value = 10
 
         easiness = {'valor': easiness_value}
 

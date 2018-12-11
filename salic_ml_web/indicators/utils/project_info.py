@@ -45,7 +45,7 @@ def fetch_general_data(pronac_list):
         result[line[0]] = {
             'pronac': line[0],
             'name': line[1],
-            'situation': string_formatter.empty_or_valid_string(line[2]) + ' - ' + string_formatter.empty_or_valid_string(line[6]),
+            'situation': string_formatter.empty_or_valid_string(line[6]) + ' - ' + string_formatter.empty_or_valid_string(line[2]),
             'start_date': string_formatter.empty_or_valid_string(line[3]),
             'end_date': string_formatter.empty_or_valid_string(line[4]),
             'stage': string_formatter.empty_or_valid_string(line[5])
